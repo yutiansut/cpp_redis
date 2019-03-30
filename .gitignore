@@ -56,3 +56,8 @@ Makefile
 
 # bazel
 bazel-*
+
+# vendor
+vendor/bin
+vendor/include
+vendor/lib*

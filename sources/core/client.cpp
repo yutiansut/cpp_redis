@@ -398,13 +398,21 @@ namespace cpp_redis {
 			return;
 		}
 
-		unprotected_auth(m_password, [&](cpp_redis::reply &reply) {
+		// In re_auth we do not want to serialize the command to the TCP buffer (i.e. call m_client.send)
+		// as it will get serialized to the buffer in resend_failed_commands after re_auth is called in
+		// reconnect.  So we just push the command into the command queue.
+		//
+		// Otherwise we will end up with the AUTH command serialized to
+		// the buffer twice and in the command queue once, which causes a problem when we get 2 responses
+		// back.  The subsequent responses are off by one in the command callbacks.
+		//
+		m_commands.push({{"AUTH", m_password}, [&](cpp_redis::reply &reply) {
 				if (reply.is_string() && reply.as_string() == "OK") {
 					__CPP_REDIS_LOG(warn, "client successfully re-authenticated");
 				} else {
 					__CPP_REDIS_LOG(warn, std::string("client failed to re-authenticate: " + reply.as_string()).c_str());
 				}
-		});
+		}});
 	}
 
 	void

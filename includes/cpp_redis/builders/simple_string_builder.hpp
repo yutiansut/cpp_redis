@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,80 +31,86 @@ namespace cpp_redis {
 
 namespace builders {
 
-/**
- * builder to build redis simple string replies
- *
- */
+//!
+//!  builder to build redis simple string replies
+//!
+//!
 class simple_string_builder : public builder_iface {
 public:
-/**
- * ctor
- *
- */
+  //!
+  //!  ctor
+  //!
+  //!
   simple_string_builder();
-/**
- * dtor
- *
- */
+  //!
+  //!  dtor
+  //!
+  //!
   ~simple_string_builder() override = default;
 
-/**
- * copy ctor
- *
- */
-  simple_string_builder(const simple_string_builder&) = delete;
-/**
- * assignment operator
- *
- */
-  simple_string_builder& operator=(const simple_string_builder&) = delete;
+  //!
+  //!  copy ctor
+  //!
+  //!
+  simple_string_builder(const simple_string_builder &) = delete;
+  //!
+  //!  assignment operator
+  //!
+  //!
+  simple_string_builder &
+  operator=(const simple_string_builder &) = delete;
 
 public:
-/**
- * take data as parameter which is consumed to build the reply
- * every bytes used to build the reply must be removed from the buffer passed as parameter
- *
- * @param data data to be consumed
- * @return current instance
- *
- */
-  builder_iface& operator<<(std::string& data) override;
+  //!
+  //!  take data as parameter which is consumed to build the reply
+  //!  every bytes used to build the reply must be removed from the buffer
+  //!  passed as parameter
+  //!
+  //!  @param data data to be consumed
+  //!  @return current instance
+  //!
+  //!
+  builder_iface &
+  operator<<(std::string &data) override;
 
-/**
- * @return whether the reply could be built
- *
- */
-  bool reply_ready() const override;
+  //!
+  //!  @return whether the reply could be built
+  //!
+  //!
+  bool
+  reply_ready() const override;
 
-/**
- * @return reply object
- *
- */
-  reply get_reply() const override;
+  //!
+  //!  @return reply object
+  //!
+  //!
+  reply
+  get_reply() const override;
 
-/**
- * @return the parsed simple string
- *
- */
-  const std::string& get_simple_string() const;
+  //!
+  //!  @return the parsed simple string
+  //!
+  //!
+  const std::string &
+  get_simple_string() const;
 
 private:
-/**
- * parsed simple string
- *
- */
+  //!
+  //!  parsed simple string
+  //!
+  //!
   std::string m_str;
 
-/**
- * whether the reply is ready or not
- *
- */
+  //!
+  //!  whether the reply is ready or not
+  //!
+  //!
   bool m_reply_ready;
 
-/**
- * reply to be built
- *
- */
+  //!
+  //!  reply to be built
+  //!
+  //!
   reply m_reply;
 };
 

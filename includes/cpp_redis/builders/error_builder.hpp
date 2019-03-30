@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#ifndef CPP_REDIS_BUILDERS_ERROR_BUILDER_HPP_
+#define CPP_REDIS_BUILDERS_ERROR_BUILDER_HPP_
 
 #include <cpp_redis/builders/builder_iface.hpp>
 #include <cpp_redis/builders/simple_string_builder.hpp>
@@ -30,77 +31,85 @@ namespace cpp_redis {
 
 namespace builders {
 
-/**
- * builder to build redis error replies
- *
- */
+//!
+//!  builder to build redis error replies
+//!
+//!
 class error_builder : public builder_iface {
 public:
-/**
- * ctor
- *
- */
+  //!
+  //!  ctor
+  //!
+  //!
   error_builder() = default;
-/**
- * dtor
- *
- */
+  //!
+  //!  dtor
+  //!
+  //!
   ~error_builder() override = default;
 
-/**
- * copy ctor
- *
- */
-  error_builder(const error_builder&) = delete;
-/**
- * assignment operator
- *
- */
-  error_builder& operator=(const error_builder&) = delete;
+  //!
+  //!  copy ctor
+  //!
+  //!
+  error_builder(const error_builder &) = delete;
+  //!
+  //!  assignment operator
+  //!
+  //!
+  error_builder &
+  operator=(const error_builder &) = delete;
 
 public:
-/**
- * take data as parameter which is consumed to build the reply
- * every bytes used to build the reply must be removed from the buffer passed as parameter
- *
- * @param data data to be consumed
- * @return current instance
- *
- */
-  builder_iface& operator<<(std::string& data) override;
+  //!
+  //!  take data as parameter which is consumed to build the reply
+  //!  every bytes used to build the reply must be removed from the buffer
+  //!  passed as parameter
+  //!
+  //!  @param data data to be consumed
+  //!  @return current instance
+  //!
+  //!
+  builder_iface &
+  operator<<(std::string &data) override;
 
-/**
- * @return whether the reply could be built
- *
- */
-  bool reply_ready() const override;
+  //!
+  //!  @return whether the reply could be built
+  //!
+  //!
+  bool
+  reply_ready() const override;
 
-/**
- * @return reply object
- *
- */
-  reply get_reply() const override;
+  //!
+  //!  @return reply object
+  //!
+  //!
+  reply_t
+  get_reply() const override;
 
-/**
- * @return the parsed error
- *
- */
-  const std::string& get_error() const;
+  //!
+  //!  @return the parsed error
+  //!
+  //!
+  const std::string &
+  get_error() const;
 
 private:
-/**
- * builder used to parse the error
- *
- */
+  //!
+  //!  builder used to parse the error
+  //!
+  //!
   simple_string_builder m_string_builder;
 
-/**
- * reply to be built
- *
- */
-  reply m_reply;
+  //!
+  //!  reply to be built
+  //!
+  //!
+  reply_t m_reply;
 };
 
 } // namespace builders
 
 } // namespace cpp_redis
+
+#endif // CPP_REDIS_BUILDERS_ERROR_BUILDER_HPP_

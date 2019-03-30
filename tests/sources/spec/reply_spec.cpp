@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -25,7 +25,7 @@
 #include <gtest/gtest.h>
 
 TEST(Reply, NullReply) {
-  cpp_redis::reply r;
+  cpp_redis::reply_t r;
 
   EXPECT_EQ(r.is_array(), false);
   EXPECT_EQ(r.is_string(), false);
@@ -37,7 +37,7 @@ TEST(Reply, NullReply) {
   EXPECT_EQ(r.ok(), true);
   EXPECT_EQ(r.ko(), false);
   EXPECT_THROW(r.error(), cpp_redis::redis_error);
-  EXPECT_EQ((bool) r, false);
+  EXPECT_EQ((bool)r, false);
   EXPECT_THROW(r.as_array(), cpp_redis::redis_error);
   EXPECT_THROW(r.as_string(), cpp_redis::redis_error);
   EXPECT_THROW(r.as_integer(), cpp_redis::redis_error);
@@ -45,7 +45,7 @@ TEST(Reply, NullReply) {
 }
 
 TEST(Reply, Error) {
-  cpp_redis::reply r("some error", cpp_redis::reply::string_type::error);
+  cpp_redis::reply_t r("some error", cpp_redis::reply::string_type::error);
 
   EXPECT_EQ(r.is_array(), false);
   EXPECT_EQ(r.is_string(), true);
@@ -57,7 +57,7 @@ TEST(Reply, Error) {
   EXPECT_EQ(r.ok(), false);
   EXPECT_EQ(r.ko(), true);
   EXPECT_EQ(r.error(), "some error");
-  EXPECT_EQ((bool) r, false);
+  EXPECT_EQ((bool)r, false);
   EXPECT_THROW(r.as_array(), cpp_redis::redis_error);
   EXPECT_EQ(r.as_string(), "some error");
   EXPECT_THROW(r.as_integer(), cpp_redis::redis_error);
@@ -65,7 +65,7 @@ TEST(Reply, Error) {
 }
 
 TEST(Reply, BulkString) {
-  cpp_redis::reply r("str", cpp_redis::reply::string_type::bulk_string);
+  cpp_redis::reply_t r("str", cpp_redis::reply::string_type::bulk_string);
 
   EXPECT_EQ(r.is_array(), false);
   EXPECT_EQ(r.is_string(), true);
@@ -77,7 +77,7 @@ TEST(Reply, BulkString) {
   EXPECT_EQ(r.ok(), true);
   EXPECT_EQ(r.ko(), false);
   EXPECT_THROW(r.error(), cpp_redis::redis_error);
-  EXPECT_EQ((bool) r, true);
+  EXPECT_EQ((bool)r, true);
   EXPECT_THROW(r.as_array(), cpp_redis::redis_error);
   EXPECT_EQ(r.as_string(), "str");
   EXPECT_THROW(r.as_integer(), cpp_redis::redis_error);
@@ -85,7 +85,7 @@ TEST(Reply, BulkString) {
 }
 
 TEST(Reply, SimpleString) {
-  cpp_redis::reply r("str", cpp_redis::reply::string_type::simple_string);
+  cpp_redis::reply_t r("str", cpp_redis::reply::string_type::simple_string);
 
   EXPECT_EQ(r.is_array(), false);
   EXPECT_EQ(r.is_string(), true);
@@ -97,7 +97,7 @@ TEST(Reply, SimpleString) {
   EXPECT_EQ(r.ok(), true);
   EXPECT_EQ(r.ko(), false);
   EXPECT_THROW(r.error(), cpp_redis::redis_error);
-  EXPECT_EQ((bool) r, true);
+  EXPECT_EQ((bool)r, true);
   EXPECT_THROW(r.as_array(), cpp_redis::redis_error);
   EXPECT_EQ(r.as_string(), "str");
   EXPECT_THROW(r.as_integer(), cpp_redis::redis_error);
@@ -105,7 +105,7 @@ TEST(Reply, SimpleString) {
 }
 
 TEST(Reply, Integer) {
-  cpp_redis::reply r(42);
+  cpp_redis::reply_t r(42);
 
   EXPECT_EQ(r.is_array(), false);
   EXPECT_EQ(r.is_string(), false);
@@ -117,7 +117,7 @@ TEST(Reply, Integer) {
   EXPECT_EQ(r.ok(), true);
   EXPECT_EQ(r.ko(), false);
   EXPECT_THROW(r.error(), cpp_redis::redis_error);
-  EXPECT_EQ((bool) r, true);
+  EXPECT_EQ((bool)r, true);
   EXPECT_THROW(r.as_array(), cpp_redis::redis_error);
   EXPECT_THROW(r.as_string(), cpp_redis::redis_error);
   EXPECT_EQ(r.as_integer(), 42);
@@ -125,9 +125,10 @@ TEST(Reply, Integer) {
 }
 
 TEST(Reply, Array) {
-  cpp_redis::reply r_arr_1(42);
-  cpp_redis::reply r_arr_2("str", cpp_redis::reply::string_type::simple_string);
-  cpp_redis::reply r({r_arr_1, r_arr_2});
+  cpp_redis::reply_t r_arr_1(42);
+  cpp_redis::reply_t r_arr_2("str",
+			     cpp_redis::reply::string_type::simple_string);
+  cpp_redis::reply_t r({r_arr_1, r_arr_2});
 
   EXPECT_EQ(r.is_array(), true);
   EXPECT_EQ(r.is_string(), false);
@@ -139,7 +140,7 @@ TEST(Reply, Array) {
   EXPECT_EQ(r.ok(), true);
   EXPECT_EQ(r.ko(), false);
   EXPECT_THROW(r.error(), cpp_redis::redis_error);
-  EXPECT_EQ((bool) r, true);
+  EXPECT_EQ((bool)r, true);
   auto arr = r.as_array();
   EXPECT_EQ(arr.size(), 2U);
   EXPECT_EQ(arr[0].is_integer(), true);

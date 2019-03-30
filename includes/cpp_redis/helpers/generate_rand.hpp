@@ -12,8 +12,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,12 +30,14 @@
 #include <string>
 
 namespace cpp_redis {
-	inline std::string generate_rand() {
-		std::mt19937 rng;
-		rng.seed(std::random_device()());
-		std::uniform_int_distribution<std::mt19937::result_type> dist6(1,6); // distribution in range [1, 6]
-		return std::to_string(dist6(rng));
-	}
+inline std::string
+generate_rand() {
+  std::mt19937 rng;
+  rng.seed(std::random_device()());
+  std::uniform_int_distribution<std::mt19937::result_type> dist6(
+      1, 6); // distribution in range [1, 6]
+  return std::to_string(dist6(rng));
 }
+} // namespace cpp_redis
 
-#endif //CPP_REDIS_GENERATE_RAND_HPP
+#endif // CPP_REDIS_GENERATE_RAND_HPP

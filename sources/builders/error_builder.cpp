@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -26,12 +26,13 @@ namespace cpp_redis {
 
 namespace builders {
 
-builder_iface&
-error_builder::operator<<(std::string& buffer) {
+builder_iface &
+error_builder::operator<<(std::string &buffer) {
   m_string_builder << buffer;
 
   if (m_string_builder.reply_ready())
-    m_reply.set(m_string_builder.get_simple_string(), reply::string_type::error);
+    m_reply.set(m_string_builder.get_simple_string(),
+		reply::string_type::error);
 
   return *this;
 }
@@ -46,7 +47,7 @@ error_builder::get_reply(void) const {
   return reply{m_reply};
 }
 
-const std::string&
+const std::string &
 error_builder::get_error(void) const {
   return m_string_builder.get_simple_string();
 }

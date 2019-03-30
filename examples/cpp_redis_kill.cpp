@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,7 +27,7 @@
 
 #ifdef _WIN32
 #include <Winsock2.h>
-#endif /* _WIN32 */
+#endif //! _WIN32
 
 int
 main(void) {
@@ -40,27 +40,34 @@ main(void) {
     std::cerr << "WSAStartup() failure" << std::endl;
     return -1;
   }
-#endif /* _WIN32 */
+#endif //! _WIN32
 
   cpp_redis::client client;
 
-  client.connect("127.0.0.1", 6379, [](const std::string& host, std::size_t port, cpp_redis::connect_state status) {
-    if (status == cpp_redis::connect_state::dropped) {
-      std::cout << "client disconnected from " << host << ":" << port << std::endl;
-    }
-  });
+  client.connect("127.0.0.1",
+		 6379,
+		 [](const std::string &host,
+		    std::size_t port,
+		    cpp_redis::connect_state status) {
+		   if (status == cpp_redis::connect_state::dropped) {
+		     std::cout << "client disconnected from " << host << ":"
+			       << port << std::endl;
+		   }
+		 });
 
   //! client kill ip:port
-  client.client_list([&client](cpp_redis::reply& reply) {
+  client.client_list([&client](cpp_redis::reply_t &reply) {
     std::string addr;
     std::stringstream ss(reply.as_string());
 
     ss >> addr >> addr;
 
-    std::string host = std::string(addr.begin() + addr.find('=') + 1, addr.begin() + addr.find(':'));
-    int port         = std::stoi(std::string(addr.begin() + addr.find(':') + 1, addr.end()));
+    std::string host = std::string(addr.begin() + addr.find('=') + 1,
+				   addr.begin() + addr.find(':'));
+    int port =
+	std::stoi(std::string(addr.begin() + addr.find(':') + 1, addr.end()));
 
-    client.client_kill(host, port, [](cpp_redis::reply& reply) {
+    client.client_kill(host, port, [](cpp_redis::reply_t &reply) {
       std::cout << reply << std::endl; //! OK
     });
 
@@ -71,24 +78,33 @@ main(void) {
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
   if (!client.is_connected()) {
-    client.connect("127.0.0.1", 6379, [](const std::string& host, std::size_t port, cpp_redis::connect_state status) {
-      if (status == cpp_redis::connect_state::dropped) {
-        std::cout << "client disconnected from " << host << ":" << port << std::endl;
-      }
-    });
+    client.connect("127.0.0.1",
+		   6379,
+		   [](const std::string &host,
+		      std::size_t port,
+		      cpp_redis::connect_state status) {
+		     if (status == cpp_redis::connect_state::dropped) {
+		       std::cout << "client disconnected from " << host << ":"
+				 << port << std::endl;
+		     }
+		   });
   }
 
   //! client kill filter
-  client.client_list([&client](cpp_redis::reply& reply) {
+  client.client_list([&client](cpp_redis::reply_t &reply) {
     std::string id_str;
     std::stringstream ss(reply.as_string());
 
     ss >> id_str;
 
-    uint64_t id = std::stoi(std::string(id_str.begin() + id_str.find('=') + 1, id_str.end()));
-    client.client_kill(id, false, cpp_redis::client::client_type::normal, [](cpp_redis::reply& reply) {
-      std::cout << reply << std::endl; //! 1
-    });
+    uint64_t id = std::stoi(
+	std::string(id_str.begin() + id_str.find('=') + 1, id_str.end()));
+    client.client_kill(id,
+		       false,
+		       cpp_redis::client::client_type::normal,
+		       [](cpp_redis::reply_t &reply) {
+			 std::cout << reply << std::endl; //! 1
+		       });
 
     client.commit();
   });
@@ -98,7 +114,7 @@ main(void) {
 
 #ifdef _WIN32
   WSACleanup();
-#endif /* _WIN32 */
+#endif //! _WIN32
 
   return 0;
 }

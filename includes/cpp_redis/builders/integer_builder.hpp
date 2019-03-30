@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#ifndef CPP_REDIS_BUILDERS_INTEGER_BUILDER_HPP_
+#define CPP_REDIS_BUILDERS_INTEGER_BUILDER_HPP_
 
 #include <cpp_redis/builders/builder_iface.hpp>
 #include <cpp_redis/core/reply.hpp>
@@ -31,89 +32,97 @@ namespace cpp_redis {
 
 namespace builders {
 
-/**
- * builder to build redis integer replies
- *
- */
+//!
+//!  builder to build redis integer replies
+//!
+//!
 class integer_builder : public builder_iface {
 public:
-/**
- * ctor
- *
- */
+  //!
+  //!  ctor
+  //!
+  //!
   integer_builder();
-/**
- * dtor
- *
- */
+  //!
+  //!  dtor
+  //!
+  //!
   ~integer_builder() override = default;
 
-/**
- * copy ctor
- *
- */
-  integer_builder(const integer_builder&) = delete;
-/**
- * assignment operator
- *
- */
-  integer_builder& operator=(const integer_builder&) = delete;
+  //!
+  //!  copy ctor
+  //!
+  //!
+  integer_builder(const integer_builder &) = delete;
+  //!
+  //!  assignment operator
+  //!
+  //!
+  integer_builder &
+  operator=(const integer_builder &) = delete;
 
 public:
-/**
- * take data as parameter which is consumed to build the reply
- * every bytes used to build the reply must be removed from the buffer passed as parameter
- *
- * @param data data to be consumed
- * @return current instance
- *
- */
-  builder_iface& operator<<(std::string& data) override;
+  //!
+  //!  take data as parameter which is consumed to build the reply
+  //!  every bytes used to build the reply must be removed from the buffer
+  //!  passed as parameter
+  //!
+  //!  @param data data to be consumed
+  //!  @return current instance
+  //!
+  //!
+  builder_iface &
+  operator<<(std::string &data) override;
 
-/**
- * @return whether the reply could be built
- *
- */
-  bool reply_ready() const override;
+  //!
+  //!  @return whether the reply could be built
+  //!
+  //!
+  bool
+  reply_ready() const override;
 
-/**
- * @return reply object
- *
- */
-  reply get_reply() const override;
+  //!
+  //!  @return reply object
+  //!
+  //!
+  reply
+  get_reply() const override;
 
-/**
- * @return the parsed integer
- *
- */
-  int64_t get_integer() const;
+  //!
+  //!  @return the parsed integer
+  //!
+  //!
+  int64_t
+  get_integer() const;
 
 private:
-/**
- * parsed number
- *
- */
+  //!
+  //!  parsed number
+  //!
+  //!
   int64_t m_nbr;
 
-/**
- * -1 for negative number, 1 otherwise
- *
- */
+  //!
+  //!  -1 for negative number, 1 otherwise
+  //!
+  //!
   int64_t m_negative_multiplicator;
 
-/**
- * whether the reply is ready or not
- *
- */
+  //!
+  //!  whether the reply is ready or not
+  //!
+  //!
   bool m_reply_ready;
 
-/**
- * reply to be built
- *
- */
+  //!
+  //!  reply to be built
+  //!
+  //!
   reply m_reply;
 };
 
 } // namespace builders
 
 } // namespace cpp_redis
+
+#endif // CPP_REDIS_BUILDERS_INTEGER_BUILDER_HPP_

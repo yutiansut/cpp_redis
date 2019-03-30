@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#ifndef CPP_REDIS_BUILDERS_FACTORY_HPP_
+#define CPP_REDIS_BUILDERS_FACTORY_HPP_
+
 
 #include <memory>
 
@@ -28,21 +30,24 @@
 
 namespace cpp_redis {
 
-	namespace builders {
+namespace builders {
 
-		/**
-		 * create a builder corresponding to the given id
-		 *  * + for simple strings
-		 *  * - for errors
-		 *  * : for integers
-		 *  * $ for bulk strings
-		 *  * * for arrays
-		 *
-		 * @param id char that determines which builder to return
-		 * @return new builder instance depending on id value
-		 */
-		std::unique_ptr<builder_iface> create_builder(char id);
+//!
+//!  create a builder corresponding to the given id
+//!  + for simple strings
+//!  - for errors
+//!  : for integers
+//!  $ for bulk strings
+//!  for arrays
+//!
+//!  @param id char that determines which builder to return
+//!  @return new builder instance depending on id value
+//!
+std::unique_ptr<builder_iface>
+create_builder(char id);
 
-	} // namespace builders
+} // namespace builders
 
 } // namespace cpp_redis
+
+#endif // CPP_REDIS_BUILDERS_FACTORY_HPP_

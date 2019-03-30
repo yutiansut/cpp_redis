@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,39 +30,43 @@
 
 namespace cpp_redis {
 
-	namespace builders {
+namespace builders {
 
-		/**
-		 * @brief interface inherited by all builders
-		 */
-		class builder_iface {
-		public:
-				virtual ~builder_iface() = default;
+//!
+//! @brief interface inherited by all builders
+//!
+class builder_iface {
+public:
+  virtual ~builder_iface() = default;
 
-				/**
-				 * take data as parameter which is consumed to build the reply
-				 * every bytes used to build the reply must be removed from the buffer passed as parameter
-				 *
-				 * @param data data to be consumed
-				 * @return current instance
-				 *
-				 */
-				virtual builder_iface &operator<<(std::string &data) = 0;
+  //!
+  //! take data as parameter which is consumed to build the reply
+  //! every bytes used to build the reply must be removed from the buffer passed
+  //! as parameter
+  //!
+  //! @param data data to be consumed
+  //! @return current instance
+  //!
+  //!
+  virtual builder_iface &
+  operator<<(std::string &data) = 0;
 
-				/**
-				 * @return whether the reply could be built
-				 *
-				 */
-				virtual bool reply_ready() const = 0;
+  //!
+  //! @return whether the reply could be built
+  //!
+  //!
+  virtual bool
+  reply_ready() const = 0;
 
-				/**
-				 * @return reply object
-				 *
-				 */
-				virtual reply get_reply() const = 0;
-		};
+  //!
+  //! @return reply object
+  //!
+  //!
+  virtual reply_t
+  get_reply() const = 0;
+};
 
-	} // namespace builders
+} // namespace builders
 
 } // namespace cpp_redis
 

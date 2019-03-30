@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,12 +30,11 @@ namespace cpp_redis {
 namespace builders {
 
 array_builder::array_builder(void)
-: m_current_builder(nullptr)
-, m_reply_ready(false)
-, m_reply(std::vector<reply>{}) {}
+    : m_current_builder(nullptr), m_reply_ready(false),
+      m_reply(std::vector<reply>{}) {}
 
 bool
-array_builder::fetch_array_size(std::string& buffer) {
+array_builder::fetch_array_size(std::string &buffer) {
   if (m_int_builder.reply_ready())
     return true;
 
@@ -47,8 +46,7 @@ array_builder::fetch_array_size(std::string& buffer) {
   if (size < 0) {
     m_reply.set();
     m_reply_ready = true;
-  }
-  else if (size == 0) {
+  } else if (size == 0) {
     m_reply_ready = true;
   }
 
@@ -58,7 +56,7 @@ array_builder::fetch_array_size(std::string& buffer) {
 }
 
 bool
-array_builder::build_row(std::string& buffer) {
+array_builder::build_row(std::string &buffer) {
   if (!m_current_builder) {
     m_current_builder = create_builder(buffer.front());
     buffer.erase(0, 1);
@@ -77,8 +75,8 @@ array_builder::build_row(std::string& buffer) {
   return true;
 }
 
-builder_iface&
-array_builder::operator<<(std::string& buffer) {
+builder_iface &
+array_builder::operator<<(std::string &buffer) {
   if (m_reply_ready)
     return *this;
 

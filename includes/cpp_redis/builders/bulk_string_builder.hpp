@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#ifndef BULK_STRING_BUILDER_HPP_
+#define BULK_STRING_BUILDER_HPP_
 
 #include <cpp_redis/builders/builder_iface.hpp>
 #include <cpp_redis/builders/integer_builder.hpp>
@@ -35,83 +36,95 @@ namespace builders {
 //!
 class bulk_string_builder : public builder_iface {
 public:
-//! ctor
+  //! ctor
   bulk_string_builder();
-//! dtor
+  //! dtor
   ~bulk_string_builder() override = default;
 
-//! copy ctor
-  bulk_string_builder(const bulk_string_builder&) = delete;
-//! assignment operator
-  bulk_string_builder& operator=(const bulk_string_builder&) = delete;
+  //! copy ctor
+  bulk_string_builder(const bulk_string_builder &) = delete;
+  //! assignment operator
+  bulk_string_builder &
+  operator=(const bulk_string_builder &) = delete;
 
 public:
-//!
-//! take data as parameter which is consumed to build the reply
-//! every bytes used to build the reply must be removed from the buffer passed as parameter
-//!
-//! @param data data to be consumed
-//! @return current instance
-//!
-  builder_iface& operator<<(std::string& data) override;
+  //!
+  //! take data as parameter which is consumed to build the reply
+  //! every bytes used to build the reply must be removed from the buffer passed
+  //! as parameter
+  //!
+  //! @param data data to be consumed
+  //! @return current instance
+  //!
+  builder_iface &
+  operator<<(std::string &data) override;
 
-//!
-//! @return whether the reply could be built
-//!
-  bool reply_ready() const override;
+  //!
+  //! @return whether the reply could be built
+  //!
+  bool
+  reply_ready() const override;
 
-//!
-//! @return reply object
-//!
-  reply get_reply() const override;
+  //!
+  //! @return reply object
+  //!
+  reply
+  get_reply() const override;
 
-//!
-//! @return the parsed bulk string
-//!
-  const std::string& get_bulk_string() const;
+  //!
+  //! @return the parsed bulk string
+  //!
+  const std::string &
+  get_bulk_string() const;
 
-//!
-//! @return whether the bulk string is null
-//!
-  bool is_null() const;
+  //!
+  //! @return whether the bulk string is null
+  //!
+  bool
+  is_null() const;
 
 private:
-  void build_reply();
-  bool fetch_size(std::string& str);
-  void fetch_str(std::string& str);
+  void
+  build_reply();
+  bool
+  fetch_size(std::string &str);
+  void
+  fetch_str(std::string &str);
 
 private:
-//!
-//! builder used to get bulk string size
-//!
+  //!
+  //! builder used to get bulk string size
+  //!
   integer_builder m_int_builder;
 
-//!
-//! bulk string size
-//!
+  //!
+  //! bulk string size
+  //!
   int m_str_size;
 
-//!
-//! bulk string
-//!
+  //!
+  //! bulk string
+  //!
   std::string m_str;
 
-//!
-//! whether the bulk string is null
-//!
+  //!
+  //! whether the bulk string is null
+  //!
   bool m_is_null;
 
-//!
-//! whether the reply is ready or not
-//!
+  //!
+  //! whether the reply is ready or not
+  //!
   bool m_reply_ready;
 
-//!
-//! reply to be built
-//!
+  //!
+  //! reply to be built
+  //!
   reply m_reply;
 };
 
 } // namespace builders
 
 } // namespace cpp_redis
+
+#endif // BULK_STRING_BUILDER_HPP_

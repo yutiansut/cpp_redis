@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,30 +27,27 @@
 
 namespace cpp_redis {
 
-/**
- * specialized runtime_error used for cpp_redis error
- *
- */
+//!
+//!  specialized runtime_error used for cpp_redis error
+//!
+//!
 class redis_error : public std::runtime_error {
 public:
   using std::runtime_error::runtime_error;
   using std::runtime_error::what;
 
-/**
- * ctor (string)
- *
- */
-  explicit redis_error(const std::string& err)
-  : std::runtime_error(err.c_str()) {
-  }
+  //!
+  //!  ctor (string)
+  //!
+  //!
+  explicit redis_error(const std::string &err)
+      : std::runtime_error(err.c_str()) {}
 
-/**
- * ctor(char*)
- *
- */
-  explicit redis_error(const char* err)
-  : std::runtime_error(err) {
-  }
+  //!
+  //!  ctor(char*)
+  //!
+  //!
+  explicit redis_error(const char *err) : std::runtime_error(err) {}
 };
 
 } // namespace cpp_redis

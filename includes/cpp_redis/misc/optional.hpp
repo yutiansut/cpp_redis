@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -29,48 +29,43 @@
 #include <optional>
 
 namespace cpp_redis {
-template <class T>
-using optional_t = std::optional<T>;
+template <class T> using optional_t = std::optional<T>;
 
-template <int I, class T>
-using enableIf = typename std::enable_if<I, T>::type;
+template <int I, class T> using enableIf = typename std::enable_if<I, T>::type;
 #else
 
 #include <cpp_redis/misc/logger.hpp>
 
 namespace cpp_redis {
-template <int I, class T>
-using enableIf = typename std::enable_if<I, T>::type;
+template <int I, class T> using enableIf = typename std::enable_if<I, T>::type;
 
-template <class T>
-struct optional {
+template <class T> struct optional {
   optional(T value) : m_value(value) {}
-//  optional<T>&
-//  operator()(T value) {
-//    m_value = value;
-//    return *this;
-//  }
+  //  optional<T>&
+  //  operator()(T value) {
+  //    m_value = value;
+  //    return *this;
+  //  }
 
   T m_value;
 
   template <class U>
   enableIf<std::is_convertible<U, T>::value, T>
-  value_or(U&& v) const {
+  value_or(U &&v) const {
     __CPP_REDIS_LOG(1, "value_or(U&& v)\n")
     return std::forward<U>(v);
   }
 
   template <class F>
   auto
-  value_or(F&& action) const -> decltype(action()) {
+  value_or(F &&action) const -> decltype(action()) {
     return action();
   }
 };
 
-template <class T>
-using optional_t = optional<T>;
+template <class T> using optional_t = optional<T>;
 #endif
 
 } // namespace cpp_redis
 
-#endif //CPP_REDIS_OPTIONAL_HPP
+#endif // CPP_REDIS_OPTIONAL_HPP

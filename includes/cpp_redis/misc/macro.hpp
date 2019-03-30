@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -23,9 +23,10 @@
 #pragma once
 
 #if _WIN32
-#define __CPP_REDIS_LENGTH(size) static_cast<unsigned int>(size) // for Windows, convert size to `unsigned int`
-#else                                                            /* _WIN32 */
-#define __CPP_REDIS_LENGTH(size) size                            // for Unix, keep size as `size_t`
-#endif                                                           /* _WIN32 */
+#define __CPP_REDIS_LENGTH(size)                                               \
+  static_cast<unsigned int>(size) // for Windows, convert size to `unsigned int`
+#else				  //!
+#define __CPP_REDIS_LENGTH(size) size // for Unix, keep size as `size_t`
+#endif				      //!
 
 #define __CPP_REDIS_PRINT(...) printf(__VA_ARGS__)

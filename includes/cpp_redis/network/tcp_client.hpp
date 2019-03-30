@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,97 +31,114 @@ namespace cpp_redis {
 
 namespace network {
 
-/**
- * implementation of the tcp_client_iface based on tacopie networking library
- *
- */
+//!
+//!  implementation of the tcp_client_iface based on tacopie networking library
+//!
+//!
 class tcp_client : public tcp_client_iface {
 public:
-/**
- * ctor
- *
- */
+  //!
+  //!  ctor
+  //!
+  //!
   tcp_client() = default;
-/**
- * dtor
- *
- */
+  //!
+  //!  dtor
+  //!
+  //!
   ~tcp_client() override = default;
 
 public:
-/**
- * start the tcp client
- *
- * @param addr host to be connected to
- * @param port port to be connected to
- * @param timeout_ms max time to connect in ms
- *
- */
-  void connect(const std::string& addr, std::uint32_t port, std::uint32_t timeout_ms) override;
+  //!
+  //!  start the tcp client
+  //!
+  //!  @param addr host to be connected to
+  //!  @param port port to be connected to
+  //!  @param timeout_ms max time to connect in ms
+  //!
+  //!
+  void
+  connect(const std::string &addr,
+	  std::uint32_t port,
+	  std::uint32_t timeout_ms) override;
 
-/**
- * stop the tcp client
- *
- * @param wait_for_removal when sets to true, disconnect blocks until the underlying TCP client has been effectively removed from the io_service and that all the underlying callbacks have completed.
- *
- */
-  void disconnect(bool wait_for_removal = false) override;
+  //!
+  //!  stop the tcp client
+  //!
+  //!  @param wait_for_removal when sets to true, disconnect blocks until the
+  //!  underlying TCP client has been effectively removed from the io_service
+  //!  and that all the underlying callbacks have completed.
+  //!
+  //!
+  void
+  disconnect(bool wait_for_removal = false) override;
 
-/**
- * @return whether the client is currently connected or not
- *
- */
-  bool is_connected() const override;
+  //!
+  //!  @return whether the client is currently connected or not
+  //!
+  //!
+  bool
+  is_connected() const override;
 
-/**
- * set number of io service workers for the io service monitoring this tcp connection
- *
- * @param nb_threads number of threads to be assigned
- *
- */
-  void set_nb_workers(std::size_t nb_threads);
-
-public:
-/**
- * async read operation
- *
- * @param request information about what should be read and what should be done after completion
- *
- */
-  void async_read(read_request& request) override;
-
-/**
- * async write operation
- *
- * @param request information about what should be written and what should be done after completion
- *
- */
-  void async_write(write_request& request) override;
+  //!
+  //!  set number of io service workers for the io service monitoring this tcp
+  //!  connection
+  //!
+  //!  @param nb_threads number of threads to be assigned
+  //!
+  //!
+  void
+  set_nb_workers(std::size_t nb_threads);
 
 public:
-/**
- * set on disconnection handler
- *
- * @param disconnection_handler handler to be called in case of a disconnection
- *
- */
-  void set_on_disconnection_handler(const disconnection_handler_t& disconnection_handler) override;
+  //!
+  //!  async read operation
+  //!
+  //!  @param request information about what should be read and what should be
+  //!  done after completion
+  //!
+  //!
+  void
+  async_read(read_request &request) override;
+
+  //!
+  //!  async write operation
+  //!
+  //!  @param request information about what should be written and what should
+  //!  be done after completion
+  //!
+  //!
+  void
+  async_write(write_request &request) override;
+
+public:
+  //!
+  //!  set on disconnection handler
+  //!
+  //!  @param disconnection_handler handler to be called in case of a
+  //!  disconnection
+  //!
+  //!
+  void
+  set_on_disconnection_handler(
+      const disconnection_handler_t &disconnection_handler) override;
 
 private:
-/**
- * tcp client for redis connection
- *
- */
+  //!
+  //!  tcp client for redis connection
+  //!
+  //!
   tacopie::tcp_client m_client;
 };
 
-/**
- * set the number of workers to be assigned for the default io service
- *
- * @param nb_threads the number of threads to be assigned
- *
- */
-void set_default_nb_workers(std::size_t nb_threads);
+//!
+//!  set the number of workers to be assigned for the default io service
+//!
+//!  @param nb_threads the number of threads to be assigned
+//!
+//!
+void
+set_default_nb_workers(std::size_t nb_threads);
 
 } // namespace network
 

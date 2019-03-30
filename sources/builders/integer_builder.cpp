@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,12 +31,10 @@ namespace cpp_redis {
 namespace builders {
 
 integer_builder::integer_builder(void)
-: m_nbr(0)
-, m_negative_multiplicator(1)
-, m_reply_ready(false) {}
+    : m_nbr(0), m_negative_multiplicator(1), m_reply_ready(false) {}
 
-builder_iface&
-integer_builder::operator<<(std::string& buffer) {
+builder_iface &
+integer_builder::operator<<(std::string &buffer) {
   if (m_reply_ready)
     return *this;
 
@@ -50,9 +48,10 @@ integer_builder::operator<<(std::string& buffer) {
     if (!i && m_negative_multiplicator == 1 && buffer[i] == '-') {
       m_negative_multiplicator = -1;
       continue;
-    }
-    else if (!std::isdigit(buffer[i])) {
-      __CPP_REDIS_LOG(error, "cpp_redis::builders::integer_builder receives invalid digit character");
+    } else if (!std::isdigit(buffer[i])) {
+      __CPP_REDIS_LOG(error,
+		      "cpp_redis::builders::integer_builder receives invalid "
+		      "digit character");
       throw redis_error("Invalid character for integer redis reply");
     }
 

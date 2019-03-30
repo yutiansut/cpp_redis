@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -24,7 +24,7 @@
 
 #ifdef _WIN32
 #include <Winsock2.h>
-#endif /* _WIN32 */
+#endif //!  _WIN32 //!
 
 //! For debugging purpose, uncomment
 // #include <cpp_redis/cpp_redis>
@@ -32,10 +32,12 @@
 // #include <tacopie/tacopie>
 
 int
-main(int argc, char** argv) {
+main(int argc, char **argv) {
   //! For debugging purpose, uncomment
-  // cpp_redis::active_logger = std::unique_ptr<cpp_redis::logger>(new cpp_redis::logger(cpp_redis::logger::log_level::debug));
-  // tacopie::active_logger   = std::unique_ptr<tacopie::logger>(new tacopie::logger(tacopie::logger::log_level::debug));
+  // cpp_redis::active_logger = std::unique_ptr<cpp_redis::logger>(new
+  // cpp_redis::logger(cpp_redis::logger::log_level::debug));
+  // tacopie::active_logger   = std::unique_ptr<tacopie::logger>(new
+  // tacopie::logger(tacopie::logger::log_level::debug));
 
 #ifdef _WIN32
   //! Windows network DLL init
@@ -46,7 +48,7 @@ main(int argc, char** argv) {
     std::cerr << "WSAStartup() failure" << std::endl;
     return -1;
   }
-#endif /* _WIN32 */
+#endif //!  _WIN32 //!
 
   ::testing::InitGoogleTest(&argc, argv);
 
@@ -54,7 +56,7 @@ main(int argc, char** argv) {
 
 #ifdef _WIN32
   WSACleanup();
-#endif /* _WIN32 */
+#endif //!  _WIN32 //!
 
   return ret;
 }

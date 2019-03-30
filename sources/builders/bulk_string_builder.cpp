@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -29,10 +29,7 @@ namespace cpp_redis {
 namespace builders {
 
 bulk_string_builder::bulk_string_builder(void)
-: m_str_size(0)
-, m_str("")
-, m_is_null(false)
-, m_reply_ready(false) {}
+    : m_str_size(0), m_str(""), m_is_null(false), m_reply_ready(false) {}
 
 void
 bulk_string_builder::build_reply(void) {
@@ -45,7 +42,7 @@ bulk_string_builder::build_reply(void) {
 }
 
 bool
-bulk_string_builder::fetch_size(std::string& buffer) {
+bulk_string_builder::fetch_size(std::string &buffer) {
   if (m_int_builder.reply_ready())
     return true;
 
@@ -53,7 +50,7 @@ bulk_string_builder::fetch_size(std::string& buffer) {
   if (!m_int_builder.reply_ready())
     return false;
 
-  m_str_size = (int) m_int_builder.get_integer();
+  m_str_size = (int)m_int_builder.get_integer();
   if (m_str_size == -1) {
     m_is_null = true;
     build_reply();
@@ -63,12 +60,15 @@ bulk_string_builder::fetch_size(std::string& buffer) {
 }
 
 void
-bulk_string_builder::fetch_str(std::string& buffer) {
-  if (buffer.size() < static_cast<std::size_t>(m_str_size) + 2) // also wait for end sequence
+bulk_string_builder::fetch_str(std::string &buffer) {
+  if (buffer.size() <
+      static_cast<std::size_t>(m_str_size) + 2) // also wait for end sequence
     return;
 
   if (buffer[m_str_size] != '\r' || buffer[m_str_size + 1] != '\n') {
-    __CPP_REDIS_LOG(error, "cpp_redis::builders::bulk_string_builder receives invalid ending sequence");
+    __CPP_REDIS_LOG(error,
+		    "cpp_redis::builders::bulk_string_builder receives invalid "
+		    "ending sequence");
     throw redis_error("Wrong ending sequence");
   }
 
@@ -77,8 +77,8 @@ bulk_string_builder::fetch_str(std::string& buffer) {
   build_reply();
 }
 
-builder_iface&
-bulk_string_builder::operator<<(std::string& buffer) {
+builder_iface &
+bulk_string_builder::operator<<(std::string &buffer) {
   if (m_reply_ready)
     return *this;
 
@@ -101,7 +101,7 @@ bulk_string_builder::get_reply(void) const {
   return reply{m_reply};
 }
 
-const std::string&
+const std::string &
 bulk_string_builder::get_bulk_string(void) const {
   return m_str;
 }

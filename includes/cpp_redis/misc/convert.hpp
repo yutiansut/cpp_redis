@@ -31,7 +31,7 @@ class try_convert {
 public:
   template <class T>
   static enableIf<std::is_convertible<T, std::string>::value,
-		  optional_t<int64_t>>
+                  optional_t<int64_t>>
   to_int(T value) {
     try {
       std::stringstream stream(value);

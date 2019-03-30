@@ -87,8 +87,7 @@ public:
 
   explicit xmessage(const reply_t &data);
 
-  friend std::ostream &
-  operator<<(std::ostream &os, const xmessage &xm);
+  friend std::ostream &operator<<(std::ostream &os, const xmessage &xm);
 };
 
 using xmessage_t = xmessage;
@@ -97,8 +96,7 @@ class xstream {
 public:
   explicit xstream(const reply_t &data);
 
-  friend std::ostream &
-  operator<<(std::ostream &os, const xstream &xs);
+  friend std::ostream &operator<<(std::ostream &os, const xstream &xs);
 
   std::string Stream;
   std::vector<xmessage_t> Messages;
@@ -123,16 +121,14 @@ class xstream_reply : public std::vector<xstream_t> {
 public:
   explicit xstream_reply(const reply_t &data);
 
-  friend std::ostream &
-  operator<<(std::ostream &os, const xstream_reply &xs);
+  friend std::ostream &operator<<(std::ostream &os, const xstream_reply &xs);
 
-  bool
-  is_null() const {
+  bool is_null() const {
     if (empty())
       return true;
     for (auto &v : *this) {
       if (v.Messages.empty())
-	return true;
+        return true;
     }
     return false;
   }
@@ -177,8 +173,8 @@ enum class connect_state {
 //!  connect handler, called whenever a new connection even occurred
 //!
 //!
-typedef std::function<void(
-    const std::string &host, std::size_t port, connect_state status)>
+typedef std::function<void(const std::string &host, std::size_t port,
+                           connect_state status)>
     connect_callback_t;
 
 using message_callback_t = std::function<void(const cpp_redis::message_type &)>;

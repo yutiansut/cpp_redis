@@ -50,15 +50,12 @@ template <class T> struct optional {
   T m_value;
 
   template <class U>
-  enableIf<std::is_convertible<U, T>::value, T>
-  value_or(U &&v) const {
+  enableIf<std::is_convertible<U, T>::value, T> value_or(U &&v) const {
     __CPP_REDIS_LOG(1, "value_or(U&& v)\n")
     return std::forward<U>(v);
   }
 
-  template <class F>
-  auto
-  value_or(F &&action) const -> decltype(action()) {
+  template <class F> auto value_or(F &&action) const -> decltype(action()) {
     return action();
   }
 };

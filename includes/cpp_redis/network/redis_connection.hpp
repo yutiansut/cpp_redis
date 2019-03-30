@@ -81,8 +81,7 @@ public:
   //!  assignment operator
   //!
   //!
-  redis_connection &
-  operator=(const redis_connection &) = delete;
+  redis_connection &operator=(const redis_connection &) = delete;
 
 public:
   //!
@@ -111,12 +110,10 @@ public:
   //!  @param timeout_ms max time to connect (in ms)
   //!
   //!
-  void
-  connect(const std::string &host = "127.0.0.1",
-	  std::size_t port = 6379,
-	  const disconnection_handler_t &disconnection_handler = nullptr,
-	  const reply_callback_t &reply_callback = nullptr,
-	  std::uint32_t timeout_ms = 0);
+  void connect(const std::string &host = "127.0.0.1", std::size_t port = 6379,
+               const disconnection_handler_t &disconnection_handler = nullptr,
+               const reply_callback_t &reply_callback = nullptr,
+               std::uint32_t timeout_ms = 0);
 
   //!
   //!  disconnect from redis server
@@ -126,15 +123,13 @@ public:
   //!  and that all the underlying callbacks have completed.
   //!
   //!
-  void
-  disconnect(bool wait_for_removal = false);
+  void disconnect(bool wait_for_removal = false);
 
   //!
   //!  @return whether we are connected to the redis server or not
   //!
   //!
-  bool
-  is_connected() const;
+  bool is_connected() const;
 
   //!
   //!  send the given command
@@ -145,8 +140,7 @@ public:
   //!  @return current instance
   //!
   //!
-  redis_connection &
-  send(const std::vector<std::string> &redis_cmd);
+  redis_connection &send(const std::vector<std::string> &redis_cmd);
 
   //!
   //!  commit pipelined transaction
@@ -155,8 +149,7 @@ public:
   //!  @return current instance
   //!
   //!
-  redis_connection &
-  commit();
+  redis_connection &commit();
 
 private:
   //!
@@ -166,16 +159,14 @@ private:
   //!  @param result read result
   //!
   //!
-  void
-  tcp_client_receive_handler(const tcp_client_iface::read_result &result);
+  void tcp_client_receive_handler(const tcp_client_iface::read_result &result);
 
   //!
   //!  tcp_client disconnection handler
   //!  called by the tcp_client whenever a disconnection occurred
   //!
   //!
-  void
-  tcp_client_disconnection_handler();
+  void tcp_client_disconnection_handler();
 
   //!
   //!  transform a user command to a redis command using the redis protocol
@@ -183,8 +174,7 @@ private:
   //!  "*2\r\n+GET\r\n+HELLO\r\n"
   //!
   //!
-  std::string
-  build_command(const std::vector<std::string> &redis_cmd);
+  std::string build_command(const std::vector<std::string> &redis_cmd);
 
 private:
   //!
@@ -192,8 +182,7 @@ private:
   //!  handler is set to null)
   //!
   //!
-  void
-  call_disconnection_handler();
+  void call_disconnection_handler();
 
 private:
   //!

@@ -57,10 +57,8 @@ public:
   //!  @param timeout_ms max time to connect in ms
   //!
   //!
-  void
-  connect(const std::string &addr,
-	  std::uint32_t port,
-	  std::uint32_t timeout_ms) override;
+  void connect(const std::string &addr, std::uint32_t port,
+               std::uint32_t timeout_ms) override;
 
   //!
   //!  stop the tcp client
@@ -70,15 +68,13 @@ public:
   //!  and that all the underlying callbacks have completed.
   //!
   //!
-  void
-  disconnect(bool wait_for_removal = false) override;
+  void disconnect(bool wait_for_removal = false) override;
 
   //!
   //!  @return whether the client is currently connected or not
   //!
   //!
-  bool
-  is_connected() const override;
+  bool is_connected() const override;
 
   //!
   //!  set number of io service workers for the io service monitoring this tcp
@@ -87,8 +83,7 @@ public:
   //!  @param nb_threads number of threads to be assigned
   //!
   //!
-  void
-  set_nb_workers(std::size_t nb_threads);
+  void set_nb_workers(std::size_t nb_threads);
 
 public:
   //!
@@ -98,8 +93,7 @@ public:
   //!  done after completion
   //!
   //!
-  void
-  async_read(read_request &request) override;
+  void async_read(read_request &request) override;
 
   //!
   //!  async write operation
@@ -108,8 +102,7 @@ public:
   //!  be done after completion
   //!
   //!
-  void
-  async_write(write_request &request) override;
+  void async_write(write_request &request) override;
 
 public:
   //!
@@ -119,8 +112,7 @@ public:
   //!  disconnection
   //!
   //!
-  void
-  set_on_disconnection_handler(
+  void set_on_disconnection_handler(
       const disconnection_handler_t &disconnection_handler) override;
 
 private:
@@ -137,8 +129,7 @@ private:
 //!  @param nb_threads the number of threads to be assigned
 //!
 //!
-void
-set_default_nb_workers(std::size_t nb_threads);
+void set_default_nb_workers(std::size_t nb_threads);
 
 } // namespace network
 

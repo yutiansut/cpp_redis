@@ -36,12 +36,12 @@ xmessage::xmessage(const reply_t &data) {
       std::string key;
       int i = 1;
       for (auto &val : val_array) {
-	if (i % 2 != 0) {
-	  key = val.as_string();
-	} else {
-	  push(key, val);
-	}
-	i++;
+        if (i % 2 != 0) {
+          key = val.as_string();
+        } else {
+          push(key, val);
+        }
+        i++;
       }
       // push(v.as_array().begin(), v.as_array().end());
     }
@@ -57,14 +57,13 @@ xstream::xstream(const reply &data) {
     auto m = data.as_array().back();
     if (m.is_array()) {
       for (auto &sm : m.as_array()) {
-	Messages.emplace_back(xmessage(sm));
+        Messages.emplace_back(xmessage(sm));
       }
     }
   }
 }
 
-std::ostream &
-operator<<(std::ostream &os, const xmessage &xm) {
+std::ostream &operator<<(std::ostream &os, const xmessage &xm) {
   os << "\n\t\t\"id\": " << xm.get_id() << "\n\t\t\"values\": {";
   for (auto &v : xm.get_values()) {
     auto re = v.second;
@@ -76,8 +75,7 @@ operator<<(std::ostream &os, const xmessage &xm) {
 
 xmessage::xmessage() = default;
 
-std::ostream &
-operator<<(std::ostream &os, const xstream &xs) {
+std::ostream &operator<<(std::ostream &os, const xstream &xs) {
   os << "{\n\t\"stream\": " << xs.Stream << "\n\t\"messages\": [";
   for (auto &m : xs.Messages) {
     os << m;
@@ -94,8 +92,7 @@ xstream_reply::xstream_reply(const reply &data) {
   }
 }
 
-std::ostream &
-operator<<(std::ostream &os, const xstream_reply &xs) {
+std::ostream &operator<<(std::ostream &os, const xstream_reply &xs) {
   for (auto &x : xs) {
     os << x;
   }

@@ -59,8 +59,7 @@ public:
   //!  assignment operator
   //!
   //!
-  array_builder &
-  operator=(const array_builder &) = delete;
+  array_builder &operator=(const array_builder &) = delete;
 
 public:
   //!
@@ -72,22 +71,19 @@ public:
   //!  @return current instance
   //!
   //!
-  builder_iface &
-  operator<<(std::string &data) override;
+  builder_iface &operator<<(std::string &data) override;
 
   //!
   //!  @return whether the reply could be built
   //!
   //!
-  bool
-  reply_ready() const override;
+  bool reply_ready() const override;
 
   //!
   //!  @return reply object
   //!
   //!
-  reply
-  get_reply() const override;
+  reply get_reply() const override;
 
 private:
   //!
@@ -99,8 +95,7 @@ private:
   //!  @return true if the size could be found
   //!
   //!
-  bool
-  fetch_array_size(std::string &buffer);
+  bool fetch_array_size(std::string &buffer);
 
   //!
   //!  take data as parameter which is consumed to build an array row
@@ -111,8 +106,7 @@ private:
   //!  @return true if the row could be built
   //!
   //!
-  bool
-  build_row(std::string &buffer);
+  bool build_row(std::string &buffer);
 
 private:
   //!

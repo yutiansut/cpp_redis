@@ -28,8 +28,7 @@
 #include <Winsock2.h>
 #endif //! _WIN32
 
-int
-main(void) {
+int main(void) {
 #ifdef _WIN32
   //! Windows netword DLL init
   WORD version = MAKEWORD(2, 2);
@@ -56,17 +55,14 @@ main(void) {
   //! Call connect with optional timeout
   //! Can put a loop around this until is_connected() returns true.
   client.connect("mymaster",
-		 [](const std::string &host,
-		    std::size_t port,
-		    cpp_redis::connect_state status) {
-		   if (status == cpp_redis::connect_state::dropped) {
-		     std::cout << "client disconnected from " << host << ":"
-			       << port << std::endl;
-		   }
-		 },
-		 0,
-		 -1,
-		 5000);
+                 [](const std::string &host, std::size_t port,
+                    cpp_redis::connect_state status) {
+                   if (status == cpp_redis::connect_state::dropped) {
+                     std::cout << "client disconnected from " << host << ":"
+                               << port << std::endl;
+                   }
+                 },
+                 0, -1, 5000);
 
   // same as client.send({ "SET", "hello", "42" }, ...)
   client.set("hello", "42", [](cpp_redis::reply_t &reply) {

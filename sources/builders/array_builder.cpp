@@ -33,8 +33,7 @@ array_builder::array_builder(void)
     : m_current_builder(nullptr), m_reply_ready(false),
       m_reply(std::vector<reply>{}) {}
 
-bool
-array_builder::fetch_array_size(std::string &buffer) {
+bool array_builder::fetch_array_size(std::string &buffer) {
   if (m_int_builder.reply_ready())
     return true;
 
@@ -55,8 +54,7 @@ array_builder::fetch_array_size(std::string &buffer) {
   return true;
 }
 
-bool
-array_builder::build_row(std::string &buffer) {
+bool array_builder::build_row(std::string &buffer) {
   if (!m_current_builder) {
     m_current_builder = create_builder(buffer.front());
     buffer.erase(0, 1);
@@ -75,8 +73,7 @@ array_builder::build_row(std::string &buffer) {
   return true;
 }
 
-builder_iface &
-array_builder::operator<<(std::string &buffer) {
+builder_iface &array_builder::operator<<(std::string &buffer) {
   if (m_reply_ready)
     return *this;
 
@@ -90,15 +87,9 @@ array_builder::operator<<(std::string &buffer) {
   return *this;
 }
 
-bool
-array_builder::reply_ready(void) const {
-  return m_reply_ready;
-}
+bool array_builder::reply_ready(void) const { return m_reply_ready; }
 
-reply
-array_builder::get_reply(void) const {
-  return reply{m_reply};
-}
+reply array_builder::get_reply(void) const { return reply{m_reply}; }
 
 } // namespace builders
 

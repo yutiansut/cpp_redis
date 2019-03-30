@@ -34,13 +34,9 @@
 
 std::condition_variable should_exit;
 
-void
-sigint_handler(int) {
-  should_exit.notify_all();
-}
+void sigint_handler(int) { should_exit.notify_all(); }
 
-int
-main(void) {
+int main(void) {
 #ifdef _WIN32
   //! Windows netword DLL init
   WORD version = MAKEWORD(2, 2);
@@ -58,17 +54,15 @@ main(void) {
 
   cpp_redis::subscriber sub;
 
-  sub.connect("127.0.0.1",
-	      6379,
-	      [](const std::string &host,
-		 std::size_t port,
-		 cpp_redis::connect_state status) {
-		if (status == cpp_redis::connect_state::dropped) {
-		  std::cout << "client disconnected from " << host << ":"
-			    << port << std::endl;
-		  should_exit.notify_all();
-		}
-	      });
+  sub.connect("127.0.0.1", 6379,
+              [](const std::string &host, std::size_t port,
+                 cpp_redis::connect_state status) {
+                if (status == cpp_redis::connect_state::dropped) {
+                  std::cout << "client disconnected from " << host << ":"
+                            << port << std::endl;
+                  should_exit.notify_all();
+                }
+              });
 
   //! authentication if server-server requires it
   // sub.auth("some_password", [](const cpp_redis::reply_t& reply) {
@@ -79,9 +73,9 @@ main(void) {
   // });
 
   sub.subscribe("some_chan",
-		[](const std::string &chan, const std::string &msg) {
-		  std::cout << "MESSAGE " << chan << ": " << msg << std::endl;
-		});
+                [](const std::string &chan, const std::string &msg) {
+                  std::cout << "MESSAGE " << chan << ": " << msg << std::endl;
+                });
   sub.psubscribe("*", [](const std::string &chan, const std::string &msg) {
     std::cout << "PMESSAGE " << chan << ": " << msg << std::endl;
   });

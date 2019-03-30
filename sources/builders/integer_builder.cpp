@@ -33,8 +33,7 @@ namespace builders {
 integer_builder::integer_builder(void)
     : m_nbr(0), m_negative_multiplicator(1), m_reply_ready(false) {}
 
-builder_iface &
-integer_builder::operator<<(std::string &buffer) {
+builder_iface &integer_builder::operator<<(std::string &buffer) {
   if (m_reply_ready)
     return *this;
 
@@ -50,8 +49,8 @@ integer_builder::operator<<(std::string &buffer) {
       continue;
     } else if (!std::isdigit(buffer[i])) {
       __CPP_REDIS_LOG(error,
-		      "cpp_redis::builders::integer_builder receives invalid "
-		      "digit character");
+                      "cpp_redis::builders::integer_builder receives invalid "
+                      "digit character");
       throw redis_error("Invalid character for integer redis reply");
     }
 
@@ -66,18 +65,11 @@ integer_builder::operator<<(std::string &buffer) {
   return *this;
 }
 
-bool
-integer_builder::reply_ready(void) const {
-  return m_reply_ready;
-}
+bool integer_builder::reply_ready(void) const { return m_reply_ready; }
 
-reply
-integer_builder::get_reply(void) const {
-  return reply{m_reply};
-}
+reply integer_builder::get_reply(void) const { return reply{m_reply}; }
 
-int64_t
-integer_builder::get_integer(void) const {
+int64_t integer_builder::get_integer(void) const {
   return m_negative_multiplicator * m_nbr;
 }
 

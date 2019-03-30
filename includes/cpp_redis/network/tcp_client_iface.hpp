@@ -58,10 +58,8 @@ public:
   //!  @param timeout_ms max time to connect in ms
   //!
   //!
-  virtual void
-  connect(const std::string &addr,
-	  std::uint32_t port,
-	  std::uint32_t timeout_ms = 0) = 0;
+  virtual void connect(const std::string &addr, std::uint32_t port,
+                       std::uint32_t timeout_ms = 0) = 0;
 
   //!
   //!  stop the tcp client
@@ -71,15 +69,13 @@ public:
   //!  and that all the underlying callbacks have completed.
   //!
   //!
-  virtual void
-  disconnect(bool wait_for_removal = false) = 0;
+  virtual void disconnect(bool wait_for_removal = false) = 0;
 
   //!
   //!  @return whether the client is currently connected or not
   //!
   //!
-  virtual bool
-  is_connected() const = 0;
+  virtual bool is_connected() const = 0;
 
 public:
   //!
@@ -178,8 +174,7 @@ public:
   //!  done after completion
   //!
   //!
-  virtual void
-  async_read(read_request &request) = 0;
+  virtual void async_read(read_request &request) = 0;
 
   //!
   //!  async write operation
@@ -188,8 +183,7 @@ public:
   //!  be done after completion
   //!
   //!
-  virtual void
-  async_write(write_request &request) = 0;
+  virtual void async_write(write_request &request) = 0;
 
 public:
   //!
@@ -205,8 +199,7 @@ public:
   //!  disconnection
   //!
   //!
-  virtual void
-  set_on_disconnection_handler(
+  virtual void set_on_disconnection_handler(
       const disconnection_handler_t &disconnection_handler) = 0;
 };
 

@@ -29,8 +29,7 @@
 #include <Winsock2.h>
 #endif //! _WIN32
 
-int
-main(void) {
+int main(void) {
 #ifdef _WIN32
   //! Windows netword DLL init
   WORD version = MAKEWORD(2, 2);
@@ -48,16 +47,14 @@ main(void) {
 
   cpp_redis::client client;
 
-  client.connect("127.0.0.1",
-		 6379,
-		 [](const std::string &host,
-		    std::size_t port,
-		    cpp_redis::connect_state status) {
-		   if (status == cpp_redis::connect_state::dropped) {
-		     std::cout << "client disconnected from " << host << ":"
-			       << port << std::endl;
-		   }
-		 });
+  client.connect("127.0.0.1", 6379,
+                 [](const std::string &host, std::size_t port,
+                    cpp_redis::connect_state status) {
+                   if (status == cpp_redis::connect_state::dropped) {
+                     std::cout << "client disconnected from " << host << ":"
+                               << port << std::endl;
+                   }
+                 });
 
   auto replcmd = [](const cpp_redis::reply_t &reply) {
     std::cout << "set hello 42: " << reply << std::endl;
@@ -83,19 +80,19 @@ main(void) {
 
   client.xreadgroup(
       {
-	  group_name,
-	  consumer_name,
-	  {{session_name}, {">"}},
-	  1,     // Count
-	  0,     // block milli
-	  false, // no ack
+          group_name,
+          consumer_name,
+          {{session_name}, {">"}},
+          1,     // Count
+          0,     // block milli
+          false, // no ack
       },
       [](cpp_redis::reply_t &reply) {
-	std::cout << "set hello 42: " << reply << std::endl;
-	auto msg = reply.as_array();
-	std::cout << "Mes: " << msg[0] << std::endl;
-	// if (reply.is_string())
-	//   do_something_with_string(reply.as_string())
+        std::cout << "set hello 42: " << reply << std::endl;
+        auto msg = reply.as_array();
+        std::cout << "Mes: " << msg[0] << std::endl;
+        // if (reply.is_string())
+        //   do_something_with_string(reply.as_string())
       });
 
 #else

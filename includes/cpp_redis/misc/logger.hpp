@@ -55,8 +55,7 @@ public:
   //!  assignment operator
   //!
   //!
-  logger_iface &
-  operator=(const logger_iface &) = default;
+  logger_iface &operator=(const logger_iface &) = default;
 
 public:
   //!
@@ -67,8 +66,8 @@ public:
   //!  @param line line in the file of the message
   //!
   //!
-  virtual void
-  debug(const std::string &msg, const std::string &file, std::size_t line) = 0;
+  virtual void debug(const std::string &msg, const std::string &file,
+                     std::size_t line) = 0;
 
   //!
   //!  info logging
@@ -78,8 +77,8 @@ public:
   //!  @param line line in the file of the message
   //!
   //!
-  virtual void
-  info(const std::string &msg, const std::string &file, std::size_t line) = 0;
+  virtual void info(const std::string &msg, const std::string &file,
+                    std::size_t line) = 0;
 
   //!
   //!  warn logging
@@ -89,8 +88,8 @@ public:
   //!  @param line line in the file of the message
   //!
   //!
-  virtual void
-  warn(const std::string &msg, const std::string &file, std::size_t line) = 0;
+  virtual void warn(const std::string &msg, const std::string &file,
+                    std::size_t line) = 0;
 
   //!
   //!  error logging
@@ -100,8 +99,8 @@ public:
   //!  @param line line in the file of the message
   //!
   //!
-  virtual void
-  error(const std::string &msg, const std::string &file, std::size_t line) = 0;
+  virtual void error(const std::string &msg, const std::string &file,
+                     std::size_t line) = 0;
 };
 
 //!
@@ -137,8 +136,7 @@ public:
   //!  assignment operator
   //!
   //!
-  logger &
-  operator=(const logger &) = default;
+  logger &operator=(const logger &) = default;
 
 public:
   //!
@@ -149,10 +147,8 @@ public:
   //!  @param line line in the file of the message
   //!
   //!
-  void
-  debug(const std::string &msg,
-	const std::string &file,
-	std::size_t line) override;
+  void debug(const std::string &msg, const std::string &file,
+             std::size_t line) override;
 
   //!
   //!  info logging
@@ -162,10 +158,8 @@ public:
   //!  @param line line in the file of the message
   //!
   //!
-  void
-  info(const std::string &msg,
-       const std::string &file,
-       std::size_t line) override;
+  void info(const std::string &msg, const std::string &file,
+            std::size_t line) override;
 
   //!
   //!  warn logging
@@ -175,10 +169,8 @@ public:
   //!  @param line line in the file of the message
   //!
   //!
-  void
-  warn(const std::string &msg,
-       const std::string &file,
-       std::size_t line) override;
+  void warn(const std::string &msg, const std::string &file,
+            std::size_t line) override;
 
   //!
   //!  error logging
@@ -188,10 +180,8 @@ public:
   //!  @param line line in the file of the message
   //!
   //!
-  void
-  error(const std::string &msg,
-	const std::string &file,
-	std::size_t line) override;
+  void error(const std::string &msg, const std::string &file,
+             std::size_t line) override;
 
 private:
   //!
@@ -223,8 +213,7 @@ extern std::unique_ptr<logger_iface> active_logger;
 //!  @param line line in the file of the message
 //!
 //!
-void
-debug(const std::string &msg, const std::string &file, std::size_t line);
+void debug(const std::string &msg, const std::string &file, std::size_t line);
 
 //!
 //!  info logging
@@ -235,8 +224,7 @@ debug(const std::string &msg, const std::string &file, std::size_t line);
 //!  @param line line in the file of the message
 //!
 //!
-void
-info(const std::string &msg, const std::string &file, std::size_t line);
+void info(const std::string &msg, const std::string &file, std::size_t line);
 
 //!
 //!  warn logging
@@ -247,8 +235,7 @@ info(const std::string &msg, const std::string &file, std::size_t line);
 //!  @param line line in the file of the message
 //!
 //!
-void
-warn(const std::string &msg, const std::string &file, std::size_t line);
+void warn(const std::string &msg, const std::string &file, std::size_t line);
 
 //!
 //!  error logging
@@ -259,8 +246,7 @@ warn(const std::string &msg, const std::string &file, std::size_t line);
 //!  @param line line in the file of the message
 //!
 //!
-void
-error(const std::string &msg, const std::string &file, std::size_t line);
+void error(const std::string &msg, const std::string &file, std::size_t line);
 
 //!
 //!  convenience macro to log with file and line information

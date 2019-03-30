@@ -33,7 +33,7 @@ TEST(RedisClient, ValidateClusterAddSlots) {
 
   client.cluster_addslots({"1", "2", "3"})
 
-  EXPECT_FALSE(client.is_connected());
+      EXPECT_FALSE(client.is_connected());
   //! should connect to 127.0.0.1:6379
   EXPECT_NO_THROW(client.connect());
   EXPECT_TRUE(client.is_connected());

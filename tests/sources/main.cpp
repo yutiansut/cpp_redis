@@ -31,8 +31,7 @@
 // #include <memory>
 // #include <tacopie/tacopie>
 
-int
-main(int argc, char **argv) {
+int main(int argc, char **argv) {
   //! For debugging purpose, uncomment
   // cpp_redis::active_logger = std::unique_ptr<cpp_redis::logger>(new
   // cpp_redis::logger(cpp_redis::logger::log_level::debug));

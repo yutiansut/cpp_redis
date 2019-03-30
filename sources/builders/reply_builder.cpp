@@ -30,8 +30,7 @@ namespace builders {
 
 reply_builder::reply_builder() : m_builder(nullptr) {}
 
-reply_builder &
-reply_builder::operator<<(const std::string &data) {
+reply_builder &reply_builder::operator<<(const std::string &data) {
   m_buffer += data;
 
   while (build_reply())
@@ -40,14 +39,12 @@ reply_builder::operator<<(const std::string &data) {
   return *this;
 }
 
-void
-reply_builder::reset() {
+void reply_builder::reset() {
   m_builder = nullptr;
   m_buffer.clear();
 }
 
-bool
-reply_builder::build_reply() {
+bool reply_builder::build_reply() {
   if (m_buffer.empty())
     return false;
 
@@ -68,29 +65,23 @@ reply_builder::build_reply() {
   return false;
 }
 
-void
-reply_builder::operator>>(reply &reply) {
-  reply = get_front();
-}
+void reply_builder::operator>>(reply &reply) { reply = get_front(); }
 
-const reply &
-reply_builder::get_front() const {
+const reply &reply_builder::get_front() const {
   if (!reply_available())
     throw redis_error("No available reply");
 
   return m_available_replies.front();
 }
 
-void
-reply_builder::pop_front() {
+void reply_builder::pop_front() {
   if (!reply_available())
     throw redis_error("No available reply");
 
   m_available_replies.pop_front();
 }
 
-bool
-reply_builder::reply_available() const {
+bool reply_builder::reply_available() const {
   return !m_available_replies.empty();
 }
 

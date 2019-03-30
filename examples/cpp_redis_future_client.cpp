@@ -28,8 +28,7 @@
 #include <Winsock2.h>
 #endif //! _WIN32
 
-int
-main(void) {
+int main(void) {
 #ifdef _WIN32
   //! Windows netword DLL init
   WORD version = MAKEWORD(2, 2);
@@ -47,16 +46,14 @@ main(void) {
 
   cpp_redis::client client;
 
-  client.connect("127.0.0.1",
-		 6379,
-		 [](const std::string &host,
-		    std::size_t port,
-		    cpp_redis::connect_state status) {
-		   if (status == cpp_redis::connect_state::dropped) {
-		     std::cout << "client disconnected from " << host << ":"
-			       << port << std::endl;
-		   }
-		 });
+  client.connect("127.0.0.1", 6379,
+                 [](const std::string &host, std::size_t port,
+                    cpp_redis::connect_state status) {
+                   if (status == cpp_redis::connect_state::dropped) {
+                     std::cout << "client disconnected from " << host << ":"
+                               << port << std::endl;
+                   }
+                 });
 
   //! Set a value
   auto set = client.set("hello", "42");
@@ -77,7 +74,7 @@ main(void) {
   cpp_redis::reply_t r = decrby.get();
   if (r.is_integer())
     std::cout << "After 'hello' decrement by 12: " << r.as_integer()
-	      << std::endl;
+              << std::endl;
 
   std::cout << "get 'hello': " << get.get() << std::endl;
 

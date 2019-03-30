@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -55,7 +55,8 @@ TEST(ArrayBuilder, WithPartOfEndSequence) {
 TEST(ArrayBuilder, WithAllInOneTime) {
   cpp_redis::builders::array_builder builder;
 
-  std::string buffer = "4\r\n+simple_string\r\n-error\r\n:42\r\n$5\r\nhello\r\n";
+  std::string buffer =
+      "4\r\n+simple_string\r\n-error\r\n:42\r\n$5\r\nhello\r\n";
   builder << buffer;
 
   EXPECT_EQ(true, builder.reply_ready());
@@ -135,7 +136,6 @@ TEST(ArrayBuilder, EmptyArray) {
   auto array = reply.as_array();
   EXPECT_EQ(0U, array.size());
 }
-
 
 TEST(ArrayBuilder, InvalidSize) {
   cpp_redis::builders::array_builder builder;

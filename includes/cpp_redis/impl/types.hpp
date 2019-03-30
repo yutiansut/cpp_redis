@@ -44,15 +44,13 @@ public:
   //!  @return the underlying string
   //!
   //!
-  virtual const std::string &
-  as_string() const = 0;
+  virtual const std::string &as_string() const = 0;
 
   //!
   //!  @return the underlying integer
   //!
   //!
-  virtual optional_t<int64_t>
-  try_get_int() const = 0;
+  virtual optional_t<int64_t> try_get_int() const = 0;
 
 protected:
   std::string m_str_val;
@@ -62,17 +60,13 @@ using serializer_ptr_t = std::shared_ptr<serializer_type>;
 
 template <typename T> class message_impl {
 public:
-  virtual const std::string
-  get_id() const = 0;
+  virtual const std::string get_id() const = 0;
 
-  virtual const message_impl &
-  set_id(std::string id) = 0;
+  virtual const message_impl &set_id(std::string id) = 0;
 
-  virtual T
-  find(std::string key) const = 0;
+  virtual T find(std::string key) const = 0;
 
-  virtual const message_impl &
-  push(std::string key, T value) = 0;
+  virtual const message_impl &push(std::string key, T value) = 0;
 
   virtual const message_impl &
   push(std::vector<std::pair<std::string, T>> values) = 0;
@@ -81,8 +75,7 @@ public:
   push(typename std::vector<T>::const_iterator ptr_begin,
        typename std::vector<T>::const_iterator ptr_end) = 0;
 
-  virtual const std::multimap<std::string, T> &
-  get_values() const = 0;
+  virtual const std::multimap<std::string, T> &get_values() const = 0;
 
 protected:
   std::string m_id;
@@ -91,19 +84,14 @@ protected:
 
 class message_type : public message_impl<reply_t> {
 public:
-  inline const std::string
-  get_id() const override {
-    return m_id;
-  };
+  inline const std::string get_id() const override { return m_id; };
 
-  inline const message_type &
-  set_id(std::string id) override {
+  inline const message_type &set_id(std::string id) override {
     m_id = id;
     return *this;
   }
 
-  inline reply_t
-  find(std::string key) const override {
+  inline reply_t find(std::string key) const override {
     auto it = m_values.find(key);
     if (it != m_values.end())
       return it->second;
@@ -111,8 +99,7 @@ public:
       throw "value not found";
   };
 
-  inline message_type &
-  push(std::string key, reply_t value) override {
+  inline message_type &push(std::string key, reply_t value) override {
     m_values.insert({key, std::move(value)});
     return *this;
   }
@@ -132,9 +119,9 @@ public:
     size_t i = 2;
     for (auto pb = ptr_begin; pb != ptr_end; pb++) {
       if (i % 2 == 0) {
-	key = pb->as_string();
+        key = pb->as_string();
       } else {
-	//! pb});
+        //! pb});
       }
     }
     return *this;
@@ -145,8 +132,7 @@ public:
     return m_values;
   };
 
-  inline std::multimap<std::string, std::string>
-  get_str_values() const {
+  inline std::multimap<std::string, std::string> get_str_values() const {
     std::multimap<std::string, std::string> ret;
     for (auto &v : m_values) {
       std::stringstream s;

@@ -39,8 +39,6 @@ using defer = std::shared_ptr<void>;
 //!
 using consumer_callback_t = dispatch_callback_t;
 
-using reply_callback_t = client::reply_callback_t;
-
 struct consumer_callback_container {
   consumer_callback_t consumer_callback;
   acknowledgement_callback_t acknowledgement_callback;
@@ -67,7 +65,8 @@ using consumer_client_container_t = consumer_client_container;
 
 using client_container_ptr_t = std::unique_ptr<consumer_client_container_t>;
 
-using consumer_callbacks_t = std::multimap<std::string, consumer_callback_container_t>;
+using consumer_callbacks_t =
+    std::multimap<std::string, consumer_callback_container_t>;
 
 // typedef std::map<std::string, consumer_callback_container_t>
 // consumer_callbacks_t;
@@ -75,14 +74,11 @@ using consumer_callbacks_t = std::multimap<std::string, consumer_callback_contai
 class consumer {
 public:
   explicit consumer(
-      std::string stream,
-      std::string consumer,
+      std::string stream, std::string consumer,
       size_t max_concurrency = std::thread::hardware_concurrency());
 
-  consumer_t &
-  subscribe(
-      const std::string &group,
-      const consumer_callback_t &consumer_callback,
+  consumer_t &subscribe(
+      const std::string &group, const consumer_callback_t &consumer_callback,
       const acknowledgement_callback_t &acknowledgement_callback = nullptr);
 
   //!
@@ -96,17 +92,13 @@ public:
   //!  dropped
   //!  @param reconnect_interval_ms time between two attempts of reconnection
   //!
-  void
-  connect(const std::string &host = "127.0.0.1",
-	  std::size_t port = 6379,
-	  const connect_callback_t &connect_callback = nullptr,
-	  std::uint32_t timeout_ms = 0,
-	  std::int32_t max_reconnects = 0,
-	  std::uint32_t reconnect_interval_ms = 0);
+  void connect(const std::string &host = "127.0.0.1", std::size_t port = 6379,
+               const connect_callback_t &connect_callback = nullptr,
+               std::uint32_t timeout_ms = 0, std::int32_t max_reconnects = 0,
+               std::uint32_t reconnect_interval_ms = 0);
 
-  void
-  auth(const std::string &password,
-       const reply_callback_t &reply_callback = nullptr);
+  void auth(const std::string &password,
+            const reply_callback_t &reply_callback = nullptr);
 
   //!
   //!  commit pipelined transaction
@@ -115,15 +107,12 @@ public:
   //!
   //!  @return current instance
   //!
-  consumer &
-  commit();
+  consumer &commit();
 
-  void
-  dispatch_changed_handler(size_t size);
+  void dispatch_changed_handler(size_t size);
 
 private:
-  void
-  poll();
+  void poll();
 
 private:
   std::string m_stream;

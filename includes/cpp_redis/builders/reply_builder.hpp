@@ -59,8 +59,7 @@ public:
   //!
   //!  assignment operator
   //!
-  reply_builder &
-  operator=(const reply_builder &) = delete;
+  reply_builder &operator=(const reply_builder &) = delete;
 
 public:
   //!
@@ -71,8 +70,7 @@ public:
   //!  @param data data to be used for building replies
   //!  @return current instance
   //!
-  reply_builder &
-  operator<<(const std::string &data);
+  reply_builder &operator<<(const std::string &data);
 
   //!
   //!  similar as get_front, store reply in the passed parameter
@@ -81,36 +79,31 @@ public:
   //!  available reply
   //!
   //!
-  void
-  operator>>(reply &reply);
+  void operator>>(reply &reply);
 
   //!
   //!  @return the first available reply
   //!
   //!
-  const reply &
-  get_front() const;
+  const reply &get_front() const;
 
   //!
   //!  pop the first available reply
   //!
   //!
-  void
-  pop_front();
+  void pop_front();
 
   //!
   //!  @return whether a reply is available
   //!
   //!
-  bool
-  reply_available() const;
+  bool reply_available() const;
 
   //!
   //!  reset the reply builder to its initial state
   //!  (clear internal buffer and stages)
   //!
-  void
-  reset();
+  void reset();
 
 private:
   //!
@@ -119,8 +112,7 @@ private:
   //!  @return whether the reply has been fully built or not
   //!
   //!
-  bool
-  build_reply();
+  bool build_reply();
 
 private:
   //!

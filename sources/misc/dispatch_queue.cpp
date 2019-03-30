@@ -26,8 +26,8 @@
 namespace cpp_redis {
 
 dispatch_queue::dispatch_queue(std::string name,
-			       const notify_callback_t &notify_callback,
-			       size_t thread_cnt)
+                               const notify_callback_t &notify_callback,
+                               size_t thread_cnt)
     : m_name(name), m_threads(thread_cnt), m_mq(),
       notify_handler(notify_callback) {
   printf("Creating dispatch queue: %s\n", name.c_str());
@@ -56,9 +56,8 @@ dispatch_queue::~dispatch_queue() {
   }
 }
 
-void
-dispatch_queue::dispatch(const cpp_redis::message_type &message,
-			 const dispatch_callback_t &op) {
+void dispatch_queue::dispatch(const cpp_redis::message_type &message,
+                              const dispatch_callback_t &op) {
   std::unique_lock<std::mutex> lock(m_threads_lock);
   m_mq.push({op, message});
 
@@ -68,9 +67,8 @@ dispatch_queue::dispatch(const cpp_redis::message_type &message,
   m_cv.notify_all();
 }
 
-void
-dispatch_queue::dispatch(const cpp_redis::message_type &message,
-			 dispatch_callback_t &&op) {
+void dispatch_queue::dispatch(const cpp_redis::message_type &message,
+                              dispatch_callback_t &&op) {
   std::unique_lock<std::mutex> lock(m_threads_lock);
   m_mq.push({std::move(op), message});
 
@@ -80,8 +78,7 @@ dispatch_queue::dispatch(const cpp_redis::message_type &message,
   m_cv.notify_all();
 }
 
-void
-dispatch_queue::dispatch_thread_handler() {
+void dispatch_queue::dispatch_thread_handler() {
   std::unique_lock<std::mutex> lock(m_threads_lock);
 
   do {
@@ -101,7 +98,7 @@ dispatch_queue::dispatch_thread_handler() {
       auto vals = op.message.get_values();
 
       for (auto v : vals) {
-	std::cout << v.second << std::endl;
+        std::cout << v.second << std::endl;
       }
 
       auto res = op.callback(op.message);
@@ -111,8 +108,7 @@ dispatch_queue::dispatch_thread_handler() {
   } while (!m_quit);
 }
 
-size_t
-dispatch_queue::size() {
+size_t dispatch_queue::size() {
   std::lock_guard<std::mutex> mq_lock(m_mq_mutex);
   long res = m_mq.size();
   // unlock now that we're done messing with the queue

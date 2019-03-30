@@ -127,7 +127,7 @@ TEST(Reply, Integer) {
 TEST(Reply, Array) {
   cpp_redis::reply_t r_arr_1(42);
   cpp_redis::reply_t r_arr_2("str",
-			     cpp_redis::reply::string_type::simple_string);
+                             cpp_redis::reply::string_type::simple_string);
   cpp_redis::reply_t r({r_arr_1, r_arr_2});
 
   EXPECT_EQ(r.is_array(), true);

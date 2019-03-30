@@ -28,8 +28,7 @@ namespace cpp_redis {
 template <typename T>
 typename std::enable_if<std::is_same<T, client::client_type>::value>::type
 client::client_kill_unpack_arg(std::vector<std::string> &redis_cmd,
-			       reply_callback_t &,
-			       client_type type) {
+                               reply_callback_t &, client_type type) {
   redis_cmd.emplace_back("TYPE");
   std::string type_string;
 
@@ -54,8 +53,7 @@ client::client_kill_unpack_arg(std::vector<std::string> &redis_cmd,
 template <typename T>
 typename std::enable_if<std::is_same<T, bool>::value>::type
 client::client_kill_unpack_arg(std::vector<std::string> &redis_cmd,
-			       reply_callback_t &,
-			       bool skip) {
+                               reply_callback_t &, bool skip) {
   redis_cmd.emplace_back("SKIPME");
   redis_cmd.emplace_back(skip ? "yes" : "no");
 }
@@ -63,8 +61,7 @@ client::client_kill_unpack_arg(std::vector<std::string> &redis_cmd,
 template <typename T>
 typename std::enable_if<std::is_integral<T>::value>::type
 client::client_kill_unpack_arg(std::vector<std::string> &redis_cmd,
-			       reply_callback_t &,
-			       uint64_t id) {
+                               reply_callback_t &, uint64_t id) {
   redis_cmd.emplace_back("ID");
   redis_cmd.emplace_back(std::to_string(id));
 }
@@ -72,39 +69,33 @@ client::client_kill_unpack_arg(std::vector<std::string> &redis_cmd,
 template <typename T>
 typename std::enable_if<std::is_class<T>::value>::type
 client::client_kill_unpack_arg(std::vector<std::string> &,
-			       reply_callback_t &reply_callback,
-			       const T &cb) {
+                               reply_callback_t &reply_callback, const T &cb) {
   reply_callback = cb;
 }
 
 template <typename T, typename... Ts>
-void
-client::client_kill_impl(std::vector<std::string> &redis_cmd,
-			 reply_callback_t &reply,
-			 const T &arg,
-			 const Ts &... args) {
+void client::client_kill_impl(std::vector<std::string> &redis_cmd,
+                              reply_callback_t &reply, const T &arg,
+                              const Ts &... args) {
   static_assert(!std::is_class<T>::value,
-		"Reply callback should be in the end of the argument list");
+                "Reply callback should be in the end of the argument list");
   client_kill_unpack_arg<T>(redis_cmd, reply, arg);
   client_kill_impl(redis_cmd, reply, args...);
 }
 
 template <typename T>
-void
-client::client_kill_impl(std::vector<std::string> &redis_cmd,
-			 reply_callback_t &reply,
-			 const T &arg) {
+void client::client_kill_impl(std::vector<std::string> &redis_cmd,
+                              reply_callback_t &reply, const T &arg) {
   client_kill_unpack_arg<T>(redis_cmd, reply, arg);
 }
 
 template <typename T, typename... Ts>
-inline client &
-client::client_kill(const T &arg, const Ts &... args) {
+inline client &client::client_kill(const T &arg, const Ts &... args) {
   static_assert(helpers::is_different_types<T, Ts...>::value,
-		"Should only have one distinct value per filter type");
+                "Should only have one distinct value per filter type");
   static_assert(
       !(std::is_class<T>::value &&
-	std::is_same<T, typename helpers::back<T, Ts...>::type>::value),
+        std::is_same<T, typename helpers::back<T, Ts...>::type>::value),
       "Should have at least one filter");
 
   std::vector<std::string> redis_cmd({"CLIENT", "KILL"});
@@ -115,13 +106,10 @@ client::client_kill(const T &arg, const Ts &... args) {
 }
 
 template <typename T, typename... Ts>
-inline client &
-client::client_kill(const std::string &host,
-		    int port,
-		    const T &arg,
-		    const Ts &... args) {
+inline client &client::client_kill(const std::string &host, int port,
+                                   const T &arg, const Ts &... args) {
   static_assert(helpers::is_different_types<T, Ts...>::value,
-		"Should only have one distinct value per filter type");
+                "Should only have one distinct value per filter type");
   std::vector<std::string> redis_cmd({"CLIENT", "KILL"});
 
   //! If we have other type than lambda, then it's a filter
@@ -136,29 +124,25 @@ client::client_kill(const std::string &host,
   return send(redis_cmd, reply_cb);
 }
 
-inline client &
-client::client_kill(const std::string &host, int port) {
+inline client &client::client_kill(const std::string &host, int port) {
   return client_kill(host, port, reply_callback_t(nullptr));
 }
 
 template <typename... Ts>
-inline client &
-client::client_kill(const char *host, int port, const Ts &... args) {
+inline client &client::client_kill(const char *host, int port,
+                                   const Ts &... args) {
   return client_kill(std::string(host), port, args...);
 }
 
 template <typename T, typename... Ts>
-std::future<reply>
-client::client_kill_future(const T arg, const Ts... args) {
+std::future<reply> client::client_kill_future(const T arg, const Ts... args) {
   //! gcc 4.8 doesn't handle variadic template capture arguments (appears
   //! in 4.9) so std::bind should capture all arguments because of the compiler.
   return exec_cmd(std::bind(
       [this](T arg, Ts... args, const reply_callback_t &cb) -> client & {
-	return client_kill(arg, args..., cb);
+        return client_kill(arg, args..., cb);
       },
-      arg,
-      args...,
-      std::placeholders::_1));
+      arg, args..., std::placeholders::_1));
 }
 
 } // namespace cpp_redis

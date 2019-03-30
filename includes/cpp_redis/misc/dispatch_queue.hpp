@@ -56,28 +56,24 @@ class dispatch_queue {
 
 public:
   explicit dispatch_queue(std::string name,
-			  const notify_callback_t &notify_callback,
-			  size_t thread_cnt = 1);
+                          const notify_callback_t &notify_callback,
+                          size_t thread_cnt = 1);
   ~dispatch_queue();
 
   // dispatch and copy
-  void
-  dispatch(const cpp_redis::message_type &message,
-	   const dispatch_callback_t &op);
+  void dispatch(const cpp_redis::message_type &message,
+                const dispatch_callback_t &op);
   // dispatch and move
-  void
-  dispatch(const cpp_redis::message_type &message, dispatch_callback_t &&op);
+  void dispatch(const cpp_redis::message_type &message,
+                dispatch_callback_t &&op);
 
   // Deleted operations
   dispatch_queue(const dispatch_queue &rhs) = delete;
-  dispatch_queue &
-  operator=(const dispatch_queue &rhs) = delete;
+  dispatch_queue &operator=(const dispatch_queue &rhs) = delete;
   dispatch_queue(dispatch_queue &&rhs) = delete;
-  dispatch_queue &
-  operator=(dispatch_queue &&rhs) = delete;
+  dispatch_queue &operator=(dispatch_queue &&rhs) = delete;
 
-  size_t
-  size();
+  size_t size();
 
 private:
   std::string m_name;
@@ -90,8 +86,7 @@ private:
 
   notify_callback_t notify_handler;
 
-  void
-  dispatch_thread_handler();
+  void dispatch_thread_handler();
 };
 
 using dispatch_queue_t = dispatch_queue;

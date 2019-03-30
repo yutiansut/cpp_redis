@@ -80,8 +80,7 @@ public:
   //!  assignment operator
   //!
   //!
-  subscriber &
-  operator=(const subscriber &) = delete;
+  subscriber &operator=(const subscriber &) = delete;
 
 public:
   //!
@@ -96,13 +95,10 @@ public:
   //!  @param reconnect_interval_ms time between two attempts of reconnection
   //!
   //!
-  void
-  connect(const std::string &host = "127.0.0.1",
-	  std::size_t port = 6379,
-	  const connect_callback_t &connect_callback = nullptr,
-	  std::uint32_t timeout_ms = 0,
-	  std::int32_t max_reconnects = 0,
-	  std::uint32_t reconnect_interval_ms = 0);
+  void connect(const std::string &host = "127.0.0.1", std::size_t port = 6379,
+               const connect_callback_t &connect_callback = nullptr,
+               std::uint32_t timeout_ms = 0, std::int32_t max_reconnects = 0,
+               std::uint32_t reconnect_interval_ms = 0);
 
   //!
   //!  @brief Connect to redis server
@@ -115,20 +111,17 @@ public:
   //!  @param reconnect_interval_ms time between two attempts of reconnection
   //!
   //!
-  void
-  connect(const std::string &name,
-	  const connect_callback_t &connect_callback = nullptr,
-	  std::uint32_t timeout_ms = 0,
-	  std::int32_t max_reconnects = 0,
-	  std::uint32_t reconnect_interval_ms = 0);
+  void connect(const std::string &name,
+               const connect_callback_t &connect_callback = nullptr,
+               std::uint32_t timeout_ms = 0, std::int32_t max_reconnects = 0,
+               std::uint32_t reconnect_interval_ms = 0);
 
   //!
   //!  @brief determines client connectivity
   //!  @return whether we are connected to the redis server
   //!
   //!
-  bool
-  is_connected() const;
+  bool is_connected() const;
 
   //!
   //!  @brief disconnect from redis server
@@ -137,23 +130,20 @@ public:
   //!  and that all the underlying callbacks have completed.
   //!
   //!
-  void
-  disconnect(bool wait_for_removal = false);
+  void disconnect(bool wait_for_removal = false);
 
   //!
   //!  @brief determines if reconnect is in progress
   //!  @return whether an attempt to reconnect is in progress
   //!
   //!
-  bool
-  is_reconnecting() const;
+  bool is_reconnecting() const;
 
   //!
   //!  @brief stop any reconnect in progress
   //!
   //!
-  void
-  cancel_reconnect();
+  void cancel_reconnect();
 
 public:
   //!
@@ -174,9 +164,8 @@ public:
   //!  @return current instance
   //!
   //!
-  subscriber &
-  auth(const std::string &password,
-       const reply_callback_t &reply_callback = nullptr);
+  subscriber &auth(const std::string &password,
+                   const reply_callback_t &reply_callback = nullptr);
 
   //!
   //!  subscribe callback, called whenever a new message is published on a
@@ -203,10 +192,8 @@ public:
   //!  @return current instance
   //!
   //!
-  subscriber &
-  subscribe(
-      const std::string &channel,
-      const subscribe_callback_t &callback,
+  subscriber &subscribe(
+      const std::string &channel, const subscribe_callback_t &callback,
       const acknowledgement_callback_t &acknowledgement_callback = nullptr);
 
   //!
@@ -226,10 +213,8 @@ public:
   //!  @return current instance
   //!
   //!
-  subscriber &
-  psubscribe(
-      const std::string &pattern,
-      const subscribe_callback_t &callback,
+  subscriber &psubscribe(
+      const std::string &pattern, const subscribe_callback_t &callback,
       const acknowledgement_callback_t &acknowledgement_callback = nullptr);
 
   //!
@@ -241,8 +226,7 @@ public:
   //!  @return current instance
   //!
   //!
-  subscriber &
-  unsubscribe(const std::string &channel);
+  subscriber &unsubscribe(const std::string &channel);
 
   //!
   //!  punsubscribe from the given pattern
@@ -253,8 +237,7 @@ public:
   //!  @return current instance
   //!
   //!
-  subscriber &
-  punsubscribe(const std::string &pattern);
+  subscriber &punsubscribe(const std::string &pattern);
 
   //!
   //!  commit pipelined transaction
@@ -264,8 +247,7 @@ public:
   //!  @return current instance
   //!
   //!
-  subscriber &
-  commit();
+  subscriber &commit();
 
 public:
   //!
@@ -277,10 +259,8 @@ public:
   //!  @param timeout_ms maximum time to connect
   //!
   //!
-  void
-  add_sentinel(const std::string &host,
-	       std::size_t port,
-	       std::uint32_t timeout_ms = 0);
+  void add_sentinel(const std::string &host, std::size_t port,
+                    std::uint32_t timeout_ms = 0);
 
   //!
   //!  retrieve sentinel for current client
@@ -288,8 +268,7 @@ public:
   //!  @return sentinel associated to current client
   //!
   //!
-  const sentinel &
-  get_sentinel() const;
+  const sentinel &get_sentinel() const;
 
   //!
   //!  retrieve sentinel for current client
@@ -298,15 +277,13 @@ public:
   //!  @return sentinel associated to current client
   //!
   //!
-  sentinel &
-  get_sentinel();
+  sentinel &get_sentinel();
 
   //!
   //!  clear all existing sentinels.
   //!
   //!
-  void
-  clear_sentinels();
+  void clear_sentinels();
 
 private:
   //!
@@ -327,9 +304,8 @@ private:
   //!  @param reply parsed reply
   //!
   //!
-  void
-  connection_receive_handler(network::redis_connection &connection,
-			     reply &reply);
+  void connection_receive_handler(network::redis_connection &connection,
+                                  reply &reply);
 
   //!
   //!  redis_connection disconnection handler, triggered whenever a
@@ -338,8 +314,7 @@ private:
   //!  @param connection redis_connection instance
   //!
   //!
-  void
-  connection_disconnection_handler(network::redis_connection &connection);
+  void connection_disconnection_handler(network::redis_connection &connection);
 
   //!
   //!  trigger the ack callback for matching channel/pattern
@@ -348,8 +323,7 @@ private:
   //!  @param reply received reply
   //!
   //!
-  void
-  handle_acknowledgement_reply(const std::vector<reply> &reply);
+  void handle_acknowledgement_reply(const std::vector<reply> &reply);
 
   //!
   //!  trigger the sub callback for all matching channels/patterns
@@ -358,8 +332,7 @@ private:
   //!  @param reply received reply
   //!
   //!
-  void
-  handle_subscribe_reply(const std::vector<reply> &reply);
+  void handle_subscribe_reply(const std::vector<reply> &reply);
 
   //!
   //!  trigger the sub callback for all matching channels/patterns
@@ -368,8 +341,7 @@ private:
   //!  @param reply received reply
   //!
   //!
-  void
-  handle_psubscribe_reply(const std::vector<reply> &reply);
+  void handle_psubscribe_reply(const std::vector<reply> &reply);
 
   //!
   //!  find channel or pattern that is associated to the reply and call its ack
@@ -383,12 +355,10 @@ private:
   //!  @param nb_chans redis server ack reply
   //!
   //!
-  void
-  call_acknowledgement_callback(
+  void call_acknowledgement_callback(
       const std::string &channel,
       const std::map<std::string, callback_holder> &channels,
-      std::mutex &channels_mtx,
-      int64_t nb_chans);
+      std::mutex &channels_mtx, int64_t nb_chans);
 
 private:
   //!
@@ -397,44 +367,38 @@ private:
   //!  case of success
   //!
   //!
-  void
-  reconnect();
+  void reconnect();
 
   //!
   //!  re authenticate to redis server based on previously used password
   //!
   //!
-  void
-  re_auth();
+  void re_auth();
 
   //!
   //!  resubscribe (sub and psub) to previously subscribed channels/patterns
   //!
   //!
-  void
-  re_subscribe();
+  void re_subscribe();
 
   //!
   //!  @return whether a reconnection attempt should be performed
   //!
   //!
-  bool
-  should_reconnect() const;
+  bool should_reconnect() const;
 
   //!
   //!  sleep between two reconnect attempts if necessary
   //!
   //!
-  void
-  sleep_before_next_reconnect_attempt();
+  void sleep_before_next_reconnect_attempt();
 
   //!
   //!  clear all subscriptions (dirty way, no unsub/punsub commands send: mostly
   //!  used for cleaning in disconnection condition)
   //!
   //!
-  void
-  clear_subscriptions();
+  void clear_subscriptions();
 
 private:
   //!
@@ -448,10 +412,8 @@ private:
   //!  completion (nullable)
   //!
   //!
-  void
-  unprotected_subscribe(
-      const std::string &channel,
-      const subscribe_callback_t &callback,
+  void unprotected_subscribe(
+      const std::string &channel, const subscribe_callback_t &callback,
       const acknowledgement_callback_t &acknowledgement_callback);
 
   //!
@@ -465,10 +427,8 @@ private:
   //!  completion (nullable)
   //!
   //!
-  void
-  unprotected_psubscribe(
-      const std::string &pattern,
-      const subscribe_callback_t &callback,
+  void unprotected_psubscribe(
+      const std::string &pattern, const subscribe_callback_t &callback,
       const acknowledgement_callback_t &acknowledgement_callback);
 
 private:

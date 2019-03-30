@@ -48,22 +48,19 @@ public:
   //! @return current instance
   //!
   //!
-  virtual builder_iface &
-  operator<<(std::string &data) = 0;
+  virtual builder_iface &operator<<(std::string &data) = 0;
 
   //!
   //! @return whether the reply could be built
   //!
   //!
-  virtual bool
-  reply_ready() const = 0;
+  virtual bool reply_ready() const = 0;
 
   //!
   //! @return reply object
   //!
   //!
-  virtual reply_t
-  get_reply() const = 0;
+  virtual reply_t get_reply() const = 0;
 };
 
 } // namespace builders

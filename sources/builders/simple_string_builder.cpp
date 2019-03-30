@@ -30,8 +30,7 @@ namespace builders {
 simple_string_builder::simple_string_builder(void)
     : m_str(""), m_reply_ready(false) {}
 
-builder_iface &
-simple_string_builder::operator<<(std::string &buffer) {
+builder_iface &simple_string_builder::operator<<(std::string &buffer) {
   if (m_reply_ready)
     return *this;
 
@@ -47,18 +46,11 @@ simple_string_builder::operator<<(std::string &buffer) {
   return *this;
 }
 
-bool
-simple_string_builder::reply_ready(void) const {
-  return m_reply_ready;
-}
+bool simple_string_builder::reply_ready(void) const { return m_reply_ready; }
 
-reply
-simple_string_builder::get_reply(void) const {
-  return reply{m_reply};
-}
+reply simple_string_builder::get_reply(void) const { return reply{m_reply}; }
 
-const std::string &
-simple_string_builder::get_simple_string(void) const {
+const std::string &simple_string_builder::get_simple_string(void) const {
   return m_str;
 }
 

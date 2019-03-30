@@ -44,8 +44,7 @@ public:
   //! copy ctor
   bulk_string_builder(const bulk_string_builder &) = delete;
   //! assignment operator
-  bulk_string_builder &
-  operator=(const bulk_string_builder &) = delete;
+  bulk_string_builder &operator=(const bulk_string_builder &) = delete;
 
 public:
   //!
@@ -56,40 +55,32 @@ public:
   //! @param data data to be consumed
   //! @return current instance
   //!
-  builder_iface &
-  operator<<(std::string &data) override;
+  builder_iface &operator<<(std::string &data) override;
 
   //!
   //! @return whether the reply could be built
   //!
-  bool
-  reply_ready() const override;
+  bool reply_ready() const override;
 
   //!
   //! @return reply object
   //!
-  reply
-  get_reply() const override;
+  reply get_reply() const override;
 
   //!
   //! @return the parsed bulk string
   //!
-  const std::string &
-  get_bulk_string() const;
+  const std::string &get_bulk_string() const;
 
   //!
   //! @return whether the bulk string is null
   //!
-  bool
-  is_null() const;
+  bool is_null() const;
 
 private:
-  void
-  build_reply();
-  bool
-  fetch_size(std::string &str);
-  void
-  fetch_str(std::string &str);
+  void build_reply();
+  bool fetch_size(std::string &str);
+  void fetch_str(std::string &str);
 
 private:
   //!

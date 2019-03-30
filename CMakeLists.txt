@@ -21,6 +21,13 @@
 # SOFTWARE.
 
 ###
+# options
+###
+option(BUILD_TESTS "whether to build tests for the project" OFF)
+option(BUILD_EXAMPLES "whether to build the examples" OFF)
+option(USE_CUSTOM_TCP_CLIENT "whether to use a tcp client other than tacopie" OFF)
+
+###
 # config
 ###
 cmake_minimum_required(VERSION 2.8.7)
@@ -76,14 +83,21 @@ endif ()
 ###
 # variables
 ###
-include(ExternalProject)
-ExternalProject_Add(tacopie
+ExternalProject_Add(tacopieGit
+PREFIX tacopie
   GIT_REPOSITORY    https://github.com/Cylix/tacopie.git
   GIT_TAG           origin/master
+  UPDATE_DISCONNECTED  ON
 )
 
-find_path(TACOPIE_INCLUDE_DIR tacopie/tacopie PATHS ${PROJECT_SOURCE_DIR}/tacopie/includes/)
-find_library(TACOPIE_LIBRARY tacopie)
+SET(TACOPIE_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/tacopie/includes)
+SET(TACOPIE_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+
+add_library(tacopie SHARED IMPORTED)
+set_target_properties(tacopie PROPERTIES IMPORTED_LOCATION ${TACOPIE_LIBRARY}/tacopie.a)
+
+# find_path(TACOPIE_INCLUDE_DIR tacopie/tacopie PATHS ${PROJECT_SOURCE_DIR}/tacopie/includes/)
+# find_library(TACOPIE_LIBRARY tacopie)
 set(CPP_REDIS_INCLUDES ${PROJECT_SOURCE_DIR}/includes)
 set(DEPS_INCLUDES ${PROJECT_SOURCE_DIR}/deps/include)
 
@@ -128,7 +142,7 @@ if (USE_CUSTOM_TCP_CLIENT)
 	file(GLOB tacopie_cpp "sources/network/tcp_client.cpp")
 	file(GLOB tacopie_h "includes/cpp_redis/network/tcp_client.hpp")
 	list(REMOVE_ITEM SOURCES ${tacopie_cpp} ${tacopie_h})
-endif (USE_CUSTOM_TCP_CLIENT)
+endif ()
 
 
 ###
@@ -154,35 +168,35 @@ if (WIN32)
 	set_target_properties(${PROJECT}
 						  PROPERTIES COMPILE_PDB_NAME ${PROJECT}
 						  COMPILE_PDB_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
-endif (WIN32)
+endif ()
 
 if (WIN32)
 	target_link_libraries(${PROJECT} ws2_32)
 else ()
 	target_link_libraries(${PROJECT} pthread)
-endif (WIN32)
+endif ()
 
 if (TACOPIE_LIBRARY)
 	target_link_libraries(${PROJECT} ${TACOPIE_LIBRARY})
 else ()
 	target_link_libraries(${PROJECT} tacopie)
-endif (TACOPIE_LIBRARY)
+endif ()
 
 
 # __CPP_REDIS_READ_SIZE
 if (READ_SIZE)
 	set_property(TARGET ${PROJECT} APPEND_STRING PROPERTY COMPILE_DEFINITIONS " __CPP_REDIS_READ_SIZE=${READ_SIZE}")
-endif (READ_SIZE)
+endif ()
 
 # __CPP_REDIS_LOGGING_ENABLED
 if (LOGGING_ENABLED)
 	set_property(TARGET ${PROJECT} APPEND_STRING PROPERTY COMPILE_DEFINITIONS " __CPP_REDIS_LOGGING_ENABLED=${LOGGING_ENABLED}")
-endif (LOGGING_ENABLED)
+endif ()
 
 # __CPP_REDIS_USE_CUSTOM_TCP_CLIENT
 if (USE_CUSTOM_TCP_CLIENT)
 	set_property(TARGET ${PROJECT} APPEND_STRING PROPERTY COMPILE_DEFINITIONS " __CPP_REDIS_USE_CUSTOM_TCP_CLIENT=${USE_CUSTOM_TCP_CLIENT}")
-endif (USE_CUSTOM_TCP_CLIENT)
+endif ()
 
 
 ###
@@ -204,7 +218,7 @@ if (BUILD_EXAMPLES)
 	add_subdirectory(examples)
 	# Reset variable to false to ensure tacopie does no build examples
 	set(BUILD_EXAMPLES false)
-endif (BUILD_EXAMPLES)
+endif ()
 
 ###
 # tests
@@ -217,7 +231,7 @@ if (BUILD_TESTS)
 						CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${PROJECT_SOURCE_DIR}/deps")
 	# Reset variable to false to ensure tacopie does no build tests
 	set(BUILD_TESTS false)
-endif (BUILD_TESTS)
+endif ()
 
 
 ###
@@ -226,4 +240,4 @@ endif (BUILD_TESTS)
 if (NOT TACOPIE_LIBRARY AND NOT USE_CUSTOM_TCP_CLIENT)
 	set(SOURCES)  # reset the SOURCES var so that the tacopie project won't include the cpp_redis sources too
 	add_subdirectory(tacopie)
-endif (NOT TACOPIE_LIBRARY AND NOT USE_CUSTOM_TCP_CLIENT)
+endif ()

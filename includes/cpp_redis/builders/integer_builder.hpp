@@ -58,8 +58,7 @@ public:
   //!  assignment operator
   //!
   //!
-  integer_builder &
-  operator=(const integer_builder &) = delete;
+  integer_builder &operator=(const integer_builder &) = delete;
 
 public:
   //!
@@ -71,29 +70,25 @@ public:
   //!  @return current instance
   //!
   //!
-  builder_iface &
-  operator<<(std::string &data) override;
+  builder_iface &operator<<(std::string &data) override;
 
   //!
   //!  @return whether the reply could be built
   //!
   //!
-  bool
-  reply_ready() const override;
+  bool reply_ready() const override;
 
   //!
   //!  @return reply object
   //!
   //!
-  reply
-  get_reply() const override;
+  reply get_reply() const override;
 
   //!
   //!  @return the parsed integer
   //!
   //!
-  int64_t
-  get_integer() const;
+  int64_t get_integer() const;
 
 private:
   //!

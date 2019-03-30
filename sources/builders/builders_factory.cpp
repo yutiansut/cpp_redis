@@ -33,8 +33,7 @@ namespace cpp_redis {
 
 namespace builders {
 
-std::unique_ptr<builder_iface>
-create_builder(char id) {
+std::unique_ptr<builder_iface> create_builder(char id) {
   switch (id) {
   case '+':
     return std::unique_ptr<simple_string_builder>{new simple_string_builder()};
@@ -48,8 +47,8 @@ create_builder(char id) {
     return std::unique_ptr<array_builder>{new array_builder()};
   default:
     __CPP_REDIS_LOG(
-	error,
-	"cpp_redis::builders::create_builder receives invalid data type");
+        error,
+        "cpp_redis::builders::create_builder receives invalid data type");
     throw redis_error("Invalid data");
   }
 }

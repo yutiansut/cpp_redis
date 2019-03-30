@@ -29,8 +29,7 @@
 #include <Winsock2.h>
 #endif //! _WIN32
 
-int
-main(void) {
+int main(void) {
 #ifdef _WIN32
   //! Windows netword DLL init
   WORD version = MAKEWORD(2, 2);
@@ -44,16 +43,14 @@ main(void) {
 
   cpp_redis::client client;
 
-  client.connect("127.0.0.1",
-		 6379,
-		 [](const std::string &host,
-		    std::size_t port,
-		    cpp_redis::connect_state status) {
-		   if (status == cpp_redis::connect_state::dropped) {
-		     std::cout << "client disconnected from " << host << ":"
-			       << port << std::endl;
-		   }
-		 });
+  client.connect("127.0.0.1", 6379,
+                 [](const std::string &host, std::size_t port,
+                    cpp_redis::connect_state status) {
+                   if (status == cpp_redis::connect_state::dropped) {
+                     std::cout << "client disconnected from " << host << ":"
+                               << port << std::endl;
+                   }
+                 });
 
   //! client kill ip:port
   client.client_list([&client](cpp_redis::reply_t &reply) {
@@ -63,9 +60,9 @@ main(void) {
     ss >> addr >> addr;
 
     std::string host = std::string(addr.begin() + addr.find('=') + 1,
-				   addr.begin() + addr.find(':'));
+                                   addr.begin() + addr.find(':'));
     int port =
-	std::stoi(std::string(addr.begin() + addr.find(':') + 1, addr.end()));
+        std::stoi(std::string(addr.begin() + addr.find(':') + 1, addr.end()));
 
     client.client_kill(host, port, [](cpp_redis::reply_t &reply) {
       std::cout << reply << std::endl; //! OK
@@ -78,16 +75,14 @@ main(void) {
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
   if (!client.is_connected()) {
-    client.connect("127.0.0.1",
-		   6379,
-		   [](const std::string &host,
-		      std::size_t port,
-		      cpp_redis::connect_state status) {
-		     if (status == cpp_redis::connect_state::dropped) {
-		       std::cout << "client disconnected from " << host << ":"
-				 << port << std::endl;
-		     }
-		   });
+    client.connect("127.0.0.1", 6379,
+                   [](const std::string &host, std::size_t port,
+                      cpp_redis::connect_state status) {
+                     if (status == cpp_redis::connect_state::dropped) {
+                       std::cout << "client disconnected from " << host << ":"
+                                 << port << std::endl;
+                     }
+                   });
   }
 
   //! client kill filter
@@ -98,13 +93,11 @@ main(void) {
     ss >> id_str;
 
     uint64_t id = std::stoi(
-	std::string(id_str.begin() + id_str.find('=') + 1, id_str.end()));
-    client.client_kill(id,
-		       false,
-		       cpp_redis::client::client_type::normal,
-		       [](cpp_redis::reply_t &reply) {
-			 std::cout << reply << std::endl; //! 1
-		       });
+        std::string(id_str.begin() + id_str.find('=') + 1, id_str.end()));
+    client.client_kill(id, false, cpp_redis::client::client_type::normal,
+                       [](cpp_redis::reply_t &reply) {
+                         std::cout << reply << std::endl; //! 1
+                       });
 
     client.commit();
   });

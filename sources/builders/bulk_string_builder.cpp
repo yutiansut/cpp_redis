@@ -31,8 +31,7 @@ namespace builders {
 bulk_string_builder::bulk_string_builder(void)
     : m_str_size(0), m_str(""), m_is_null(false), m_reply_ready(false) {}
 
-void
-bulk_string_builder::build_reply(void) {
+void bulk_string_builder::build_reply(void) {
   if (m_is_null)
     m_reply.set();
   else
@@ -41,8 +40,7 @@ bulk_string_builder::build_reply(void) {
   m_reply_ready = true;
 }
 
-bool
-bulk_string_builder::fetch_size(std::string &buffer) {
+bool bulk_string_builder::fetch_size(std::string &buffer) {
   if (m_int_builder.reply_ready())
     return true;
 
@@ -59,16 +57,15 @@ bulk_string_builder::fetch_size(std::string &buffer) {
   return true;
 }
 
-void
-bulk_string_builder::fetch_str(std::string &buffer) {
+void bulk_string_builder::fetch_str(std::string &buffer) {
   if (buffer.size() <
       static_cast<std::size_t>(m_str_size) + 2) // also wait for end sequence
     return;
 
   if (buffer[m_str_size] != '\r' || buffer[m_str_size + 1] != '\n') {
     __CPP_REDIS_LOG(error,
-		    "cpp_redis::builders::bulk_string_builder receives invalid "
-		    "ending sequence");
+                    "cpp_redis::builders::bulk_string_builder receives invalid "
+                    "ending sequence");
     throw redis_error("Wrong ending sequence");
   }
 
@@ -77,8 +74,7 @@ bulk_string_builder::fetch_str(std::string &buffer) {
   build_reply();
 }
 
-builder_iface &
-bulk_string_builder::operator<<(std::string &buffer) {
+builder_iface &bulk_string_builder::operator<<(std::string &buffer) {
   if (m_reply_ready)
     return *this;
 
@@ -91,25 +87,15 @@ bulk_string_builder::operator<<(std::string &buffer) {
   return *this;
 }
 
-bool
-bulk_string_builder::reply_ready(void) const {
-  return m_reply_ready;
-}
+bool bulk_string_builder::reply_ready(void) const { return m_reply_ready; }
 
-reply
-bulk_string_builder::get_reply(void) const {
-  return reply{m_reply};
-}
+reply bulk_string_builder::get_reply(void) const { return reply{m_reply}; }
 
-const std::string &
-bulk_string_builder::get_bulk_string(void) const {
+const std::string &bulk_string_builder::get_bulk_string(void) const {
   return m_str;
 }
 
-bool
-bulk_string_builder::is_null(void) const {
-  return m_is_null;
-}
+bool bulk_string_builder::is_null(void) const { return m_is_null; }
 
 } // namespace builders
 

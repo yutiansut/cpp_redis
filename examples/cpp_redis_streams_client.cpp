@@ -26,8 +26,7 @@
 #include <Winsock2.h>
 #endif //! _WIN32
 
-int
-main() {
+int main() {
 #ifdef _WIN32
   //! Windows netword DLL init
   WORD version = MAKEWORD(2, 2);
@@ -45,16 +44,14 @@ main() {
 
   cpp_redis::client client;
 
-  client.connect("127.0.0.1",
-		 6379,
-		 [](const std::string &host,
-		    std::size_t port,
-		    cpp_redis::connect_state status) {
-		   if (status == cpp_redis::connect_state::dropped) {
-		     std::cout << "client disconnected from " << host << ":"
-			       << port << std::endl;
-		   }
-		 });
+  client.connect("127.0.0.1", 6379,
+                 [](const std::string &host, std::size_t port,
+                    cpp_redis::connect_state status) {
+                   if (status == cpp_redis::connect_state::dropped) {
+                     std::cout << "client disconnected from " << host << ":"
+                               << port << std::endl;
+                   }
+                 });
 
   auto reply_cmd = [](cpp_redis::reply_t &reply) {
     std::cout << "response: " << reply.as_string() << std::endl;
@@ -74,14 +71,13 @@ main() {
 
   client.xgroup_create(session_name, group_name, reply_cmd);
 
-  client.xadd(session_name,
-	      "*",
-	      {{"message", "hello"}, {"details", "some details"}},
-	      [&](cpp_redis::reply_t &reply) {
-		std::cout << "response: " << reply.as_string() << std::endl;
-		message_id = reply.as_string();
-		std::cout << "message id: " << message_id << std::endl;
-	      });
+  client.xadd(session_name, "*",
+              {{"message", "hello"}, {"details", "some details"}},
+              [&](cpp_redis::reply_t &reply) {
+                std::cout << "response: " << reply.as_string() << std::endl;
+                message_id = reply.as_string();
+                std::cout << "message id: " << message_id << std::endl;
+              });
 
   client.sync_commit();
 
@@ -107,32 +103,32 @@ main() {
 
   client.xreadgroup(
       {
-	  group_name,
-	  "0",
-	  {{session_name}, {">"}},
-	  1,
-	  -1,
-	  false // count, block, no_ack
+          group_name,
+          "0",
+          {{session_name}, {">"}},
+          1,
+          -1,
+          false // count, block, no_ack
       },
       [](cpp_redis::reply_t &reply) {
-	cpp_redis::xstream_reply msg(reply);
-	std::cout << msg << std::endl;
+        cpp_redis::xstream_reply msg(reply);
+        std::cout << msg << std::endl;
       });
 
   client.sync_commit(std::chrono::milliseconds(100));
 
   client.xreadgroup(
       {
-	  group_name,
-	  consumer_name,
-	  {{session_name}, {">"}},
-	  1,
-	  0,
-	  false // count, block, no_ack
+          group_name,
+          consumer_name,
+          {{session_name}, {">"}},
+          1,
+          0,
+          false // count, block, no_ack
       },
       [](cpp_redis::reply_t &reply) {
-	cpp_redis::xstream_reply msg(reply);
-	std::cout << msg << std::endl;
+        cpp_redis::xstream_reply msg(reply);
+        std::cout << msg << std::endl;
       });
 
   // commands are pipelined and only sent when client.commit() is called

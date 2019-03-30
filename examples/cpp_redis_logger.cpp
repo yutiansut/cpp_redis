@@ -32,33 +32,29 @@ public:
 
   //! copy ctor & assignment operator
   my_logger(const my_logger &) = default;
-  my_logger &
-  operator=(const my_logger &) = default;
+  my_logger &operator=(const my_logger &) = default;
 
 public:
-  void
-  debug(const std::string &msg, const std::string &file, std::size_t line) {
+  void debug(const std::string &msg, const std::string &file,
+             std::size_t line) {
     std::cout << "debug: " << msg << " @ " << file << ":" << line << std::endl;
   }
 
-  void
-  info(const std::string &msg, const std::string &file, std::size_t line) {
+  void info(const std::string &msg, const std::string &file, std::size_t line) {
     std::cout << "info: " << msg << " @ " << file << ":" << line << std::endl;
   }
 
-  void
-  warn(const std::string &msg, const std::string &file, std::size_t line) {
+  void warn(const std::string &msg, const std::string &file, std::size_t line) {
     std::cout << "warn: " << msg << " @ " << file << ":" << line << std::endl;
   }
 
-  void
-  error(const std::string &msg, const std::string &file, std::size_t line) {
+  void error(const std::string &msg, const std::string &file,
+             std::size_t line) {
     std::cerr << "error: " << msg << " @ " << file << ":" << line << std::endl;
   }
 };
 
-int
-main(void) {
+int main(void) {
   //! By default, no logging
   //! Force logger call, just for the example (you will never have to do that by
   //! yourself)

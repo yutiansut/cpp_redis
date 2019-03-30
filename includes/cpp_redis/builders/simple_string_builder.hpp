@@ -57,8 +57,7 @@ public:
   //!  assignment operator
   //!
   //!
-  simple_string_builder &
-  operator=(const simple_string_builder &) = delete;
+  simple_string_builder &operator=(const simple_string_builder &) = delete;
 
 public:
   //!
@@ -70,29 +69,25 @@ public:
   //!  @return current instance
   //!
   //!
-  builder_iface &
-  operator<<(std::string &data) override;
+  builder_iface &operator<<(std::string &data) override;
 
   //!
   //!  @return whether the reply could be built
   //!
   //!
-  bool
-  reply_ready() const override;
+  bool reply_ready() const override;
 
   //!
   //!  @return reply object
   //!
   //!
-  reply
-  get_reply() const override;
+  reply get_reply() const override;
 
   //!
   //!  @return the parsed simple string
   //!
   //!
-  const std::string &
-  get_simple_string() const;
+  const std::string &get_simple_string() const;
 
 private:
   //!

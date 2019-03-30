@@ -118,7 +118,7 @@ TEST(RedisClient, SyncCommitTimeoutNotConnected) {
   cpp_redis::client client;
 
   EXPECT_THROW(client.sync_commit(std::chrono::milliseconds(100)),
-	       cpp_redis::redis_error);
+               cpp_redis::redis_error);
 }
 
 TEST(RedisClient, SyncCommitTimeout) {
@@ -169,7 +169,7 @@ TEST(RedisClient, SendConnectedSyncCommitConnected) {
 
   std::atomic_bool<bool> callback_run = ATOMIC_VAR_INIT(false);
   client.send({"GET", "HELLO"},
-	      [&](cpp_redis::reply_t &) { callback_run = true; });
+              [&](cpp_redis::reply_t &) { callback_run = true; });
 
   client.sync_commit();
   EXPECT_TRUE(callback_run);
@@ -180,7 +180,7 @@ TEST(RedisClient, SendNotConnectedSyncCommitConnected) {
 
   std::atomic<bool> callback_run = ATOMIC_VAR_INIT(false);
   client.send({"GET", "HELLO"},
-	      [&](cpp_redis::reply_t &) { callback_run = true; });
+              [&](cpp_redis::reply_t &) { callback_run = true; });
 
   client.connect();
   client.sync_commit();
@@ -192,7 +192,7 @@ TEST(RedisClient, SendNotConnectedSyncCommitNotConnectedSyncCommitConnected) {
 
   std::atomic<bool> callback_run = ATOMIC_VAR_INIT(false);
   client.send({"GET", "HELLO"},
-	      [&](cpp_redis::reply_t &) { callback_run = true; });
+              [&](cpp_redis::reply_t &) { callback_run = true; });
 
   EXPECT_THROW(client.sync_commit(), cpp_redis::redis_error);
   client.connect();
@@ -246,10 +246,10 @@ TEST(RedisClient, MultipleSendPipeline) {
     EXPECT_TRUE(reply.as_string() == "PONG");
   });
   client.send({"SET", "HELLO", "MultipleSendPipeline"},
-	      [&](cpp_redis::reply_t &reply) {
-		EXPECT_TRUE(reply.is_string());
-		EXPECT_TRUE(reply.as_string() == "OK");
-	      });
+              [&](cpp_redis::reply_t &reply) {
+                EXPECT_TRUE(reply.is_string());
+                EXPECT_TRUE(reply.as_string() == "OK");
+              });
   client.send({"GET", "HELLO"}, [&](cpp_redis::reply_t &reply) {
     EXPECT_TRUE(reply.is_string());
     EXPECT_TRUE(reply.as_string() == "MultipleSendPipeline");
@@ -263,13 +263,12 @@ TEST(RedisClient, DisconnectionHandlerWithQuit) {
 
   std::atomic<bool> disconnection_handler_called = ATOMIC_VAR_INIT(false);
   client.connect(
-      "127.0.0.1",
-      6379,
+      "127.0.0.1", 6379,
       [&](const std::string &, std::size_t, cpp_redis::connect_state status) {
-	if (status == cpp_redis::connect_state::dropped) {
-	  disconnection_handler_called = true;
-	  cv.notify_all();
-	}
+        if (status == cpp_redis::connect_state::dropped) {
+          disconnection_handler_called = true;
+          cv.notify_all();
+        }
       });
 
   client.send({"QUIT"});
@@ -288,13 +287,12 @@ TEST(RedisClient, DisconnectionHandlerWithoutQuit) {
 
   std::atomic<bool> disconnection_handler_called = ATOMIC_VAR_INIT(false);
   client.connect(
-      "127.0.0.1",
-      6379,
+      "127.0.0.1", 6379,
       [&](const std::string &, std::size_t, cpp_redis::connect_state status) {
-	if (status == cpp_redis::connect_state::dropped) {
-	  disconnection_handler_called = true;
-	  cv.notify_all();
-	}
+        if (status == cpp_redis::connect_state::dropped) {
+          disconnection_handler_called = true;
+          cv.notify_all();
+        }
       });
 
   client.sync_commit();

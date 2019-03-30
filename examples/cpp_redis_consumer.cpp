@@ -33,13 +33,9 @@
 
 std::condition_variable should_exit;
 
-void
-sigint_handler(int) {
-  should_exit.notify_all();
-}
+void sigint_handler(int) { should_exit.notify_all(); }
 
-int
-main() {
+int main() {
 #ifdef _WIN32
   //! Windows netword DLL init
   WORD version = MAKEWORD(2, 2);
@@ -63,49 +59,47 @@ main() {
 
   cpp_redis::consumer sub(session_name, consumer_name);
 
-  sub.connect("127.0.0.1",
-	      6379,
-	      [](const std::string &host,
-		 std::size_t port,
-		 cpp_redis::connect_state status) {
-		if (status == cpp_redis::connect_state::dropped) {
-		  std::cout << "client disconnected from " << host << ":"
-			    << port << std::endl;
-		}
-	      });
+  sub.connect("127.0.0.1", 6379,
+              [](const std::string &host, std::size_t port,
+                 cpp_redis::connect_state status) {
+                if (status == cpp_redis::connect_state::dropped) {
+                  std::cout << "client disconnected from " << host << ":"
+                            << port << std::endl;
+                }
+              });
 
   sub.auth("{redis_key}");
 
   for (auto &group : group_names) {
 
     sub.subscribe(group,
-		  [group](const cpp_redis::message_type msg) {
-		    cpp_redis::consumer_response_t res;
-		    // Callback will run for each message obtained from the
-		    // queue
-		    std::cout << "Group: " << group << std::endl;
-		    std::cout << "Id in the cb: " << msg.get_id() << std::endl;
-		    res.insert({"Id", msg.get_id()});
-		    return res;
-		  },
-		  [group](int ack_status) {
-		    // Callback will run upon return of xack
-		    std::cout << "Group: " << group << std::endl;
-		    std::cout << "Ack status: " << ack_status << std::endl;
-		  });
+                  [group](const cpp_redis::message_type msg) {
+                    cpp_redis::consumer_response_t res;
+                    // Callback will run for each message obtained from the
+                    // queue
+                    std::cout << "Group: " << group << std::endl;
+                    std::cout << "Id in the cb: " << msg.get_id() << std::endl;
+                    res.insert({"Id", msg.get_id()});
+                    return res;
+                  },
+                  [group](int ack_status) {
+                    // Callback will run upon return of xack
+                    std::cout << "Group: " << group << std::endl;
+                    std::cout << "Ack status: " << ack_status << std::endl;
+                  });
   }
 
   /*sub.subscribe(group_name,
-		      [](const cpp_redis::message_type msg) {
-				      // Callback will run for each message
-     obtained from the queue std::cout << "Id in the cb: " << msg.get_id() <<
-     std::endl; return msg;
-		      },
-		      [](int ack_status) {
-				      // Callback will run upon return of xack
-				      std::cout << "Ack status: " << ack_status
-     << std::endl;
-		      });*/
+                          [](const cpp_redis::message_type msg) {
+                                          // Callback will run for each message
+         obtained from the queue std::cout << "Id in the cb: " << msg.get_id()
+     << std::endl; return msg;
+                          },
+                          [](int ack_status) {
+                                          // Callback will run upon return of
+     xack std::cout << "Ack status: " << ack_status
+         << std::endl;
+                          });*/
 
   sub.commit();
 

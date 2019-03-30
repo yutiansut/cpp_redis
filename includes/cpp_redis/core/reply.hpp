@@ -119,8 +119,7 @@ public:
   //!  assignment operator
   //!
   //!
-  reply &
-  operator=(const reply &) = default;
+  reply &operator=(const reply &) = default;
 
   //!
   //!  move ctor
@@ -132,73 +131,63 @@ public:
   //!  move assignment operator
   //!
   //!
-  reply &
-  operator=(reply &&) noexcept;
+  reply &operator=(reply &&) noexcept;
 
 public:
   //!
   //!  @return whether the reply is an array
   //!
   //!
-  bool
-  is_array() const;
+  bool is_array() const;
 
   //!
   //!  @return whether the reply is a string (simple, bulk, error)
   //!
   //!
-  bool
-  is_string() const;
+  bool is_string() const;
 
   //!
   //!  @return whether the reply is a simple string
   //!
   //!
-  bool
-  is_simple_string() const;
+  bool is_simple_string() const;
 
   //!
   //!  @return whether the reply is a bulk string
   //!
   //!
-  bool
-  is_bulk_string() const;
+  bool is_bulk_string() const;
 
   //!
   //!  @return whether the reply is an error
   //!
   //!
-  bool
-  is_error() const;
+  bool is_error() const;
 
   //!
   //!  @return whether the reply is an integer
   //!
   //!
-  bool
-  is_integer() const;
+  bool is_integer() const;
 
   //!
   //!  @return whether the reply is null
   //!
   //!
-  bool
-  is_null() const;
+  bool is_null() const;
 
 public:
   //!
   //!  @return true if function is not an error
   //!
   //!
-  bool
-  ok() const;
+  bool ok() const;
 
   //!
   //!  @return true if function is an error
   //!
   //!
-  bool
-  ko() const;
+  bool ko() const;
 
   //!
   //!  convenience implicit conversion, same as !is_null() / ok()
@@ -207,45 +196,39 @@ public:
   explicit operator bool() const;
 
 public:
-  optional_t<int64_t>
-  try_get_int() const;
+  optional_t<int64_t> try_get_int() const;
 
 public:
   //!
   //!  @return the underlying error
   //!
   //!
-  const std::string &
-  error() const;
+  const std::string &error() const;
 
   //!
   //!  @return the underlying array
   //!
   //!
-  const std::vector<reply> &
-  as_array() const;
+  const std::vector<reply> &as_array() const;
 
   //!
   //!  @return the underlying string
   //!
   //!
-  const std::string &
-  as_string() const;
+  const std::string &as_string() const;
 
   //!
   //!  @return the underlying integer
   //!
   //!
-  int64_t
-  as_integer() const;
+  int64_t as_integer() const;
 
 public:
   //!
   //!  set reply as null
   //!
   //!
-  void
-  set();
+  void set();
 
   //!
   //!  set a string reply
@@ -254,8 +237,7 @@ public:
   //!  @param reply_type of string reply
   //!
   //!
-  void
-  set(const std::string &value, string_type reply_type);
+  void set(const std::string &value, string_type reply_type);
 
   //!
   //!  set an integer reply
@@ -263,8 +245,7 @@ public:
   //!  @param value integer value
   //!
   //!
-  void
-  set(int64_t value);
+  void set(int64_t value);
 
   //!
   //!  set an array reply
@@ -272,8 +253,7 @@ public:
   //!  @param rows array reply
   //!
   //!
-  void
-  set(const std::vector<reply> &rows);
+  void set(const std::vector<reply> &rows);
 
   //!
   //!  for array replies, add a new row to the reply
@@ -282,16 +262,14 @@ public:
   //!  @return current instance
   //!
   //!
-  reply &
-  operator<<(const reply &reply);
+  reply &operator<<(const reply &reply);
 
 public:
   //!
   //!  @return reply type
   //!
   //!
-  type
-  get_type() const;
+  type get_type() const;
 
 private:
   type m_type;
@@ -308,5 +286,4 @@ using reply_t = reply;
 //!  support for output
 //!
 //!
-std::ostream &
-operator<<(std::ostream &os, const cpp_redis::reply_t &reply);
+std::ostream &operator<<(std::ostream &os, const cpp_redis::reply_t &reply);

@@ -57,8 +57,7 @@ public:
   //!  assignment operator
   //!
   //!
-  error_builder &
-  operator=(const error_builder &) = delete;
+  error_builder &operator=(const error_builder &) = delete;
 
 public:
   //!
@@ -70,29 +69,25 @@ public:
   //!  @return current instance
   //!
   //!
-  builder_iface &
-  operator<<(std::string &data) override;
+  builder_iface &operator<<(std::string &data) override;
 
   //!
   //!  @return whether the reply could be built
   //!
   //!
-  bool
-  reply_ready() const override;
+  bool reply_ready() const override;
 
   //!
   //!  @return reply object
   //!
   //!
-  reply_t
-  get_reply() const override;
+  reply_t get_reply() const override;
 
   //!
   //!  @return the parsed error
   //!
   //!
-  const std::string &
-  get_error() const;
+  const std::string &get_error() const;
 
 private:
   //!

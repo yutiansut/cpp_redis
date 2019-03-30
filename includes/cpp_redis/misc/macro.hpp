@@ -25,8 +25,8 @@
 #if _WIN32
 #define __CPP_REDIS_LENGTH(size)                                               \
   static_cast<unsigned int>(size) // for Windows, convert size to `unsigned int`
-#else				  //!
+#else                             //!
 #define __CPP_REDIS_LENGTH(size) size // for Unix, keep size as `size_t`
-#endif				      //!
+#endif                                //!
 
 #define __CPP_REDIS_PRINT(...) printf(__VA_ARGS__)

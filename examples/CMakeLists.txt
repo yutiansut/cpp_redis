@@ -37,7 +37,7 @@ include_directories(${CPP_REDIS_INCLUDES})
 ###
 # libraries
 ###
-link_directories(${DEPS_LIBRARIES})
+link_directories(${VENDOR_LIBRARY_DIR})
 
 set(EXAMPLES cpp_redis_client
               cpp_redis_consumer

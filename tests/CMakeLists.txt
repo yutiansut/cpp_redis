@@ -38,13 +38,13 @@ endif(NOT WIN32)
 ###
 # includes
 ###
-include_directories(${DEPS_INCLUDES} ${CPP_REDIS_INCLUDES})
+include_directories(${VENDOR_INCLUDES} ${CPP_REDIS_INCLUDES})
 
 
 ###
 # libraries
 ###
-link_directories(${DEPS_LIBRARIES})
+link_directories(${VENDOR_LIBRARY_DIR})
 
 
 ###
@@ -57,7 +57,7 @@ foreach(DIR ${DIRS})
   foreach(SOURCE ${s_${DIR}})
     get_filename_component(TEST_NAME ${SOURCE} NAME_WE)
     add_executable(${TEST_NAME} ${MAIN} ${SOURCE})
-    target_link_libraries(${TEST_NAME} cpp_redis gtest)
+    target_link_libraries(${TEST_NAME} cpp_redis gtest tacopie)
     if(WIN32)
       target_link_libraries(${TEST_NAME} ws2_32)
     else()

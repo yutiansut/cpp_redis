@@ -32,6 +32,7 @@ namespace cpp_redis {
 using defer = std::shared_ptr<void>;
 
 #define READ_NEW ">"
+#define CPP_REDIS_WILD_CARD "*"
 
 //!
 //!  reply callback called whenever a reply is received
@@ -77,7 +78,7 @@ public:
       std::string stream, std::string consumer,
       size_t max_concurrency = std::thread::hardware_concurrency());
 
-  consumer_t &subscribe(
+  consumer &subscribe(
       const std::string &group, const consumer_callback_t &consumer_callback,
       const acknowledgement_callback_t &acknowledgement_callback = nullptr);
 

@@ -116,7 +116,7 @@ void consumer::poll() {
 
                             // add results to result stream
                             m_client->ack_client.xadd(m_stream + ":results",
-                                                      "*", response);
+                                                      CPP_REDIS_WILD_CARD, response);
 
                             // acknowledge task completion
                             m_client->ack_client

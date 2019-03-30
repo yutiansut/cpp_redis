@@ -28,23 +28,33 @@
 
 #include <gtest/gtest.h>
 
-TEST(RedisClient, ValidateClusterAddSlots) {
-  cpp_redis::client client;
-
-  client.cluster_addslots({"1", "2", "3"})
-
-      EXPECT_FALSE(client.is_connected());
-  //! should connect to 127.0.0.1:6379
-  EXPECT_NO_THROW(client.connect());
-  EXPECT_TRUE(client.is_connected());
-}
-
-TEST(RedisClient, ValidConnectionDefinedHost) {
+TEST(RedisClient, ValidateClusterNodesReturnsBulkString) {
   cpp_redis::client client;
 
   EXPECT_FALSE(client.is_connected());
   //! should connect to 127.0.0.1:6379
-  EXPECT_NO_THROW(client.connect("127.0.0.1", 6379));
-  EXPECT_NO_THROW(client.sync_commit(std::chrono::milliseconds(100)));
+  EXPECT_NO_THROW(client.connect("127.0.0.1", 30001));
   EXPECT_TRUE(client.is_connected());
+
+  client.cluster_nodes([](cpp_redis::reply_t &reply) {
+    EXPECT_FALSE(reply.is_error());
+    EXPECT_TRUE(reply.is_bulk_string());
+  });
+
+  // client.cluster_addslots({"1", "2", "3"}, [&](const std::string &, [](cpp_redis::reply_t &reply) {
+  //   EXPECT_FALSE(reply.is_error());
+  //   EXPECT_EQ(reply.error(), "OK");
+  // });
+
+  EXPECT_NO_THROW(client.sync_commit());
 }
+
+// TEST(RedisClient, ValidConnectionDefinedHost) {
+//   cpp_redis::client client;
+
+//   EXPECT_FALSE(client.is_connected());
+//   //! should connect to 127.0.0.1:6379
+//   EXPECT_NO_THROW(client.connect("127.0.0.1", 6379));
+//   EXPECT_NO_THROW(client.sync_commit(std::chrono::milliseconds(100)));
+//   EXPECT_TRUE(client.is_connected());
+// }

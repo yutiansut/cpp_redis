@@ -169,6 +169,8 @@ enum class connect_state {
   stopped
 };
 
+using connect_state_t = connect_state;
+
 //!
 //!  connect handler, called whenever a new connection even occurred
 //!

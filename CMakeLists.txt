@@ -83,36 +83,23 @@ endif ()
 ###
 # variables
 ###
-ExternalProject_Add(tacopieGit
-PREFIX tacopie
-  GIT_REPOSITORY    https://github.com/Cylix/tacopie.git
-  GIT_TAG           origin/master
-  UPDATE_DISCONNECTED  ON
-)
-
-SET(TACOPIE_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/tacopie/includes)
-SET(TACOPIE_LIBRARY ${CMAKE_CURRENT_BINARY_DIR}/lib)
-
-add_library(tacopie SHARED IMPORTED)
-set_target_properties(tacopie PROPERTIES IMPORTED_LOCATION ${TACOPIE_LIBRARY}/tacopie.a)
+set(VENDOR_DIR ${PROJECT_SOURCE_DIR}/vendor)
+set(VENDOR_INCLUDES ${VENDOR_DIR}/include)
+set(VENDOR_LIBRARY_DIR ${VENDOR_DIR}/lib ${VENDOR_DIR}/lib64)
 
 # find_path(TACOPIE_INCLUDE_DIR tacopie/tacopie PATHS ${PROJECT_SOURCE_DIR}/tacopie/includes/)
 # find_library(TACOPIE_LIBRARY tacopie)
 set(CPP_REDIS_INCLUDES ${PROJECT_SOURCE_DIR}/includes)
-set(DEPS_INCLUDES ${PROJECT_SOURCE_DIR}/deps/include)
 
 if (NOT USE_CUSTOM_TCP_CLIENT)
-	set(DEPS_INCLUDES ${DEPS_INCLUDES} ${TACOPIE_INCLUDE_DIR})
+	set(VENDOR_INCLUDES ${VENDOR_INCLUDES} ${TACOPIE_INCLUDE_DIR})
 endif ()
-
-set(DEPS_LIBRARIES ${PROJECT_SOURCE_DIR}/deps/lib)
 
 
 ###
 # includes
 ###
-include_directories(${CPP_REDIS_INCLUDES} ${DEPS_INCLUDES})
-
+include_directories(${CPP_REDIS_INCLUDES} ${VENDOR_INCLUDES})
 
 ###
 # sources
@@ -161,8 +148,13 @@ configure_file("cpp_redis.pc.in" "${CMAKE_PKGCONFIG_OUTPUT_DIRECTORY}/cpp_redis.
 ###
 # executable
 ###
-add_library(${PROJECT} ${SOURCES})
+add_library(${PROJECT} STATIC ${SOURCES})
 set_property(TARGET ${PROJECT} PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+###
+# add tacopie as dependency to force clone
+###
+#add_dependencies(${PROJECT} ${TACOPIE_LIBRARY})
 
 if (WIN32)
 	set_target_properties(${PROJECT}
@@ -177,7 +169,8 @@ else ()
 endif ()
 
 if (TACOPIE_LIBRARY)
-	target_link_libraries(${PROJECT} ${TACOPIE_LIBRARY})
+	target_link_libraries(${PROJECT} tacopie)
+	target_include_directories(${PROJECT} PUBLIC ${VENDOR_INCLUDES})
 else ()
 	target_link_libraries(${PROJECT} tacopie)
 endif ()
@@ -210,6 +203,20 @@ install(DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/ DESTINATION lib USE_SOURCE_
 install(DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ DESTINATION bin USE_SOURCE_PERMISSIONS)
 install(DIRECTORY ${CPP_REDIS_INCLUDES}/ DESTINATION include USE_SOURCE_PERMISSIONS)
 
+###
+# tacopie
+###
+if (NOT TACOPIE_LIBRARY AND NOT USE_CUSTOM_TCP_CLIENT)
+	ExternalProject_Add(tacopiegit
+		GIT_REPOSITORY    "https://github.com/Cylix/tacopie.git"
+		CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${VENDOR_DIR}"
+		UPDATE_DISCONNECTED  OFF
+	)
+
+	SET(TACOPIE_INCLUDE_DIR ${VENDOR_INCLUDES})
+	SET(TACOPIE_LIBRARY_DIR ${VENDOR_LIBRARY_DIR})
+	SET(TACOPIE_LIBRARY tacopie)
+endif ()
 
 ###
 # examples
@@ -228,16 +235,8 @@ if (BUILD_TESTS)
 	add_subdirectory(tests)
 	ExternalProject_Add("googletest"
 						GIT_REPOSITORY "https://github.com/google/googletest.git"
-						CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${PROJECT_SOURCE_DIR}/deps")
+						CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${VENDOR_DIR}"
+						UPDATE_DISCONNECTED  ON)
 	# Reset variable to false to ensure tacopie does no build tests
 	set(BUILD_TESTS false)
-endif ()
-
-
-###
-# tacopie
-###
-if (NOT TACOPIE_LIBRARY AND NOT USE_CUSTOM_TCP_CLIENT)
-	set(SOURCES)  # reset the SOURCES var so that the tacopie project won't include the cpp_redis sources too
-	add_subdirectory(tacopie)
 endif ()

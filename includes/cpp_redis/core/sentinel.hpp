@@ -442,4 +442,6 @@ private:
   std::atomic<unsigned int> m_callbacks_running;
 };
 
+using sentinel_t = sentinel;
+
 } // namespace cpp_redis

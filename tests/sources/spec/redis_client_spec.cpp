@@ -167,7 +167,7 @@ TEST(RedisClient, SendConnectedSyncCommitConnected) {
 
   client.connect();
 
-  std::atomic<bool> callback_run = ATOMIC_VAR_INIT(false);
+  std::atomic_bool<bool> callback_run = ATOMIC_VAR_INIT(false);
   client.send({"GET", "HELLO"},
 	      [&](cpp_redis::reply_t &) { callback_run = true; });
 
@@ -176,7 +176,7 @@ TEST(RedisClient, SendConnectedSyncCommitConnected) {
 }
 
 TEST(RedisClient, SendNotConnectedSyncCommitConnected) {
-  cpp_redis::client client;
+  cpp_redis::client_t client;
 
   std::atomic<bool> callback_run = ATOMIC_VAR_INIT(false);
   client.send({"GET", "HELLO"},

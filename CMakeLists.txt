@@ -76,6 +76,12 @@ endif ()
 ###
 # variables
 ###
+include(ExternalProject)
+ExternalProject_Add(tacopie
+  GIT_REPOSITORY    https://github.com/Cylix/tacopie.git
+  GIT_TAG           origin/master
+)
+
 find_path(TACOPIE_INCLUDE_DIR tacopie/tacopie PATHS ${PROJECT_SOURCE_DIR}/tacopie/includes/)
 find_library(TACOPIE_LIBRARY tacopie)
 set(CPP_REDIS_INCLUDES ${PROJECT_SOURCE_DIR}/includes)

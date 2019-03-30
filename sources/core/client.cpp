@@ -1694,7 +1694,7 @@ namespace cpp_redis {
 	}
 
 	client &
-	client::psetex(const std::string &key, int ms, const std::string &val,
+	client::psetex(const std::string &key, int64_t ms, const std::string &val,
 	               const reply_callback_t &reply_callback) {
 		send({"PSETEX", key, std::to_string(ms), val}, reply_callback);
 		return *this;
@@ -1967,7 +1967,7 @@ namespace cpp_redis {
 	}
 
 	client &
-	client::setex(const std::string &key, int seconds, const std::string &value, const reply_callback_t &reply_callback) {
+	client::setex(const std::string &key, int64_t seconds, const std::string &value, const reply_callback_t &reply_callback) {
 		send({"SETEX", key, std::to_string(seconds), value}, reply_callback);
 		return *this;
 	}
@@ -4020,7 +4020,7 @@ namespace cpp_redis {
 	}
 
 	std::future<reply>
-	client::psetex(const std::string &key, int ms, const std::string &val) {
+	client::psetex(const std::string &key, int64_t ms, const std::string &val) {
 		return exec_cmd([=](const reply_callback_t &cb) -> client & { return psetex(key, ms, val, cb); });
 	}
 
@@ -4199,7 +4199,7 @@ namespace cpp_redis {
 	}
 
 	std::future<reply>
-	client::setex(const std::string &key, int seconds, const std::string &value) {
+	client::setex(const std::string &key, int64_t seconds, const std::string &value) {
 		return exec_cmd([=](const reply_callback_t &cb) -> client & { return setex(key, seconds, value, cb); });
 	}
 

@@ -41,7 +41,7 @@ bool array_builder::fetch_array_size(std::string &buffer) {
   if (!m_int_builder.reply_ready())
     return false;
 
-  int64_t size = m_int_builder.get_integer();
+  int_t size = m_int_builder.get_integer();
   if (size < 0) {
     m_reply.set();
     m_reply_ready = true;

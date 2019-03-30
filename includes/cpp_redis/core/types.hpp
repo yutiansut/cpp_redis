@@ -33,7 +33,7 @@
 #include <vector>
 
 namespace cpp_redis {
-using ms = std::int64_t;
+
 //!
 //!  @brief first array is the session name, second is ids
 //!
@@ -45,29 +45,29 @@ using streams_t = std::pair<std::vector<std::string>, std::vector<std::string>>;
 //!
 typedef struct xread_options {
   streams_t Streams;
-  std::int64_t Count;
-  std::int64_t Block;
+  int_t Count;
+  int_t Block;
 } xread_options_t;
 
 typedef struct xreadgroup_options {
   std::string Group;
   std::string Consumer;
   streams_t Streams;
-  std::int64_t Count;
-  std::int64_t Block;
+  int_t Count;
+  int_t Block;
   bool NoAck;
 } xreadgroup_options_t;
 
 typedef struct range_options {
   std::string Start;
   std::string Stop;
-  std::int64_t Count;
+  int_t Count;
 } range_options_t;
 
 typedef struct xclaim_options {
-  std::int64_t Idle;
+  int_t Idle;
   std::time_t *Time;
-  std::int64_t RetryCount;
+  int_t RetryCount;
   bool Force;
   bool JustId;
 } xclaim_options_t;
@@ -108,10 +108,10 @@ class xinfo_reply {
 public:
   explicit xinfo_reply(const cpp_redis::reply_t &data);
 
-  std::int64_t Length;
-  std::int64_t RadixTreeKeys;
-  std::int64_t RadixTreeNodes;
-  std::int64_t Groups;
+  int_t Length;
+  int_t RadixTreeKeys;
+  int_t RadixTreeNodes;
+  int_t Groups;
   std::string LastGeneratedId;
   xmessage_t FirstEntry;
   xmessage_t LastEntry;
@@ -146,7 +146,7 @@ using xstream_reply_t = xstream_reply;
 //!  of channels you are subscribed to)
 //!
 //!
-using acknowledgement_callback_t = std::function<void(const int64_t &)>;
+using acknowledgement_callback_t = std::function<void(const int_t &)>;
 
 //!
 //!  high availability (re)connection states

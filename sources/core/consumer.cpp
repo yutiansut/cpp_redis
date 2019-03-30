@@ -52,17 +52,17 @@ consumer_t &cpp_redis::consumer::subscribe(
   return *this;
 }
 
-void consumer::dispatch_changed_handler(size_t size) {
+void consumer::dispatch_changed_handler(std::size_t size) {
   if (size >= m_max_concurrency) {
     dispatch_queue_full.store(true);
     dispatch_queue_changed.notify_all();
   }
 }
 
-void consumer::connect(const std::string &host, size_t port,
+void consumer::connect(const std::string &host, std::size_t port,
                        const connect_callback_t &connect_callback,
-                       uint32_t timeout_ms, int32_t max_reconnects,
-                       uint32_t reconnect_interval_ms) {
+                       int timeout_ms, int max_reconnects,
+                       int reconnect_interval_ms) {
   m_client->ack_client.connect(host, port, connect_callback, timeout_ms,
                                max_reconnects, reconnect_interval_ms);
   m_client->poll_client.connect(host, port, connect_callback, timeout_ms,
@@ -116,7 +116,8 @@ void consumer::poll() {
 
                             // add results to result stream
                             m_client->ack_client.xadd(m_stream + ":results",
-                                                      CPP_REDIS_WILD_CARD, response);
+                                                      CPP_REDIS_WILD_CARD,
+                                                      response);
 
                             // acknowledge task completion
                             m_client->ack_client

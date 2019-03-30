@@ -99,7 +99,7 @@ endif ()
 ###
 # includes
 ###
-include_directories(${CPP_REDIS_INCLUDES} ${VENDOR_INCLUDES})
+include_directories(${CPP_REDIS_INCLUDES} ${VENDOR_INCLUDES} /usr/include/c++/6)
 
 ###
 # sources

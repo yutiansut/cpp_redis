@@ -76,7 +76,7 @@ class consumer {
 public:
   explicit consumer(
       std::string stream, std::string consumer,
-      size_t max_concurrency = std::thread::hardware_concurrency());
+      std::size_t max_concurrency = std::thread::hardware_concurrency());
 
   consumer &subscribe(
       const std::string &group, const consumer_callback_t &consumer_callback,
@@ -95,8 +95,8 @@ public:
   //!
   void connect(const std::string &host = "127.0.0.1", std::size_t port = 6379,
                const connect_callback_t &connect_callback = nullptr,
-               std::uint32_t timeout_ms = 0, std::int32_t max_reconnects = 0,
-               std::uint32_t reconnect_interval_ms = 0);
+               int timeout_ms = 0, int max_reconnects = 0,
+               int reconnect_interval_ms = 0);
 
   void auth(const std::string &password,
             const reply_callback_t &reply_callback = nullptr);
@@ -110,7 +110,7 @@ public:
   //!
   consumer &commit();
 
-  void dispatch_changed_handler(size_t size);
+  void dispatch_changed_handler(std::size_t size);
 
 private:
   void poll();
@@ -120,7 +120,7 @@ private:
   std::string m_name;
   std::string m_read_id;
   int m_block_sec;
-  size_t m_max_concurrency;
+  std::size_t m_max_concurrency;
   int m_read_count;
 
   client_container_ptr_t m_client;

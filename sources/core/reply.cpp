@@ -31,7 +31,7 @@ reply::reply() : m_type(type::null) {}
 reply::reply(const std::string &value, string_type reply_type)
     : m_type(static_cast<type>(reply_type)), m_str_val(value) {}
 
-reply::reply(int64_t value) : m_type(type::integer), m_int_val(value) {}
+reply::reply(int_t value) : m_type(type::integer), m_int_val(value) {}
 
 reply::reply(const std::vector<reply> &rows)
     : m_type(type::array), m_rows(rows) {}
@@ -43,9 +43,9 @@ reply::reply(reply &&other) noexcept {
   m_int_val = other.m_int_val;
 }
 
-optional_t<int64_t> reply::try_get_int() const {
+optional_t<int_t> reply::try_get_int() const {
   if (is_integer())
-    return optional_t<int64_t>(m_int_val);
+    return optional_t<int_t>(m_int_val);
 
   __CPP_REDIS_LOG(1, "Reply is not an integer");
   return {0};
@@ -82,7 +82,7 @@ void reply::set(const std::string &value, string_type reply_type) {
   m_str_val = value;
 }
 
-void reply::set(int64_t value) {
+void reply::set(int_t value) {
   m_type = type::integer;
   m_int_val = value;
 }
@@ -129,7 +129,7 @@ const std::string &reply::as_string() const {
   return m_str_val;
 }
 
-int64_t reply::as_integer() const {
+int_t reply::as_integer() const {
   if (!is_integer())
     throw cpp_redis::redis_error("Reply is not an integer");
 

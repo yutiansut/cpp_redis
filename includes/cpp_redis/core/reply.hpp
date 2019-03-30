@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include <cpp_redis/misc/types.hpp>
 #include <cpp_redis/misc/optional.hpp>
 
 #include <cstdint>
@@ -92,7 +93,7 @@ public:
   //!  @param value integer value
   //!
   //!
-  explicit reply(int64_t value);
+  explicit reply(int_t value);
 
   //!
   //!  ctor for array values
@@ -196,7 +197,7 @@ public:
   explicit operator bool() const;
 
 public:
-  optional_t<int64_t> try_get_int() const;
+  optional_t<int_t> try_get_int() const;
 
 public:
   //!
@@ -221,7 +222,7 @@ public:
   //!  @return the underlying integer
   //!
   //!
-  int64_t as_integer() const;
+  int_t as_integer() const;
 
 public:
   //!
@@ -245,7 +246,7 @@ public:
   //!  @param value integer value
   //!
   //!
-  void set(int64_t value);
+  void set(int_t value);
 
   //!
   //!  set an array reply
@@ -275,7 +276,7 @@ private:
   type m_type;
   std::vector<cpp_redis::reply> m_rows;
   std::string m_str_val;
-  int64_t m_int_val;
+  int_t m_int_val;
 };
 
 using reply_t = reply;

@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 
+#include <cpp_redis/core/reply.hpp>
 #include <cpp_redis/core/sentinel.hpp>
 #include <cpp_redis/core/types.hpp>
 #include <cpp_redis/helpers/variadic_template.hpp>

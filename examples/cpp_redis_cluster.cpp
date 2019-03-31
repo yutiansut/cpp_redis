@@ -32,11 +32,13 @@
 #endif //! _WIN32
 
 int main(void) {
-  std::string buffer = "131\r\n07c37dfeb235213a872192d90877d0cd55635b91 127.0.0.1:30004 slave e7d1eecce10fd6bb5eb35b9f99a514335d9ba9ca 0 1426238317239 4 connected\r";
-
- 
+  std::string buffer = "235\r\n07c37dfeb235213a872192d90877d0cd55635b91 127.0.0.1:30004 slave e7d1eecce10fd6bb5eb35b9f99a514335d9ba9ca 0 1426238317239 4 connected";
   
   cpp_redis::builders::bulk_string_builder builder;
+  builder << buffer;
+
+  buffer += "\n67ed2db8d677e59ec4a4cefb06858cf2a1a89fa1 127.0.0.1:30002 master - 0 1426238316232 2 connected 5461-10922\r";
+
   builder << buffer;
 
    buffer += "\n";

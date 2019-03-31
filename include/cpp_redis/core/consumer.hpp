@@ -116,12 +116,6 @@ private:
   void poll();
 
 private:
-  std::string m_stream;
-  std::string m_name;
-  std::string m_read_id;
-  int m_block_sec;
-  std::size_t m_max_concurrency;
-  int m_read_count;
 
   client_container_ptr_t m_client;
 
@@ -135,6 +129,36 @@ private:
 
   bool is_ready = false;
   std::atomic_bool m_should_read_pending{true};
+  private:
+  //!
+  //!  the name of the stream
+  //!
+  std::string m_stream;
+
+  //!
+  //!  the name of this consumer group
+  //!
+  std::string m_name;
+
+  //!
+  //!  the topic ID
+  //!
+  std::string m_read_id;
+
+  //!
+  //!  number of milliseconds to block when polling
+  //!
+  int m_block_sec;
+
+  //!
+  //!  maximum number of worker threads
+  //!
+  std::size_t m_max_concurrency;
+  
+  //!
+  //!  number of messages read
+  //!
+  int m_read_count;
 };
 
 using consumer_t = consumer;

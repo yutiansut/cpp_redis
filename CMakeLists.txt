@@ -89,7 +89,7 @@ set(VENDOR_LIBRARY_DIR ${VENDOR_DIR}/lib ${VENDOR_DIR}/lib64)
 
 # find_path(TACOPIE_INCLUDE_DIR tacopie/tacopie PATHS ${PROJECT_SOURCE_DIR}/tacopie/includes/)
 # find_library(TACOPIE_LIBRARY tacopie)
-set(CPP_REDIS_INCLUDES ${PROJECT_SOURCE_DIR}/includes)
+set(CPP_REDIS_INCLUDES ${PROJECT_SOURCE_DIR}/include)
 
 if (NOT USE_CUSTOM_TCP_CLIENT)
 	set(VENDOR_INCLUDES ${VENDOR_INCLUDES} ${TACOPIE_INCLUDE_DIR})
@@ -104,29 +104,43 @@ include_directories(${CPP_REDIS_INCLUDES} ${VENDOR_INCLUDES} /usr/include/c++/6)
 ###
 # sources
 ###
-set(SRC_DIRS "sources"
-	"sources/builders"
-	"sources/core"
-	"sources/misc"
-	"sources/network"
-	"includes/cpp_redis"
-	"includes/cpp_redis/builders"
-	"includes/cpp_redis/core"
-	"includes/cpp_redis/misc"
-	"includes/cpp_redis/network")
+# set(SRC_DIRS "src"
+# 	"src/cpp_redis/builders"
+# 	"src/cpp_redis/core"
+# 	"src/cpp_redis/misc"
+# 	"src/cpp_redis/network"
+# 	)
 
-foreach (dir ${SRC_DIRS})
+# set(INCLUDE_DIRS "includes/cpp_redis"
+# 	"includes/cpp_redis/builders"
+# 	"includes/cpp_redis/core"
+# 	"includes/cpp_redis/misc"
+# 	"includes/cpp_redis/network")
+
+
+#foreach (dir ${SRC_DIRS})
 	# get directory sources and headers
-	file(GLOB s_${dir} "${dir}/*.cpp")
-	file(GLOB h_${dir} "${dir}/*.hpp")
-	file(GLOB i_${dir} "${dir}/*.ipp")
+	# file(GLOB s_${dir} "${dir}/*.cpp")
+	# file(GLOB h_${dir} "${dir}/*.hpp")
+	# file(GLOB i_${dir} "${dir}/*.ipp")
 
 	# set sources
-	set(SOURCES ${SOURCES} ${s_${dir}} ${h_${dir}} ${i_${dir}})
-endforeach ()
+	#set(SOURCES ${SOURCES} ${s_${dir}} ${h_${dir}} ${i_${dir}})
+#endforeach ()
+
+file(GLOB_RECURSE INCLUDES
+	 LIST_DIRECTORIES TRUE
+	 RELATIVE "${PROJECT_SOURCE_DIR}" *.hpp *.ipp)
+
+file(GLOB_RECURSE SOURCES 
+	LIST_DIRECTORIES TRUE
+	 RELATIVE "${PROJECT_SOURCE_DIR}" *.cpp)
+
+set(SOURCES ${SOURCES} ${INCLUDES})
+
 # filter tcp_client if no tacopie
 if (USE_CUSTOM_TCP_CLIENT)
-	file(GLOB tacopie_cpp "sources/network/tcp_client.cpp")
+	file(GLOB tacopie_cpp "sources/cpp_redis/network/tcp_client.cpp")
 	file(GLOB tacopie_h "includes/cpp_redis/network/tcp_client.hpp")
 	list(REMOVE_ITEM SOURCES ${tacopie_cpp} ${tacopie_h})
 endif ()

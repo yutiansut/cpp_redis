@@ -61,3 +61,4 @@ bazel-*
 vendor/bin
 vendor/include
 vendor/lib*
+.cquery

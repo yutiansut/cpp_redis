@@ -81,7 +81,7 @@ typedef struct xpending_options {
 //!  @brief Replies
 //!
 
-class xmessage : public message_type {
+class xmessage : public virtual message_type {
 public:
   xmessage();
 

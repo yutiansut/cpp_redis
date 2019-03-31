@@ -41,6 +41,8 @@
 #include <cpp_redis/network/redis_connection.hpp>
 #include <cpp_redis/network/tcp_client_iface.hpp>
 
+#include <cpp_redis/impl/reply.ipp>
+
 #define __METER "m"
 
 #define __CPP_REDIS_DEFAULT_HOST "127.0.0.1"
@@ -48,11 +50,37 @@
 
 namespace cpp_redis {
 
+  struct client_list_reply {
+    std::string id;
+    std::string addr;
+    std::string name;
+  };
+  using client_list_reply_t = client_list_reply;
+
+  class client_list_payload : public virtual reply_payload_iface<client_list_reply_t> {
+    public:
+    client_list_payload(const reply_t &repl) : reply_payload_iface(repl) {}
+    client_list_reply_t& get_payload() override {
+      client_list_reply resp;
+      if(m_reply.is_bulk_string()) {
+        std::string replstr = m_reply.as_string();
+        auto sep = replstr.find(' ');
+        resp.id = replstr.substr(0,sep);
+        return resp;
+      }
+      throw "Bad reply";
+    }
+  };
+
+  using client_list_payload_t = client_list_payload;
+
 //!
 //!  reply callback called whenever a reply is received
 //!  takes as parameter the received reply
 //!
 using reply_callback_t = std::function<void(reply_t &)>;
+
+using client_list_reply_callback_t = std::function<void(const client_list_payload_t &)>;
 
 using future_reply_t = std::future<reply_t>;
 
@@ -581,6 +609,8 @@ public:
   future_reply_t client_kill_future(T, const Ts...);
 
   client &client_list(const reply_callback_t &reply_callback);
+
+  client &client_list_test(const client_list_reply_callback_t &reply_callback);
 
   future_reply_t client_list();
 

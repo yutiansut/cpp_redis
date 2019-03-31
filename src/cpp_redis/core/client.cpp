@@ -24,6 +24,8 @@
 #include <cpp_redis/misc/error.hpp>
 #include <cpp_redis/misc/macro.hpp>
 
+#include <cpp_redis/impl/reply.ipp>
+
 namespace cpp_redis {
 
 #ifndef __CPP_REDIS_USE_CUSTOM_TCP_CLIENT
@@ -708,6 +710,14 @@ client &client::client_id(const reply_callback_t &reply_callback) {
 
 client &client::client_list(const reply_callback_t &reply_callback) {
   send({"CLIENT", "LIST"}, reply_callback);
+  return *this;
+}
+
+client &client::client_list_test(const client_list_reply_callback_t &reply_callback) {
+  send({"CLIENT", "GETNAME"}, [&](const reply_t &repl) {
+    client_list_payload_t clp(repl);
+    reply_callback(clp);
+  });
   return *this;
 }
 

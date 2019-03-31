@@ -40,7 +40,7 @@ consumer::consumer(std::string stream, std::string consumer,
   // Supply the dispatch queue a callback to notify the queue when it is at max
   // capacity
   m_dispatch_queue = dispatch_queue_ptr_t(new dispatch_queue(
-      stream, [&](size_t size) { dispatch_changed_handler(size); },
+      stream, [&](std::size_t size) { dispatch_changed_handler(size); },
       max_concurrency));
   m_client = client_container_ptr_t(new consumer_client_container());
 }

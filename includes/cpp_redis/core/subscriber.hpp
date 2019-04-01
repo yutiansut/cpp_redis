@@ -161,6 +161,16 @@ namespace cpp_redis {
 			subscriber &auth(const std::string &password, const reply_callback_t &reply_callback = nullptr);
 
 /**
+ * @brief Set the label for the connection on the Redis server via the CLIENT SETNAME command.
+ * This is useful for monitoring and managing connections on the server side of things.
+ * @param name - string to label the connection with on the server side
+ * @param reply_callback callback to be called on auth completion (nullable)
+ * @return current instance
+ *
+ */
+			subscriber& client_setname(const std::string& name, const reply_callback_t& reply_callback = nullptr);
+
+/**
  * subscribe callback, called whenever a new message is published on a subscribed channel
  * takes as parameter the channel and the message
  *
@@ -343,6 +353,12 @@ namespace cpp_redis {
 			void re_auth();
 
 /**
+ * re send CLIENT SETNAME to redis server based on previously used name
+ *
+ */
+			void re_client_setname(void);
+
+/**
  * resubscribe (sub and psub) to previously subscribed channels/patterns
  *
  */
@@ -412,6 +428,12 @@ namespace cpp_redis {
  *
  */
 			std::string m_password;
+
+/**
+ * name to use with CLIENT SETNAME
+ *
+ */
+			std::string m_client_name;
 
 /**
  * tcp client for redis connection
@@ -490,6 +512,12 @@ namespace cpp_redis {
  *
  */
 			reply_callback_t m_auth_reply_callback;
+
+/**
+ * client setname reply callback
+ *
+ */
+			reply_callback_t m_client_setname_reply_callback;
 	};
 
 } // namespace cpp_redis

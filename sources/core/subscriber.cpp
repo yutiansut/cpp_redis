@@ -32,7 +32,8 @@ namespace cpp_redis {
 subscriber::subscriber()
 : m_reconnecting(false)
 , m_cancel(false)
-, m_auth_reply_callback(nullptr) {
+, m_auth_reply_callback(nullptr)
+, m_client_setname_reply_callback(nullptr) {
   __CPP_REDIS_LOG(debug, "cpp_redis::subscriber created");
 }
 #endif /* __CPP_REDIS_USE_CUSTOM_TCP_CLIENT */
@@ -154,6 +155,24 @@ subscriber::auth(const std::string& password, const reply_callback_t& reply_call
   m_client.send({"AUTH", password});
 
   __CPP_REDIS_LOG(info, "cpp_redis::subscriber AUTH command sent");
+
+  return *this;
+}
+
+subscriber&
+subscriber::client_setname(const std::string& name, const reply_callback_t& reply_callback) {
+  __CPP_REDIS_LOG(debug, "cpp_redis::subscriber attempts to send CLIENT SETNAME");
+
+  // Retain the name as CLIENT SETNAME can only be sent between the reAUTH and reSUBSCRIBE
+  // commands on reconnecting.  This makes it impossible to do reliably in the application
+  // layer as opposed to in the subscriber itself for reconnects.  re_client_setname will
+  // send the command at reconnect time.
+  m_client_name = name;
+  m_client_setname_reply_callback = reply_callback;
+
+  m_client.send({"CLIENT", "SETNAME", name});
+
+  __CPP_REDIS_LOG(info, "cpp_redis::subscriber CLIENT SETNAME command sent");
 
   return *this;
 }
@@ -364,6 +383,12 @@ subscriber::connection_receive_handler(network::redis_connection&, reply& reply)
       m_auth_reply_callback(reply);
       m_auth_reply_callback = nullptr;
     }
+    else if (m_client_setname_reply_callback) {
+      __CPP_REDIS_LOG(debug, "cpp_redis::subscriber executes client setname callback");
+
+      m_client_setname_reply_callback(reply);
+      m_client_setname_reply_callback = nullptr;
+    }
 
     return;
   }
@@ -480,6 +505,10 @@ subscriber::reconnect() {
   __CPP_REDIS_LOG(info, "client reconnected ok");
 
   re_auth();
+  // This is the only window that the Redis server will let us send the CLIENT SETNAME
+  // (i.e. between the re_auth and the re_subscriber).  So this needs to be done
+  // by the subscriber as opposed to the application layer for reconnects.
+  re_client_setname();
   re_subscribe();
   commit();
 }
@@ -510,6 +539,22 @@ subscriber::re_auth() {
     }
     else {
       __CPP_REDIS_LOG(warn, std::string("subscriber failed to re-authenticate: " + reply.as_string()).c_str());
+    }
+  });
+}
+
+void
+subscriber::re_client_setname(void) {
+  if (m_client_name.empty()) {
+    return;
+  }
+
+  client_setname(m_client_name, [&](cpp_redis::reply& reply) {
+    if (reply.is_string() && reply.as_string() == "OK") {
+      __CPP_REDIS_LOG(warn, "subscriber successfully re-sent client setname");
+    }
+    else {
+      __CPP_REDIS_LOG(warn, std::string("subscriber failed to re-send client setname: " + reply.as_string()).c_str());
     }
   });
 }

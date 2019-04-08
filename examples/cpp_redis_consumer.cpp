@@ -26,10 +26,7 @@
 #include <signal.h>
 
 #include <cpp_redis/cpp_redis>
-
-#ifdef _WIN32
-#include <Winsock2.h>
-#endif /* _WIN32 */
+#include "winsock_initializer.h"
 
 std::condition_variable should_exit;
 
@@ -40,17 +37,7 @@ sigint_handler(int) {
 
 int
 main() {
-#ifdef _WIN32
-	//! Windows netword DLL init
-	WORD version = MAKEWORD(2, 2);
-	WSADATA data;
-
-	if (WSAStartup(version, &data) != 0) {
-		std::cerr << "WSAStartup() failure" << std::endl;
-		return -1;
-	}
-#endif /* _WIN32 */
-
+	winsock_initializer winsock_init;
 	//! Enable logging
 
 	//const std::string group_name = "groupone";
@@ -106,10 +93,6 @@ main() {
 	std::mutex mtx;
 	std::unique_lock<std::mutex> l(mtx);
 	should_exit.wait(l);
-
-#ifdef _WIN32
-	WSACleanup();
-#endif /* _WIN32 */
 
 	return 0;
 }

@@ -1004,9 +1004,29 @@ namespace cpp_redis {
 	}
 
 	client &
+	client::eval(const std::string &script, const std::vector<std::string> &keys,
+	             const std::vector<std::string> &args, const reply_callback_t &reply_callback) {
+		std::vector<std::string> cmd = {"EVAL", script, std::to_string(keys.size())};
+		cmd.insert(cmd.end(), keys.begin(), keys.end());
+		cmd.insert(cmd.end(), args.begin(), args.end());
+		send(cmd, reply_callback);
+		return *this;
+	}
+
+	client &
 	client::evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
 	                const std::vector<std::string> &args, const reply_callback_t &reply_callback) {
 		std::vector<std::string> cmd = {"EVALSHA", sha1, std::to_string(numkeys)};
+		cmd.insert(cmd.end(), keys.begin(), keys.end());
+		cmd.insert(cmd.end(), args.begin(), args.end());
+		send(cmd, reply_callback);
+		return *this;
+	}
+
+	client &
+	client::evalsha(const std::string &sha1, const std::vector<std::string> &keys,
+	                const std::vector<std::string> &args, const reply_callback_t &reply_callback) {
+		std::vector<std::string> cmd = {"EVALSHA", sha1, std::to_string(keys.size())};
 		cmd.insert(cmd.end(), keys.begin(), keys.end());
 		cmd.insert(cmd.end(), args.begin(), args.end());
 		send(cmd, reply_callback);
@@ -3671,13 +3691,27 @@ namespace cpp_redis {
 	std::future<reply>
 	client::eval(const std::string &script, int numkeys, const std::vector<std::string> &keys,
 	             const std::vector<std::string> &args) {
-		return exec_cmd([=](const reply_callback_t &cb) -> client & { return eval(script, numkeys, keys, args, cb); });
+		(void) numkeys;
+		return exec_cmd([=](const reply_callback_t &cb) -> client & { return eval(script, keys, args, cb); });
+	}
+
+	std::future<reply>
+	client::eval(const std::string &script, const std::vector<std::string> &keys,
+	             const std::vector<std::string> &args) {
+		return exec_cmd([=](const reply_callback_t &cb) -> client & { return eval(script, keys, args, cb); });
+	}
+
+	std::future<reply>
+	client::evalsha(const std::string &sha1, const std::vector<std::string> &keys,
+	                const std::vector<std::string> &args) {
+		return exec_cmd([=](const reply_callback_t &cb) -> client & { return evalsha(sha1, keys, args, cb); });
 	}
 
 	std::future<reply>
 	client::evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
 	                const std::vector<std::string> &args) {
-		return exec_cmd([=](const reply_callback_t &cb) -> client & { return evalsha(sha1, numkeys, keys, args, cb); });
+		(void) numkeys;
+		return exec_cmd([=](const reply_callback_t &cb) -> client & { return evalsha(sha1, keys, args, cb); });
 	}
 
 	std::future<reply>

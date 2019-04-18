@@ -39,6 +39,7 @@
 #include <cpp_redis/misc/logger.hpp>
 #include <cpp_redis/network/redis_connection.hpp>
 #include <cpp_redis/network/tcp_client_iface.hpp>
+#include <cpp_redis/misc/deprecated.hpp>
 
 namespace cpp_redis {
 
@@ -779,16 +780,28 @@ namespace cpp_redis {
 
 			std::future<reply> echo(const std::string &msg);
 
-			client &eval(const std::string &script, int numkeys, const std::vector<std::string> &keys,
+			client &eval(const std::string &script, const std::vector<std::string> &keys,
 			             const std::vector<std::string> &args, const reply_callback_t &reply_callback);
 
-			std::future<reply> eval(const std::string &script, int numkeys, const std::vector<std::string> &keys,
+			DEPRECATED client &eval(const std::string &script, int numkeys, const std::vector<std::string> &keys,
+			             const std::vector<std::string> &args, const reply_callback_t &reply_callback);
+
+			std::future<reply> eval(const std::string &script, const std::vector<std::string> &keys,
 			                        const std::vector<std::string> &args);
 
-			client &evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
+			DEPRECATED std::future<reply> eval(const std::string &script, int numkeys, const std::vector<std::string> &keys,
+			                        const std::vector<std::string> &args);
+
+			client &evalsha(const std::string &sha1, const std::vector<std::string> &keys,
 			                const std::vector<std::string> &args, const reply_callback_t &reply_callback);
 
-			std::future<reply> evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
+			DEPRECATED client &evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
+			                const std::vector<std::string> &args, const reply_callback_t &reply_callback);
+
+			std::future<reply> evalsha(const std::string &sha1, const std::vector<std::string> &keys,
+			                           const std::vector<std::string> &args);
+
+			DEPRECATED std::future<reply> evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
 			                           const std::vector<std::string> &args);
 
 			client &exec(const reply_callback_t &reply_callback);

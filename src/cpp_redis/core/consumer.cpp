@@ -89,6 +89,32 @@ consumer_t &consumer::commit() {
   return *this;
 }
 
+void consumer::dispatch() {
+  m_dispatch_queue->dispatch(
+  m, [&](const message_type &message) {
+    auto response =
+        cb.second.consumer_callback(message);
+
+    // add results to result stream
+    m_client->ack_client.xadd(m_stream + ":results",
+                              CPP_REDIS_WILD_CARD,
+                              response);
+
+    // acknowledge task completion
+    m_client->ack_client
+        .xack(m_stream, cb.first, {message.get_id()},
+              [&](const reply_t &r) {
+                if (r.is_integer()) {
+                  auto ret_int = r.as_integer();
+                  cb.second.acknowledgement_callback(
+                      ret_int);
+                }
+              })
+        .sync_commit();
+    return response;
+  });
+}
+
 void consumer::poll() {
   for (auto &cb : m_callbacks) {
     m_client->poll_client
@@ -109,29 +135,7 @@ void consumer::poll() {
                     if (m_should_read_pending.load())
                       m_read_id = m.get_id();
                     try {
-                      m_dispatch_queue->dispatch(
-                          m, [&](const message_type &message) {
-                            auto response =
-                                cb.second.consumer_callback(message);
-
-                            // add results to result stream
-                            m_client->ack_client.xadd(m_stream + ":results",
-                                                      CPP_REDIS_WILD_CARD,
-                                                      response);
-
-                            // acknowledge task completion
-                            m_client->ack_client
-                                .xack(m_stream, cb.first, {message.get_id()},
-                                      [&](const reply_t &r) {
-                                        if (r.is_integer()) {
-                                          auto ret_int = r.as_integer();
-                                          cb.second.acknowledgement_callback(
-                                              ret_int);
-                                        }
-                                      })
-                                .sync_commit();
-                            return response;
-                          });
+                      dispatch();
                     } catch (std::exception &exc) {
                       __CPP_REDIS_LOG(
                           1, "Processing failed for message id: " + m.get_id() +
@@ -141,18 +145,11 @@ void consumer::poll() {
                   }
                 }
               } else {
-                if (m_should_read_pending.load()) {
-                  m_should_read_pending.store(false);
-                  m_read_id = READ_NEW;
-                  // Set to block infinitely
-                  m_block_sec = 0;
-                  // Set to read 1
-                  m_read_count = 1;
-                }
+                check_for_pending();
               }
               return;
             })
-        .sync_commit(); //(std::chrono::milliseconds(1000));
+        .sync_commit();
   }
 }
 

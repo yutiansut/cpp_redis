@@ -54,24 +54,9 @@ struct consumer_reply {
 
 using consumer_reply_t = consumer_reply;
 
-class consumer_client_container {
-public:
-  consumer_client_container();
-
-  client_t ack_client;
-  client_t poll_client;
-};
-
-using consumer_client_container_t = consumer_client_container;
-
-using client_container_ptr_t = std::unique_ptr<consumer_client_container_t>;
-
-using consumer_callbacks_t =
-    std::multimap<std::string, consumer_callback_container_t>;
-
-// typedef std::map<std::string, consumer_callback_container_t>
-// consumer_callbacks_t;
-
+//!
+//!  background processing using redis streams
+//!
 class consumer {
 public:
   explicit consumer(
@@ -109,27 +94,102 @@ public:
   //!  @return current instance
   //!
   consumer &commit();
+  //!
+  //!  check if it is necessary to read
+  //!  entries from the backlog
+  //!
+  void check_for_pending() {
+    if (m_should_read_pending.load()) {
+        m_should_read_pending.store(false);
+        m_read_id = READ_NEW;
+        // Set to block infinitely
+        m_block_sec = 0;
+        // Set to read 1
+        m_read_count = 1;
+      }
+  }
 
+  //!
+  //!  fires upon a change in the dispatcher.
+  //!  changes occur when a task item is finished
+  //!  or the queue is full.
+  //!
   void dispatch_changed_handler(std::size_t size);
 
 private:
+  //!
+  //!  polls the stream for work items
+  //!
   void poll();
+
+  void dispatch();
 
 private:
 
+  class client_container {
+  public:
+    client_container();
+
+    client_t ack_client;
+    client_t poll_client;
+  };
+
+private:
+  //!
+  //!  internal typedef for mapping callbacks
+  //!
+  using client_container_t = client_container;
+  //!
+  //!  internal typedef for mapping callbacks
+  //!
+  using client_container_ptr_t = std::unique_ptr<client_container_t>;
+  //!
+  //!  internal typedef for mapping callbacks
+  //!
+  using consumer_callbacks_t =
+      std::multimap<std::string, consumer_callback_container_t>;
+
+private:
+  //!
+  //!  the redis client
+  //!
   client_container_ptr_t m_client;
-
+  //!
+  //!  callback container
+  //!
   consumer_callbacks_t m_callbacks;
+  //!
+  //!  mutex for the callback container
+  //!
   std::mutex m_callbacks_mutex;
-
+  //!
+  //!  dispatch queue:
+  //!   fire and forget background processing
+  //!
   dispatch_queue_ptr_t m_dispatch_queue;
+  //!
+  //!  whether to add additional work items
+  //!
   std::atomic_bool dispatch_queue_full{false};
+  //!
+  //!  signals from the dispatcher
+  //!
   std::condition_variable dispatch_queue_changed;
+  //!
+  //!  lock for the condi variable
+  //!
   std::mutex dispatch_queue_changed_mutex;
-
+  //!
+  //!  the name of the stream
+  //!
   bool is_ready = false;
+  //!
+  //!  whether or not the client should read
+  //!  from new or stale
+  //!
   std::atomic_bool m_should_read_pending{true};
-  private:
+
+private:
   //!
   //!  the name of the stream
   //!
@@ -154,15 +214,16 @@ private:
   //!  maximum number of worker threads
   //!
   std::size_t m_max_concurrency;
-  
+
   //!
   //!  number of messages read
   //!
   int m_read_count;
 };
-
+//!
+//!  exported typedef
+//!
 using consumer_t = consumer;
-
 } // namespace cpp_redis
 
 #endif // CPP_REDIS_CONSUMER_HPP

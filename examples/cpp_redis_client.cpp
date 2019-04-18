@@ -29,7 +29,7 @@
 #include <Winsock2.h>
 #endif //! _WIN32
 
-int main(void) {
+int main() {
 #ifdef _WIN32
   //! Windows netword DLL init
   WORD version = MAKEWORD(2, 2);

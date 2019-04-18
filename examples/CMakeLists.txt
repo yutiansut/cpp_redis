@@ -47,6 +47,7 @@ set(EXAMPLES cpp_redis_client
               cpp_redis_kill
               cpp_redis_streams_client
               cpp_redis_high_availability_client
+              cpp_redis_multi_exec
     )
 
 foreach(EXAMPLE IN ITEMS ${EXAMPLES})

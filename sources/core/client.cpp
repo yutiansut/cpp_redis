@@ -398,13 +398,21 @@ namespace cpp_redis {
 			return;
 		}
 
-		unprotected_auth(m_password, [&](cpp_redis::reply &reply) {
+		// In re_auth we do not want to serialize the command to the TCP buffer (i.e. call m_client.send)
+		// as it will get serialized to the buffer in resend_failed_commands after re_auth is called in
+		// reconnect.  So we just push the command into the command queue.
+		//
+		// Otherwise we will end up with the AUTH command serialized to
+		// the buffer twice and in the command queue once, which causes a problem when we get 2 responses
+		// back.  The subsequent responses are off by one in the command callbacks.
+		//
+		m_commands.push({{"AUTH", m_password}, [&](cpp_redis::reply &reply) {
 				if (reply.is_string() && reply.as_string() == "OK") {
 					__CPP_REDIS_LOG(warn, "client successfully re-authenticated");
 				} else {
 					__CPP_REDIS_LOG(warn, std::string("client failed to re-authenticate: " + reply.as_string()).c_str());
 				}
-		});
+		}});
 	}
 
 	void
@@ -996,9 +1004,29 @@ namespace cpp_redis {
 	}
 
 	client &
+	client::eval(const std::string &script, const std::vector<std::string> &keys,
+	             const std::vector<std::string> &args, const reply_callback_t &reply_callback) {
+		std::vector<std::string> cmd = {"EVAL", script, std::to_string(keys.size())};
+		cmd.insert(cmd.end(), keys.begin(), keys.end());
+		cmd.insert(cmd.end(), args.begin(), args.end());
+		send(cmd, reply_callback);
+		return *this;
+	}
+
+	client &
 	client::evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
 	                const std::vector<std::string> &args, const reply_callback_t &reply_callback) {
 		std::vector<std::string> cmd = {"EVALSHA", sha1, std::to_string(numkeys)};
+		cmd.insert(cmd.end(), keys.begin(), keys.end());
+		cmd.insert(cmd.end(), args.begin(), args.end());
+		send(cmd, reply_callback);
+		return *this;
+	}
+
+	client &
+	client::evalsha(const std::string &sha1, const std::vector<std::string> &keys,
+	                const std::vector<std::string> &args, const reply_callback_t &reply_callback) {
+		std::vector<std::string> cmd = {"EVALSHA", sha1, std::to_string(keys.size())};
 		cmd.insert(cmd.end(), keys.begin(), keys.end());
 		cmd.insert(cmd.end(), args.begin(), args.end());
 		send(cmd, reply_callback);
@@ -1694,7 +1722,7 @@ namespace cpp_redis {
 	}
 
 	client &
-	client::psetex(const std::string &key, int ms, const std::string &val,
+	client::psetex(const std::string &key, int64_t ms, const std::string &val,
 	               const reply_callback_t &reply_callback) {
 		send({"PSETEX", key, std::to_string(ms), val}, reply_callback);
 		return *this;
@@ -1967,7 +1995,7 @@ namespace cpp_redis {
 	}
 
 	client &
-	client::setex(const std::string &key, int seconds, const std::string &value, const reply_callback_t &reply_callback) {
+	client::setex(const std::string &key, int64_t seconds, const std::string &value, const reply_callback_t &reply_callback) {
 		send({"SETEX", key, std::to_string(seconds), value}, reply_callback);
 		return *this;
 	}
@@ -3663,13 +3691,27 @@ namespace cpp_redis {
 	std::future<reply>
 	client::eval(const std::string &script, int numkeys, const std::vector<std::string> &keys,
 	             const std::vector<std::string> &args) {
-		return exec_cmd([=](const reply_callback_t &cb) -> client & { return eval(script, numkeys, keys, args, cb); });
+		(void) numkeys;
+		return exec_cmd([=](const reply_callback_t &cb) -> client & { return eval(script, keys, args, cb); });
+	}
+
+	std::future<reply>
+	client::eval(const std::string &script, const std::vector<std::string> &keys,
+	             const std::vector<std::string> &args) {
+		return exec_cmd([=](const reply_callback_t &cb) -> client & { return eval(script, keys, args, cb); });
+	}
+
+	std::future<reply>
+	client::evalsha(const std::string &sha1, const std::vector<std::string> &keys,
+	                const std::vector<std::string> &args) {
+		return exec_cmd([=](const reply_callback_t &cb) -> client & { return evalsha(sha1, keys, args, cb); });
 	}
 
 	std::future<reply>
 	client::evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
 	                const std::vector<std::string> &args) {
-		return exec_cmd([=](const reply_callback_t &cb) -> client & { return evalsha(sha1, numkeys, keys, args, cb); });
+		(void) numkeys;
+		return exec_cmd([=](const reply_callback_t &cb) -> client & { return evalsha(sha1, keys, args, cb); });
 	}
 
 	std::future<reply>
@@ -4020,7 +4062,7 @@ namespace cpp_redis {
 	}
 
 	std::future<reply>
-	client::psetex(const std::string &key, int ms, const std::string &val) {
+	client::psetex(const std::string &key, int64_t ms, const std::string &val) {
 		return exec_cmd([=](const reply_callback_t &cb) -> client & { return psetex(key, ms, val, cb); });
 	}
 
@@ -4199,7 +4241,7 @@ namespace cpp_redis {
 	}
 
 	std::future<reply>
-	client::setex(const std::string &key, int seconds, const std::string &value) {
+	client::setex(const std::string &key, int64_t seconds, const std::string &value) {
 		return exec_cmd([=](const reply_callback_t &cb) -> client & { return setex(key, seconds, value, cb); });
 	}
 

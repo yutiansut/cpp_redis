@@ -39,6 +39,7 @@
 #include <cpp_redis/misc/logger.hpp>
 #include <cpp_redis/network/redis_connection.hpp>
 #include <cpp_redis/network/tcp_client_iface.hpp>
+#include <cpp_redis/misc/deprecated.hpp>
 
 namespace cpp_redis {
 
@@ -779,16 +780,28 @@ namespace cpp_redis {
 
 			std::future<reply> echo(const std::string &msg);
 
-			client &eval(const std::string &script, int numkeys, const std::vector<std::string> &keys,
+			client &eval(const std::string &script, const std::vector<std::string> &keys,
 			             const std::vector<std::string> &args, const reply_callback_t &reply_callback);
 
-			std::future<reply> eval(const std::string &script, int numkeys, const std::vector<std::string> &keys,
+			DEPRECATED client &eval(const std::string &script, int numkeys, const std::vector<std::string> &keys,
+			             const std::vector<std::string> &args, const reply_callback_t &reply_callback);
+
+			std::future<reply> eval(const std::string &script, const std::vector<std::string> &keys,
 			                        const std::vector<std::string> &args);
 
-			client &evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
+			DEPRECATED std::future<reply> eval(const std::string &script, int numkeys, const std::vector<std::string> &keys,
+			                        const std::vector<std::string> &args);
+
+			client &evalsha(const std::string &sha1, const std::vector<std::string> &keys,
 			                const std::vector<std::string> &args, const reply_callback_t &reply_callback);
 
-			std::future<reply> evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
+			DEPRECATED client &evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
+			                const std::vector<std::string> &args, const reply_callback_t &reply_callback);
+
+			std::future<reply> evalsha(const std::string &sha1, const std::vector<std::string> &keys,
+			                           const std::vector<std::string> &args);
+
+			DEPRECATED std::future<reply> evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
 			                           const std::vector<std::string> &args);
 
 			client &exec(const reply_callback_t &reply_callback);
@@ -1151,9 +1164,9 @@ namespace cpp_redis {
 			std::future<reply> ping(const std::string &message);
 
 			client &
-			psetex(const std::string &key, int ms, const std::string &val, const reply_callback_t &reply_callback);
+			psetex(const std::string &key, int64_t ms, const std::string &val, const reply_callback_t &reply_callback);
 
-			std::future<reply> psetex(const std::string &key, int ms, const std::string &val);
+			std::future<reply> psetex(const std::string &key, int64_t ms, const std::string &val);
 
 			client &publish(const std::string &channel, const std::string &message, const reply_callback_t &reply_callback);
 
@@ -1307,9 +1320,9 @@ namespace cpp_redis {
 			std::future<reply> setbit_(const std::string &key, int offset, const std::string &value);
 
 			client &
-			setex(const std::string &key, int seconds, const std::string &value, const reply_callback_t &reply_callback);
+			setex(const std::string &key, int64_t seconds, const std::string &value, const reply_callback_t &reply_callback);
 
-			std::future<reply> setex(const std::string &key, int seconds, const std::string &value);
+			std::future<reply> setex(const std::string &key, int64_t seconds, const std::string &value);
 
 			client &setnx(const std::string &key, const std::string &value, const reply_callback_t &reply_callback);
 

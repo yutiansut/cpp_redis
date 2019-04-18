@@ -24,7 +24,7 @@
 # compilation options
 ###
 if(NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-unused-variable")
 endif(NOT WIN32)
 
 
@@ -47,6 +47,7 @@ set(EXAMPLES cpp_redis_client
               cpp_redis_kill
               cpp_redis_streams_client
               cpp_redis_high_availability_client
+              cpp_redis_multi_exec
     )
 
 foreach(EXAMPLE IN ITEMS ${EXAMPLES})

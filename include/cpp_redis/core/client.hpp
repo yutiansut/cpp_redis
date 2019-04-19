@@ -35,7 +35,7 @@
 
 #include <cpp_redis/core/reply.hpp>
 #include <cpp_redis/core/sentinel.hpp>
-#include <cpp_redis/core/types.hpp>
+#include <cpp_redis/types/streams_types.hpp>
 #include <cpp_redis/helpers/variadic_template.hpp>
 #include <cpp_redis/misc/logger.hpp>
 #include <cpp_redis/network/redis_connection.hpp>
@@ -61,13 +61,14 @@ namespace cpp_redis {
 
   class client_list_payload : public virtual reply_payload_iface<client_list_reply_t> {
     public:
-    client_list_payload(const reply_t &repl) : reply_payload_iface(repl) {}
+    explicit client_list_payload(const reply_t &repl) : reply_payload_iface(repl) {}
+
     client_list_reply_t& get_payload() override {
-      client_list_reply resp;
+      client_list_reply_t resp;
       if(m_reply.is_bulk_string()) {
-        std::string replstr = m_reply.as_string();
-        auto sep = replstr.find(' ');
-        resp.id = replstr.substr(0,sep);
+        std::string repl_str = m_reply.as_string();
+        auto sep = repl_str.find(' ');
+        resp.id = repl_str.substr(0,sep);
         return resp;
       }
       throw "Bad reply";
@@ -260,7 +261,7 @@ public:
     std::unique_lock<std::mutex> lock_callback(m_callbacks_mutex);
     __CPP_REDIS_LOG(debug,
                     "cpp_redis::client waiting for callbacks to complete");
-    if (!m_sync_condvar.wait_for(lock_callback, timeout, [=] {
+    if (!m_sync_cond_var.wait_for(lock_callback, timeout, [=] {
           return m_callbacks_running == 0 && m_commands.empty();
         })) {
       __CPP_REDIS_LOG(debug, "cpp_redis::client finished waiting for callback");
@@ -2690,9 +2691,9 @@ private:
   std::mutex m_callbacks_mutex;
 
   //!
-  //!  condvar for callbacks updates
+  //!  cond var for callbacks updates
   //!
-  std::condition_variable m_sync_condvar;
+  std::condition_variable m_sync_cond_var;
 
   //!
   //!  number of callbacks currently being running

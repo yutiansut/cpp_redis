@@ -14,7 +14,7 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -29,7 +29,7 @@
 #include <string>
 
 #include <cpp_redis/core/sentinel.hpp>
-#include <cpp_redis/core/types.hpp>
+#include <cpp_redis/types/streams_types.hpp>
 #include <cpp_redis/network/redis_connection.hpp>
 #include <cpp_redis/network/tcp_client_iface.hpp>
 
@@ -166,6 +166,15 @@ public:
   //!
   subscriber &auth(const std::string &password,
                    const reply_callback_t &reply_callback = nullptr);
+
+  //!
+  //! @brief Set the label for the connection on the Redis server via the CLIENT SETNAME command.
+  //! This is useful for monitoring and managing connections on the server side of things.
+  //! @param name - string to label the connection with on the server side
+  //! @param reply_callback callback to be called on auth completion (nullable)
+  //! @return current instance
+  //!
+  subscriber& client_setname(const std::string& name, const reply_callback_t& reply_callback = nullptr);
 
   //!
   //!  subscribe callback, called whenever a new message is published on a
@@ -376,6 +385,11 @@ private:
   void re_auth();
 
   //!
+  //! re send CLIENT SETNAME to redis server based on previously used name
+  //!
+  void re_client_setname(void);
+
+  //!
   //!  resubscribe (sub and psub) to previously subscribed channels/patterns
   //!
   //!
@@ -454,6 +468,11 @@ private:
   std::string m_password;
 
   //!
+  //! name to use with CLIENT SETNAME
+  //!
+  std::string m_client_name;
+
+  //!
   //!  tcp client for redis connection
   //!
   //!
@@ -530,6 +549,11 @@ private:
   //!
   //!
   reply_callback_t m_auth_reply_callback;
+
+  //!
+  //! client setname reply callback
+  //!
+  reply_callback_t m_client_setname_reply_callback;
 };
 
 } // namespace cpp_redis

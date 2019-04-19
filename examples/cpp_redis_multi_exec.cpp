@@ -5,7 +5,7 @@
 #include <string>
 
 int
-main(void) {
+main() {
   winsock_initializer winsock_init;
   cpp_redis::client client;
 

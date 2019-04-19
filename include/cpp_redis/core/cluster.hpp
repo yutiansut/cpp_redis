@@ -1,3 +1,5 @@
+#include <utility>
+
 // The MIT License (MIT)
 //
 // Copyright (c) 2015-2017 Simon Ninon <simon.ninon@gmail.com>
@@ -72,9 +74,9 @@ private:
 
 public:
   node(string_t ip, int port)
-      : m_client(new client_t()), m_ip(ip), m_port(port) {}
+      : m_ip(std::move(ip)), m_client(new client_t()), m_port(port) {}
 
-  const void set_address(string_t &address) {
+   void set_address(string_t &address) {
     int sep = address.find_first_of(':');
     m_ip = address.substr(0, sep);
     std::cout << "ip:  " << m_ip << std::endl;
@@ -83,7 +85,7 @@ public:
     m_port = 8000;
     // m_port = std::stoi(address.substr(sep,address.length())); }
   }
-  const int get_port() { return m_port; }
+   int get_port() { return m_port; }
 };
 
 using node_t = node;
@@ -92,7 +94,7 @@ using node_pair_t = std::pair<string_t, node_t>;
 
 using node_ptr_t = std::shared_ptr<node_t>;
 
-using node_map_t = hash_map_t<node_ptr_t>;
+using node_map_t = std::map<string_t, node_ptr_t>;
 
 class node_slots {
 public:

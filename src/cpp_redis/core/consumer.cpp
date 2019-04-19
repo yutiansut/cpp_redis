@@ -14,7 +14,7 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -29,20 +29,22 @@ using namespace std::placeholders;
 
 namespace cpp_redis {
 
-consumer_client_container::consumer_client_container()
+consumer::client_container::client_container()
     : ack_client(), poll_client() {}
 
 consumer::consumer(std::string stream, std::string consumer,
                    std::size_t max_concurrency)
-    : m_stream(std::move(stream)), m_name(std::move(consumer)), m_read_id("0"),
-      m_block_sec(-1), m_max_concurrency(max_concurrency),
-      m_read_count(static_cast<int>(max_concurrency)), m_callbacks() {
+    : m_callbacks(),
+    m_stream(std::move(stream)), m_name(std::move(consumer)), m_read_id("0"),
+      m_block_sec(-1),
+      m_max_concurrency(max_concurrency),
+      m_read_count(static_cast<int>(max_concurrency)){
   // Supply the dispatch queue a callback to notify the queue when it is at max
   // capacity
   m_dispatch_queue = dispatch_queue_ptr_t(new dispatch_queue(
       stream, [&](std::size_t size) { dispatch_changed_handler(size); },
       max_concurrency));
-  m_client = client_container_ptr_t(new consumer_client_container());
+  m_client = consumer::client_container_ptr_t(new consumer::client_container());
 }
 
 consumer_t &cpp_redis::consumer::subscribe(
@@ -89,9 +91,9 @@ consumer_t &consumer::commit() {
   return *this;
 }
 
-void consumer::dispatch() {
+void consumer::dispatch(const xmessage_t &message, const std::pair<std::string, consumer_callback_container_t> &cb) {
   m_dispatch_queue->dispatch(
-  m, [&](const message_type &message) {
+      message, [&](const message_type &message) {
     auto response =
         cb.second.consumer_callback(message);
 
@@ -135,7 +137,7 @@ void consumer::poll() {
                     if (m_should_read_pending.load())
                       m_read_id = m.get_id();
                     try {
-                      dispatch();
+                      dispatch(m, cb);
                     } catch (std::exception &exc) {
                       __CPP_REDIS_LOG(
                           1, "Processing failed for message id: " + m.get_id() +
@@ -152,5 +154,4 @@ void consumer::poll() {
         .sync_commit();
   }
 }
-
 } // namespace cpp_redis

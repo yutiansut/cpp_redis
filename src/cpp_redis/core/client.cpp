@@ -14,7 +14,7 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -211,7 +211,7 @@ client &client::sync_commit() {
 
   std::unique_lock<std::mutex> lock_callback(m_callbacks_mutex);
   __CPP_REDIS_LOG(debug, "cpp_redis::client waiting for callbacks to complete");
-  m_sync_condvar.wait(lock_callback, [=] {
+  m_sync_cond_var.wait(lock_callback, [=] {
     return m_callbacks_running == 0 && m_commands.empty();
   });
   __CPP_REDIS_LOG(debug,
@@ -259,7 +259,7 @@ void client::connection_receive_handler(network::redis_connection &,
   {
     std::lock_guard<std::mutex> lock(m_callbacks_mutex);
     m_callbacks_running -= 1;
-    m_sync_condvar.notify_all();
+    m_sync_cond_var.notify_all();
   }
 }
 
@@ -288,7 +288,7 @@ void client::clear_callbacks() {
       commands.pop();
     }
 
-    m_sync_condvar.notify_all();
+    m_sync_cond_var.notify_all();
   });
   t.detach();
 }

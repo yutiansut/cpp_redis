@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <cpp_redis/core/types.hpp>
+#include <cpp_redis/types/streams_types.hpp>
 
 namespace cpp_redis {
 

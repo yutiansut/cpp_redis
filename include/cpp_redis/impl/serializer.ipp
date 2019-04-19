@@ -58,6 +58,11 @@ protected:
 
 using serializer_ptr_t = std::shared_ptr<serializer_type>;
 
+//!
+//
+template <typename T>
+using hash_map_t = std::multimap<std::string, T>;
+
 template <typename T> class message_impl {
 public:
   virtual const std::string get_id() const = 0;
@@ -79,7 +84,7 @@ public:
 
 protected:
   std::string m_id;
-  std::multimap<std::string, T> m_values;
+  hash_map_t<T> m_values;
 };
 
 class message_type : public message_impl<reply_t> {
@@ -116,7 +121,7 @@ public:
   push(std::vector<reply_t>::const_iterator ptr_begin,
        std::vector<reply_t>::const_iterator ptr_end) override {
     std::string key;
-    size_t i = 2;
+    std::size_t i = 2;
     for (auto pb = ptr_begin; pb != ptr_end; pb++) {
       if (i % 2 == 0) {
         key = pb->as_string();
@@ -132,8 +137,8 @@ public:
     return m_values;
   };
 
-  inline std::multimap<std::string, std::string> get_str_values() const {
-    std::multimap<std::string, std::string> ret;
+  inline hash_map_t<std::string> get_str_values() const {
+    hash_map_t<std::string> ret;
     for (auto &v : m_values) {
       std::stringstream s;
       s << v.second;
@@ -142,6 +147,9 @@ public:
     return ret;
   };
 };
+
+using message_type_t = message_type;
+
 } // namespace cpp_redis
 
 #endif // CPP_REDIS_TYPES_HPP

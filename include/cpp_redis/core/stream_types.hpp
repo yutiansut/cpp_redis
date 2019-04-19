@@ -37,8 +37,7 @@ namespace cpp_redis {
 //!
 //!  @brief first array is the session name, second is ids
 //!
-//!
-using streams_t = std::pair<std::vector<std::string>, std::vector<std::string>>;
+using streams_t = std::pair<std::vector<string_t>, std::vector<string_t>>;
 
 //!
 //!  @brief Options
@@ -50,8 +49,8 @@ typedef struct xread_options {
 } xread_options_t;
 
 typedef struct xreadgroup_options {
-  std::string Group;
-  std::string Consumer;
+  string_t Group;
+  string_t Consumer;
   streams_t Streams;
   int_t Count;
   int_t Block;
@@ -59,8 +58,8 @@ typedef struct xreadgroup_options {
 } xreadgroup_options_t;
 
 typedef struct range_options {
-  std::string Start;
-  std::string Stop;
+  string_t Start;
+  string_t Stop;
   int_t Count;
 } range_options_t;
 
@@ -74,13 +73,12 @@ typedef struct xclaim_options {
 
 typedef struct xpending_options {
   range_options_t Range;
-  std::string Consumer;
+  string_t Consumer;
 } xpending_options_t;
 
 //!
 //!  @brief Replies
 //!
-
 class xmessage : public virtual message_type {
 public:
   xmessage();
@@ -98,7 +96,7 @@ public:
 
   friend std::ostream &operator<<(std::ostream &os, const xstream &xs);
 
-  std::string Stream;
+  string_t Stream;
   std::vector<xmessage_t> Messages;
 };
 
@@ -112,7 +110,7 @@ public:
   int_t RadixTreeKeys;
   int_t RadixTreeNodes;
   int_t Groups;
-  std::string LastGeneratedId;
+  string_t LastGeneratedId;
   xmessage_t FirstEntry;
   xmessage_t LastEntry;
 };
@@ -175,7 +173,7 @@ using connect_state_t = connect_state;
 //!  connect handler, called whenever a new connection even occurred
 //!
 //!
-typedef std::function<void(const std::string &host, std::size_t port,
+typedef std::function<void(const string_t &host, std::size_t port,
                            connect_state status)>
     connect_callback_t;
 

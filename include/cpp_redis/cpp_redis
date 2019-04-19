@@ -33,7 +33,8 @@
 #include <cpp_redis/core/reply.hpp>
 #include <cpp_redis/misc/error.hpp>
 #include <cpp_redis/misc/logger.hpp>
-#include <cpp_redis/core/types.hpp>
+#include <cpp_redis/types/cluster_types.hpp>
+#include <cpp_redis/types/streams_types.hpp>
 
 #endif
 

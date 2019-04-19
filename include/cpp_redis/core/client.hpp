@@ -41,6 +41,8 @@
 #include <cpp_redis/network/redis_connection.hpp>
 #include <cpp_redis/network/tcp_client_iface.hpp>
 
+#include <cpp_redis/misc/deprecated.hpp>
+
 #include <cpp_redis/impl/reply.ipp>
 
 #define __METER "m"
@@ -815,23 +817,29 @@ public:
 
   future_reply_t echo(const std::string &msg);
 
-  client &eval(const std::string &script, int numkeys,
-               const std::vector<std::string> &keys,
-               const std::vector<std::string> &args,
-               const reply_callback_t &reply_callback);
+  client &eval(const std::string &script, const std::vector<std::string> &keys,
+			             const std::vector<std::string> &args, const reply_callback_t &reply_callback);
 
-  future_reply_t eval(const std::string &script, int numkeys,
-                      const std::vector<std::string> &keys,
-                      const std::vector<std::string> &args);
+  DEPRECATED client &eval(const std::string &script, int numkeys, const std::vector<std::string> &keys,
+                const std::vector<std::string> &args, const reply_callback_t &reply_callback);
 
-  client &evalsha(const std::string &sha1, int numkeys,
-                  const std::vector<std::string> &keys,
-                  const std::vector<std::string> &args,
-                  const reply_callback_t &reply_callback);
+  future_reply_t eval(const std::string &script, const std::vector<std::string> &keys,
+                          const std::vector<std::string> &args);
 
-  future_reply_t evalsha(const std::string &sha1, int numkeys,
-                         const std::vector<std::string> &keys,
-                         const std::vector<std::string> &args);
+  DEPRECATED future_reply_t eval(const std::string &script, int numkeys, const std::vector<std::string> &keys,
+                          const std::vector<std::string> &args);
+
+  client &evalsha(const std::string &sha1, const std::vector<std::string> &keys,
+                  const std::vector<std::string> &args, const reply_callback_t &reply_callback);
+
+  DEPRECATED client &evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
+                  const std::vector<std::string> &args, const reply_callback_t &reply_callback);
+
+  future_reply_t evalsha(const std::string &sha1, const std::vector<std::string> &keys,
+                              const std::vector<std::string> &args);
+
+  DEPRECATED future_reply_t evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
+                              const std::vector<std::string> &args);
 
   client &exec(const reply_callback_t &reply_callback);
 
@@ -2693,6 +2701,8 @@ private:
 }; // class client
 
 using client_t = client;
+
+using client_ptr_t = std::unique_ptr<client_t>;
 
 } // namespace cpp_redis
 

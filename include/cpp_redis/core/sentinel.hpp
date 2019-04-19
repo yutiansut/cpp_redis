@@ -20,7 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#ifndef CPP_REDIS_CORE_SENTINEL_HPP_
+#define CPP_REDIS_CORE_SENTINEL_HPP_
 
 #include <atomic>
 #include <condition_variable>
@@ -445,3 +446,5 @@ private:
 using sentinel_t = sentinel;
 
 } // namespace cpp_redis
+
+#endif // !CPP_REDIS_CORE_SENTINEL_HPP_

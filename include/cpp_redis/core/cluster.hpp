@@ -53,29 +53,32 @@ enum class link_state_type { CONNECTED = 1, DISCONNECTED = 2 };
 
 using link_state_t = link_state_type;
 
+using slot_vec_t = std::vector<slot_t>;
+
 class node {
 private:
-  std::string m_ip;
-  std::unique_ptr<client_t> m_client;
+  string_t m_ip;
+  client_ptr_t m_client;
   int m_port;
-  // optional_t<std::string> master;
+  // optional_t<string_t> master;
   int ping_sent;
   int ping_recv;
-  // AKA version. Pick the highest version
-  // when multiple nodes claim the same hash slot
+
+  //! AKA version. Pick the highest version
+  //! when multiple nodes claim the same hash slot
   int config_epoch;
   link_state_t link_state;
-  std::vector<slot_t> slots;
+  slot_vec_t slots;
 
 public:
-  node(std::string ip, int port)
+  node(string_t ip, int port)
       : m_client(new client_t()), m_ip(ip), m_port(port) {}
 
-  const void set_address(std::string &address) {
+  const void set_address(string_t &address) {
     int sep = address.find_first_of(':');
     m_ip = address.substr(0, sep);
     std::cout << "ip:  " << m_ip << std::endl;
-    std::string v = address.substr(sep, address.length());
+    string_t v = address.substr(sep, address.length());
     std::cout << "lksdjf " << v << std::endl;
     m_port = 8000;
     // m_port = std::stoi(address.substr(sep,address.length())); }
@@ -85,7 +88,11 @@ public:
 
 using node_t = node;
 
-using node_map_t = std::map<std::string, std::shared_ptr<node_t>>;
+using node_pair_t = std::pair<string_t, node_t>;
+
+using node_ptr_t = std::shared_ptr<node_t>;
+
+using node_map_t = hash_map_t<node_ptr_t>;
 
 class node_slots {
 public:
@@ -98,13 +105,13 @@ struct cluster_slot {
   slot_t range;
 };
 
-std::istream &operator>>(std::istream &is, std::pair<std::string, node_t> &t) {
+std::istream &operator>>(std::istream &is, node_pair_t &t) {
   // Read string to space
   getline(is >> std::ws, t.first, ' ');
 
   int i = 1;
   while ((is.peek() != '\n') && (is >> std::ws)) {
-    std::string temp;
+    string_t temp;
     getline(is >> std::ws, temp, ' ');
     switch (i) {
     case 1:
@@ -132,7 +139,7 @@ std::istream &operator>>(std::istream &is, std::pair<std::string, node_t> &t) {
 
 std::istream &operator>>(std::istream &is, node_map_t &data) {
   data.clear();
-  std::pair<std::string, node_t> rec = {"", node_t("", 0)};
+  node_pair_t rec = {"", node_t("", 0)};
   while (is >> rec)
     data.insert({rec.first, std::shared_ptr<node_t>(&rec.second)});
   return is;
@@ -141,11 +148,11 @@ std::istream &operator>>(std::istream &is, node_map_t &data) {
 class cluster_client {
 private:
   node_map_t m_nodes;
-  std::vector<std::string> m_slots;
-  std::pair<std::string, int> m_address;
+  std::vector<string_t> m_slots;
+  std::pair<string_t, int> m_address;
 
 public:
-  cluster_client(const std::string ip, int port) : m_address({ip, port}) {}
+  cluster_client(const string_t ip, int port) : m_address({ip, port}) {}
 
   void connect() {
     client_t rclient;

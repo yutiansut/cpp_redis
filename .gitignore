@@ -26,6 +26,10 @@
 .idea
 .vscode
 
+# Vendor
+vendor/*
+!vendor/.gitkeep
+
 # Autogen directories
 build
 *build*

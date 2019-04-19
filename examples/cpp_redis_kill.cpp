@@ -24,23 +24,11 @@
 
 #include <iostream>
 #include <sstream>
+#include "winsock_initializer.h"
 
-#ifdef _WIN32
-#include <Winsock2.h>
-#endif //! _WIN32
-
-int main(void) {
-#ifdef _WIN32
-  //! Windows netword DLL init
-  WORD version = MAKEWORD(2, 2);
-  WSADATA data;
-
-  if (WSAStartup(version, &data) != 0) {
-    std::cerr << "WSAStartup() failure" << std::endl;
-    return -1;
-  }
-#endif //! _WIN32
-
+int
+main(void) {
+  winsock_initializer winsock_init;
   cpp_redis::client client;
 
   client.connect("127.0.0.1", 6379,
@@ -59,10 +47,8 @@ int main(void) {
 
     ss >> addr >> addr;
 
-    std::string host = std::string(addr.begin() + addr.find('=') + 1,
-                                   addr.begin() + addr.find(':'));
-    int port =
-        std::stoi(std::string(addr.begin() + addr.find(':') + 1, addr.end()));
+    std::string host = std::string(addr.begin() + addr.find('=') + 1, addr.begin() + addr.find(':'));
+    int port         = std::stoi(std::string(addr.begin() + addr.find(':') + 1, addr.end()));
 
     client.client_kill(host, port, [](cpp_redis::reply_t &reply) {
       std::cout << reply << std::endl; //! OK
@@ -104,10 +90,6 @@ int main(void) {
 
   client.sync_commit();
   std::this_thread::sleep_for(std::chrono::seconds(1));
-
-#ifdef _WIN32
-  WSACleanup();
-#endif //! _WIN32
 
   return 0;
 }

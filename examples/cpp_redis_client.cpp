@@ -19,55 +19,40 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+#include <string>
 #include <cpp_redis/cpp_redis>
 #include <cpp_redis/misc/macro.hpp>
-#include <string>
+#include "winsock_initializer.h"
 
 #define ENABLE_SESSION = 1
 
-#ifdef _WIN32
-#include <Winsock2.h>
-#endif //! _WIN32
+int
+main(void) {
+	winsock_initializer winsock_init;
+	//! Enable logging
+	cpp_redis::active_logger = std::unique_ptr<cpp_redis::logger>(new cpp_redis::logger);
 
-int main() {
-#ifdef _WIN32
-  //! Windows netword DLL init
-  WORD version = MAKEWORD(2, 2);
-  WSADATA data;
+	cpp_redis::client client;
 
-  if (WSAStartup(version, &data) != 0) {
-    std::cerr << "WSAStartup() failure" << std::endl;
-    return -1;
-  }
-#endif //! _WIN32
+	client.connect("127.0.0.1", 6379,
+	               [](const std::string &host, std::size_t port, cpp_redis::connect_state status) {
+			               if (status == cpp_redis::connect_state::dropped) {
+				               std::cout << "client disconnected from " << host << ":" << port << std::endl;
+			               }
+	               });
 
-  //! Enable logging
-  cpp_redis::active_logger =
-      std::unique_ptr<cpp_redis::logger>(new cpp_redis::logger);
+	auto replcmd = [](const cpp_redis::reply &reply) {
+			std::cout << "set hello 42: " << reply << std::endl;
+			// if (reply.is_string())
+			//   do_something_with_string(reply.as_string())
+	};
 
-  cpp_redis::client client;
+	const std::string group_name = "groupone";
+	const std::string session_name = "sessone";
+	const std::string consumer_name = "ABCD";
 
-  client.connect("127.0.0.1", 6379,
-                 [](const std::string &host, std::size_t port,
-                    cpp_redis::connect_state status) {
-                   if (status == cpp_redis::connect_state::dropped) {
-                     std::cout << "client disconnected from " << host << ":"
-                               << port << std::endl;
-                   }
-                 });
-
-  auto replcmd = [](const cpp_redis::reply_t &reply) {
-    std::cout << "set hello 42: " << reply << std::endl;
-    // if (reply.is_string())
-    //   do_something_with_string(reply.as_string())
-  };
-
-  const std::string group_name = "groupone";
-  const std::string session_name = "sessone";
-  const std::string consumer_name = "ABCD";
-
-  std::multimap<std::string, std::string> ins;
-  ins.insert(std::pair<std::string, std::string>{"message", "hello"});
+	std::multimap<std::string, std::string> ins;
+	ins.insert(std::pair<std::string, std::string>{"message", "hello"});
 
 #ifdef ENABLE_SESSION
 
@@ -126,12 +111,6 @@ int main() {
   // synchronous commit, no timeout
   client.sync_commit();
 
-  // synchronous commit, timeout
-  // client.sync_commit(std::chrono::milliseconds(100));
 
-#ifdef _WIN32
-  WSACleanup();
-#endif //! _WIN32
-
-  return 0;
+	return 0;
 }

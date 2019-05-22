@@ -22,12 +22,11 @@
 
 #include <cpp_redis/cpp_redis>
 
-#include <iostream>
 #include "winsock_initializer.h"
+#include <iostream>
 
-int
-main(void) {
-  winsock_initializer winsock_init;
+int main() {
+  WINSOCK_INITIALIZER()
 
   //! Enable logging
   cpp_redis::active_logger =

@@ -27,10 +27,10 @@ namespace cpp_redis {
 
 template <typename T>
 typename std::enable_if<std::is_same<T, client::client_type>::value>::type
-client::client_kill_unpack_arg(std::vector<std::string> &redis_cmd,
+client::client_kill_unpack_arg(std::vector<string_t> &redis_cmd,
                                reply_callback_t &, client_type type) {
   redis_cmd.emplace_back("TYPE");
-  std::string type_string;
+  string_t type_string;
 
   switch (type) {
   case client_type::normal:
@@ -52,7 +52,7 @@ client::client_kill_unpack_arg(std::vector<std::string> &redis_cmd,
 
 template <typename T>
 typename std::enable_if<std::is_same<T, bool>::value>::type
-client::client_kill_unpack_arg(std::vector<std::string> &redis_cmd,
+client::client_kill_unpack_arg(std::vector<string_t> &redis_cmd,
                                reply_callback_t &, bool skip) {
   redis_cmd.emplace_back("SKIPME");
   redis_cmd.emplace_back(skip ? "yes" : "no");
@@ -60,7 +60,7 @@ client::client_kill_unpack_arg(std::vector<std::string> &redis_cmd,
 
 template <typename T>
 typename std::enable_if<std::is_integral<T>::value>::type
-client::client_kill_unpack_arg(std::vector<std::string> &redis_cmd,
+client::client_kill_unpack_arg(std::vector<string_t> &redis_cmd,
                                reply_callback_t &, uint64_t id) {
   redis_cmd.emplace_back("ID");
   redis_cmd.emplace_back(std::to_string(id));
@@ -68,13 +68,13 @@ client::client_kill_unpack_arg(std::vector<std::string> &redis_cmd,
 
 template <typename T>
 typename std::enable_if<std::is_class<T>::value>::type
-client::client_kill_unpack_arg(std::vector<std::string> &,
+client::client_kill_unpack_arg(std::vector<string_t> &,
                                reply_callback_t &reply_callback, const T &cb) {
   reply_callback = cb;
 }
 
 template <typename T, typename... Ts>
-void client::client_kill_impl(std::vector<std::string> &redis_cmd,
+void client::client_kill_impl(std::vector<string_t> &redis_cmd,
                               reply_callback_t &reply, const T &arg,
                               const Ts &... args) {
   static_assert(!std::is_class<T>::value,
@@ -84,7 +84,7 @@ void client::client_kill_impl(std::vector<std::string> &redis_cmd,
 }
 
 template <typename T>
-void client::client_kill_impl(std::vector<std::string> &redis_cmd,
+void client::client_kill_impl(std::vector<string_t> &redis_cmd,
                               reply_callback_t &reply, const T &arg) {
   client_kill_unpack_arg<T>(redis_cmd, reply, arg);
 }
@@ -98,7 +98,7 @@ inline client &client::client_kill(const T &arg, const Ts &... args) {
         std::is_same<T, typename helpers::back<T, Ts...>::type>::value),
       "Should have at least one filter");
 
-  std::vector<std::string> redis_cmd({"CLIENT", "KILL"});
+  std::vector<string_t> redis_cmd({"CLIENT", "KILL"});
   reply_callback_t reply_cb = nullptr;
   client_kill_impl<T, Ts...>(redis_cmd, reply_cb, arg, args...);
 
@@ -106,11 +106,11 @@ inline client &client::client_kill(const T &arg, const Ts &... args) {
 }
 
 template <typename T, typename... Ts>
-inline client &client::client_kill(const std::string &host, int port,
-                                   const T &arg, const Ts &... args) {
+inline client &client::client_kill(const string_t &host, int port, const T &arg,
+                                   const Ts &... args) {
   static_assert(helpers::is_different_types<T, Ts...>::value,
                 "Should only have one distinct value per filter type");
-  std::vector<std::string> redis_cmd({"CLIENT", "KILL"});
+  std::vector<string_t> redis_cmd({"CLIENT", "KILL"});
 
   //! If we have other type than lambda, then it's a filter
   if (!std::is_class<T>::value) {
@@ -124,14 +124,14 @@ inline client &client::client_kill(const std::string &host, int port,
   return send(redis_cmd, reply_cb);
 }
 
-inline client &client::client_kill(const std::string &host, int port) {
+inline client &client::client_kill(const string_t &host, int port) {
   return client_kill(host, port, reply_callback_t(nullptr));
 }
 
 template <typename... Ts>
 inline client &client::client_kill(const char *host, int port,
                                    const Ts &... args) {
-  return client_kill(std::string(host), port, args...);
+  return client_kill(string_t(host), port, args...);
 }
 
 template <typename T, typename... Ts>

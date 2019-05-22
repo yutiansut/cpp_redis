@@ -85,7 +85,7 @@ public:
   //!  @param reply_type of string reply
   //!
   //!
-  reply(const std::string &value, string_type reply_type);
+  reply(const string_t &value, string_type reply_type);
 
   //!
   //!  ctor for int values
@@ -102,7 +102,7 @@ public:
   //!  @return current instance
   //!
   //!
-  explicit reply(const std::vector<reply> &rows);
+  explicit reply(const vector<reply> &rows);
 
   //!
   //!  dtor
@@ -204,19 +204,19 @@ public:
   //!  @return the underlying error
   //!
   //!
-  const std::string &error() const;
+  const string_t &error() const;
 
   //!
   //!  @return the underlying array
   //!
   //!
-  const std::vector<reply> &as_array() const;
+  const vector<reply> &as_array() const;
 
   //!
   //!  @return the underlying string
   //!
   //!
-  const std::string &as_string() const;
+  const string_t &as_string() const;
 
   //!
   //!  @return the underlying integer
@@ -238,7 +238,7 @@ public:
   //!  @param reply_type of string reply
   //!
   //!
-  void set(const std::string &value, string_type reply_type);
+  void set(const string_t &value, string_type reply_type);
 
   //!
   //!  set an integer reply
@@ -254,7 +254,7 @@ public:
   //!  @param rows array reply
   //!
   //!
-  void set(const std::vector<reply> &rows);
+  void set(const vector<reply> &rows);
 
   //!
   //!  for array replies, add a new row to the reply
@@ -274,8 +274,8 @@ public:
 
 private:
   type m_type;
-  std::vector<cpp_redis::reply> m_rows;
-  std::string m_str_val;
+  vector<cpp_redis::reply> m_rows;
+  string_t m_str_val;
   int_t m_int_val;
 };
 

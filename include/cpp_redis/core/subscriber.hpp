@@ -20,7 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#ifndef CPP_REDIS_CORE_SUBSCRIBER_HPP_
+#define CPP_REDIS_CORE_SUBSCRIBER_HPP_
 
 #include <atomic>
 #include <functional>
@@ -29,9 +30,9 @@
 #include <string>
 
 #include <cpp_redis/core/sentinel.hpp>
-#include <cpp_redis/types/streams_types.hpp>
 #include <cpp_redis/network/redis_connection.hpp>
 #include <cpp_redis/network/tcp_client_iface.hpp>
+#include <cpp_redis/types/streams_types.hpp>
 
 namespace cpp_redis {
 
@@ -62,7 +63,7 @@ public:
   //!
   //!
   explicit subscriber(
-      const std::shared_ptr<network::tcp_client_iface> &tcp_client);
+      const shared_ptr<tcp_client_iface_t> &tcp_client);
 
   //!
   //!  dtor
@@ -95,10 +96,10 @@ public:
   //!  @param reconnect_interval_ms time between two attempts of reconnection
   //!
   //!
-  void connect(const std::string &host = "127.0.0.1", std::size_t port = 6379,
+  void connect(const string_t &host = "127.0.0.1", size_t port = 6379,
                const connect_callback_t &connect_callback = nullptr,
-               std::uint32_t timeout_ms = 0, std::int32_t max_reconnects = 0,
-               std::uint32_t reconnect_interval_ms = 0);
+               uint_t timeout_ms = 0, int_t max_reconnects = 0,
+               uint_t reconnect_interval_ms = 0);
 
   //!
   //!  @brief Connect to redis server
@@ -111,10 +112,10 @@ public:
   //!  @param reconnect_interval_ms time between two attempts of reconnection
   //!
   //!
-  void connect(const std::string &name,
+  void connect(const string_t &name,
                const connect_callback_t &connect_callback = nullptr,
-               std::uint32_t timeout_ms = 0, std::int32_t max_reconnects = 0,
-               std::uint32_t reconnect_interval_ms = 0);
+               uint_t timeout_ms = 0, int_t max_reconnects = 0,
+               uint_t reconnect_interval_ms = 0);
 
   //!
   //!  @brief determines client connectivity
@@ -151,7 +152,7 @@ public:
   //!  parameter the received reply
   //!
   //!
-  using reply_callback_t = std::function<void(reply &)>;
+  using reply_callback_t = std::function<void(reply_t &)>;
 
   //!
   //!  @brief ability to authenticate on the redis server if necessary
@@ -164,24 +165,26 @@ public:
   //!  @return current instance
   //!
   //!
-  subscriber &auth(const std::string &password,
+  subscriber &auth(const string_t &password,
                    const reply_callback_t &reply_callback = nullptr);
 
   //!
-  //! @brief Set the label for the connection on the Redis server via the CLIENT SETNAME command.
-  //! This is useful for monitoring and managing connections on the server side of things.
+  //! @brief Set the label for the connection on the Redis server via the CLIENT
+  //! SETNAME command. This is useful for monitoring and managing connections on
+  //! the server side of things.
   //! @param name - string to label the connection with on the server side
   //! @param reply_callback callback to be called on auth completion (nullable)
   //! @return current instance
   //!
-  subscriber& client_setname(const std::string& name, const reply_callback_t& reply_callback = nullptr);
+  subscriber &client_setname(const string_t &name,
+                             const reply_callback_t &reply_callback = nullptr);
 
   //!
   //!  subscribe callback, called whenever a new message is published on a
   //!  subscribed channel takes as parameter the channel and the message
   //!
   //!
-  typedef std::function<void(const std::string &, const std::string &)>
+  typedef std::function<void(const string_t &, const string_t &)>
       subscribe_callback_t;
 
   //!
@@ -202,7 +205,7 @@ public:
   //!
   //!
   subscriber &subscribe(
-      const std::string &channel, const subscribe_callback_t &callback,
+      const string_t &channel, const subscribe_callback_t &callback,
       const acknowledgement_callback_t &acknowledgement_callback = nullptr);
 
   //!
@@ -223,7 +226,7 @@ public:
   //!
   //!
   subscriber &psubscribe(
-      const std::string &pattern, const subscribe_callback_t &callback,
+      const string_t &pattern, const subscribe_callback_t &callback,
       const acknowledgement_callback_t &acknowledgement_callback = nullptr);
 
   //!
@@ -235,7 +238,7 @@ public:
   //!  @return current instance
   //!
   //!
-  subscriber &unsubscribe(const std::string &channel);
+  subscriber &unsubscribe(const string_t &channel);
 
   //!
   //!  punsubscribe from the given pattern
@@ -246,7 +249,7 @@ public:
   //!  @return current instance
   //!
   //!
-  subscriber &punsubscribe(const std::string &pattern);
+  subscriber &punsubscribe(const string_t &pattern);
 
   //!
   //!  commit pipelined transaction
@@ -268,8 +271,8 @@ public:
   //!  @param timeout_ms maximum time to connect
   //!
   //!
-  void add_sentinel(const std::string &host, std::size_t port,
-                    std::uint32_t timeout_ms = 0);
+  void add_sentinel(const string_t &host, size_t port,
+                    uint_t timeout_ms = 0);
 
   //!
   //!  retrieve sentinel for current client
@@ -277,7 +280,7 @@ public:
   //!  @return sentinel associated to current client
   //!
   //!
-  const sentinel &get_sentinel() const;
+  const sentinel_t &get_sentinel() const;
 
   //!
   //!  retrieve sentinel for current client
@@ -286,7 +289,7 @@ public:
   //!  @return sentinel associated to current client
   //!
   //!
-  sentinel &get_sentinel();
+  sentinel_t &get_sentinel();
 
   //!
   //!  clear all existing sentinels.
@@ -313,7 +316,7 @@ private:
   //!  @param reply parsed reply
   //!
   //!
-  void connection_receive_handler(network::redis_connection &connection,
+  void connection_receive_handler(redis_connection_t &connection,
                                   reply &reply);
 
   //!
@@ -323,7 +326,7 @@ private:
   //!  @param connection redis_connection instance
   //!
   //!
-  void connection_disconnection_handler(network::redis_connection &connection);
+  void connection_disconnection_handler(redis_connection_t &connection);
 
   //!
   //!  trigger the ack callback for matching channel/pattern
@@ -365,9 +368,9 @@ private:
   //!
   //!
   void call_acknowledgement_callback(
-      const std::string &channel,
-      const std::map<std::string, callback_holder> &channels,
-      std::mutex &channels_mtx, int64_t nb_chans);
+      const string_t &channel,
+      const map<string_t, callback_holder> &channels,
+      mutex_t &channels_mtx, int_t nb_chans);
 
 private:
   //!
@@ -427,7 +430,7 @@ private:
   //!
   //!
   void unprotected_subscribe(
-      const std::string &channel, const subscribe_callback_t &callback,
+      const string_t &channel, const subscribe_callback_t &callback,
       const acknowledgement_callback_t &acknowledgement_callback);
 
   //!
@@ -442,7 +445,7 @@ private:
   //!
   //!
   void unprotected_psubscribe(
-      const std::string &pattern, const subscribe_callback_t &callback,
+      const string_t &pattern, const subscribe_callback_t &callback,
       const acknowledgement_callback_t &acknowledgement_callback);
 
 private:
@@ -450,82 +453,82 @@ private:
   //!  server we are connected to
   //!
   //!
-  std::string m_redis_server;
+  string_t m_redis_server;
   //!
   //!  port we are connected to
   //!
   //!
-  std::size_t m_redis_port = 0;
+  size_t m_redis_port = 0;
   //!
   //!  master name (if we are using sentinel) we are connected to
   //!
   //!
-  std::string m_master_name;
+  string_t m_master_name;
   //!
   //!  password used to authenticate
   //!
   //!
-  std::string m_password;
+  string_t m_password;
 
   //!
   //! name to use with CLIENT SETNAME
   //!
-  std::string m_client_name;
+  string_t m_client_name;
 
   //!
   //!  tcp client for redis connection
   //!
   //!
-  network::redis_connection m_client;
+  redis_connection_t m_client;
 
   //!
   //!  redis sentinel
   //!
   //!
-  cpp_redis::sentinel m_sentinel;
+  sentinel_t m_sentinel;
 
   //!
   //!  max time to connect
   //!
   //!
-  std::uint32_t m_connect_timeout_ms = 0;
+  uint_t m_connect_timeout_ms = 0;
   //!
   //!  max number of reconnection attempts
   //!
   //!
-  std::int32_t m_max_reconnects = 0;
+  int_t m_max_reconnects = 0;
   //!
   //!  current number of attempts to reconnect
   //!
   //!
-  std::int32_t m_current_reconnect_attempts = 0;
+  int_t m_current_reconnect_attempts = 0;
   //!
   //!  time between two reconnection attempts
   //!
   //!
-  std::uint32_t m_reconnect_interval_ms = 0;
+  uint_t m_reconnect_interval_ms = 0;
 
   //!
   //!  reconnection status
   //!
   //!
-  std::atomic_bool m_reconnecting;
+  atomic_bool m_reconnecting;
   //!
   //!  to force cancel reconnection
   //!
   //!
-  std::atomic_bool m_cancel;
+  atomic_bool m_cancel;
 
   //!
   //!  subscribed channels and their associated channels
   //!
   //!
-  std::map<std::string, callback_holder> m_subscribed_channels;
+  map<string_t, callback_holder> m_subscribed_channels;
   //!
   //!  psubscribed channels and their associated channels
   //!
   //!
-  std::map<std::string, callback_holder> m_psubscribed_channels;
+  map<string_t, callback_holder> m_psubscribed_channels;
 
   //!
   //!  connect handler
@@ -537,12 +540,12 @@ private:
   //!  sub chans thread safety
   //!
   //!
-  std::mutex m_psubscribed_channels_mutex;
+  mutex_t m_psubscribed_channels_mutex;
   //!
   //!  psub chans thread safety
   //!
   //!
-  std::mutex m_subscribed_channels_mutex;
+  mutex_t m_subscribed_channels_mutex;
 
   //!
   //!  auth reply callback
@@ -557,3 +560,5 @@ private:
 };
 
 } // namespace cpp_redis
+
+#endif // !CPP_REDIS_CORE_SUBSCRIBER_HPP_

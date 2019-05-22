@@ -30,14 +30,13 @@ namespace cpp_redis {
 class try_convert {
 public:
   template <class T>
-  static enableIf<std::is_convertible<T, std::string>::value,
-                  optional_t<int64_t>>
+  static enableIf<std::is_convertible<T, string_t>::value, optional_t<int_t>>
   to_int(T value) {
     try {
-      std::stringstream stream(value);
-      int64_t x;
+      stringstream stream(value);
+      int_t x;
       stream >> x;
-      return optional_t<int64_t>(x);
+      return optional_t<int_t>(x);
     } catch (std::exception &exc) {
       return {};
     }

@@ -33,7 +33,7 @@ xmessage::xmessage(const reply_t &data) {
     }
     if (v.is_array()) {
       auto val_array = v.as_array();
-      std::string key;
+      string_t key;
       int i = 1;
       for (auto &val : val_array) {
         if (i % 2 != 0) {

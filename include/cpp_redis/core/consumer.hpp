@@ -29,7 +29,7 @@
 
 namespace cpp_redis {
 
-using defer = std::shared_ptr<void>;
+using defer = shared_ptr<void>;
 
 #define READ_NEW ">"
 #define CPP_REDIS_WILD_CARD "*"
@@ -48,7 +48,7 @@ struct consumer_callback_container {
 using consumer_callback_container_t = consumer_callback_container;
 
 struct consumer_reply {
-  std::string group_id;
+  string_t group_id;
   xstream_reply_t reply;
 };
 
@@ -60,11 +60,11 @@ using consumer_reply_t = consumer_reply;
 class consumer {
 public:
   explicit consumer(
-      std::string stream, std::string consumer,
-      std::size_t max_concurrency = std::thread::hardware_concurrency());
+      string_t stream, string_t consumer,
+      size_t max_concurrency = std::thread::hardware_concurrency());
 
   consumer &subscribe(
-      const std::string &group, const consumer_callback_t &consumer_callback,
+      const string_t &group, const consumer_callback_t &consumer_callback,
       const acknowledgement_callback_t &acknowledgement_callback = nullptr);
 
   //!
@@ -78,12 +78,12 @@ public:
   //!  dropped
   //!  @param reconnect_interval_ms time between two attempts of reconnection
   //!
-  void connect(const std::string &host = "127.0.0.1", std::size_t port = 6379,
+  void connect(const string_t &host = "127.0.0.1", size_t port = 6379,
                const connect_callback_t &connect_callback = nullptr,
                int timeout_ms = 0, int max_reconnects = 0,
                int reconnect_interval_ms = 0);
 
-  void auth(const std::string &password,
+  void auth(const string_t &password,
             const reply_callback_t &reply_callback = nullptr);
 
   //!
@@ -100,13 +100,13 @@ public:
   //!
   void check_for_pending() {
     if (m_should_read_pending.load()) {
-        m_should_read_pending.store(false);
-        m_read_id = READ_NEW;
-        // Set to block infinitely
-        m_block_sec = 0;
-        // Set to read 1
-        m_read_count = 1;
-      }
+      m_should_read_pending.store(false);
+      m_read_id = READ_NEW;
+      // Set to block infinitely
+      m_block_sec = 0;
+      // Set to read 1
+      m_read_count = 1;
+    }
   }
 
   //!
@@ -114,7 +114,7 @@ public:
   //!  changes occur when a task item is finished
   //!  or the queue is full.
   //!
-  void dispatch_changed_handler(std::size_t size);
+  void dispatch_changed_handler(size_t size);
 
 private:
   //!
@@ -122,10 +122,10 @@ private:
   //!
   void poll();
 
-  void dispatch(const xmessage_t &message, const std::pair<std::string, consumer_callback_container_t> &cb);
+  void dispatch(const xmessage_t &message,
+                const pair<string_t, consumer_callback_container_t> &cb);
 
 private:
-
   class client_container {
   public:
     client_container();
@@ -142,12 +142,12 @@ public:
   //!
   //!  internal typedef for mapping callbacks
   //!
-  using client_container_ptr_t = std::unique_ptr<client_container_t>;
+  using client_container_ptr_t = unique_ptr<client_container_t>;
   //!
   //!  internal typedef for mapping callbacks
   //!
   using consumer_callbacks_t =
-      std::multimap<std::string, consumer_callback_container_t>;
+      multimap<string_t, consumer_callback_container_t>;
 
 private:
   //!
@@ -161,7 +161,7 @@ private:
   //!
   //!  mutex for the callback container
   //!
-  std::mutex m_callbacks_mutex;
+  mutex_t m_callbacks_mutex;
   //!
   //!  dispatch queue:
   //!   fire and forget background processing
@@ -170,15 +170,15 @@ private:
   //!
   //!  whether to add additional work items
   //!
-  std::atomic_bool dispatch_queue_full{false};
+  atomic_bool dispatch_queue_full{false};
   //!
   //!  signals from the dispatcher
   //!
-  std::condition_variable dispatch_queue_changed;
+  condition_variable_t dispatch_queue_changed;
   //!
   //!  lock for the condi variable
   //!
-  std::mutex dispatch_queue_changed_mutex;
+  mutex_t dispatch_queue_changed_mutex;
   //!
   //!  the name of the stream
   //!
@@ -187,23 +187,23 @@ private:
   //!  whether or not the client should read
   //!  from new or stale
   //!
-  std::atomic_bool m_should_read_pending{true};
+  atomic_bool m_should_read_pending{true};
 
 private:
   //!
   //!  the name of the stream
   //!
-  std::string m_stream;
+  string_t m_stream;
 
   //!
   //!  the name of this consumer group
   //!
-  std::string m_name;
+  string_t m_name;
 
   //!
   //!  the topic ID
   //!
-  std::string m_read_id;
+  string_t m_read_id;
 
   //!
   //!  number of milliseconds to block when polling
@@ -213,17 +213,19 @@ private:
   //!
   //!  maximum number of worker threads
   //!
-  std::size_t m_max_concurrency;
+  size_t m_max_concurrency;
 
   //!
   //!  number of messages read
   //!
   int m_read_count;
 };
+
 //!
 //!  exported typedef
 //!
 using consumer_t = consumer;
+
 } // namespace cpp_redis
 
 #endif // CPP_REDIS_CONSUMER_HPP

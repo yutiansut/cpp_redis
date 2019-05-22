@@ -246,7 +246,7 @@ None
 ### Tag
 `3.1.2`.
 ### Changes
-* rename the `setbit()` function into `setbit_()` in order to avoid conflict with the standard library macro `setbit` causing compilation error.
+* rename the `setbit()` function into `setbit()` in order to avoid conflict with the standard library macro `setbit` causing compilation error.
 ### Additions
 * add `send()` method to the `sync_client` and `future_client`.
 ### Removals

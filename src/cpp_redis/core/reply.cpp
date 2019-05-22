@@ -28,7 +28,7 @@ namespace cpp_redis {
 
 reply::reply() : m_type(type::null) {}
 
-reply::reply(const std::string &value, string_type reply_type)
+reply::reply(const string_t &value, string_type reply_type)
     : m_type(static_cast<type>(reply_type)), m_str_val(value) {}
 
 reply::reply(int_t value) : m_type(type::integer), m_int_val(value) {}
@@ -66,7 +66,7 @@ bool reply::ok() const { return !is_error(); }
 
 bool reply::ko() const { return !ok(); }
 
-const std::string &reply::error() const {
+const string_t &reply::error() const {
   if (!is_error())
     throw cpp_redis::redis_error("Reply is not an error");
 
@@ -77,7 +77,7 @@ reply::operator bool() const { return !is_error() && !is_null(); }
 
 void reply::set() { m_type = type::null; }
 
-void reply::set(const std::string &value, string_type reply_type) {
+void reply::set(const string_t &value, string_type reply_type) {
   m_type = static_cast<type>(reply_type);
   m_str_val = value;
 }
@@ -122,7 +122,7 @@ const std::vector<reply> &reply::as_array() const {
   return m_rows;
 }
 
-const std::string &reply::as_string() const {
+const string_t &reply::as_string() const {
   if (!is_string())
     throw cpp_redis::redis_error("Reply is not a string");
 
@@ -152,7 +152,7 @@ std::ostream &operator<<(std::ostream &os, const cpp_redis::reply_t &reply) {
     os << reply.as_string();
     break;
   case cpp_redis::reply::type::null:
-    os << std::string("(nil)");
+    os << cpp_redis::string_t("(nil)");
     break;
   case cpp_redis::reply::type::integer:
     os << reply.as_integer();

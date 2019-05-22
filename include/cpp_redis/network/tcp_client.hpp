@@ -57,7 +57,7 @@ public:
   //!  @param timeout_ms max time to connect in ms
   //!
   //!
-  void connect(const std::string &addr, std::uint32_t port,
+  void connect(const string_t &addr, std::uint32_t port,
                std::uint32_t timeout_ms) override;
 
   //!

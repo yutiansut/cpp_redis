@@ -68,10 +68,10 @@ client::~client() {
   __CPP_REDIS_LOG(debug, "cpp_redis::client destroyed");
 }
 
-void client::connect(const std::string &name,
+void client::connect(const string_t &name,
                      const connect_callback_t &connect_callback,
-                     std::uint32_t timeout_ms, std::int32_t max_reconnects,
-                     std::uint32_t reconnect_interval_ms) {
+                     uint_t timeout_ms, int_t max_reconnects,
+                     uint_t reconnect_interval_ms) {
   //!
   //!  Save for auto reconnects
   //!
@@ -92,10 +92,10 @@ void client::connect(const std::string &name,
   }
 }
 
-void client::connect(const std::string &host, std::size_t port,
+void client::connect(const string_t &host, std::size_t port,
                      const connect_callback_t &connect_callback,
-                     std::uint32_t timeout_ms, std::int32_t max_reconnects,
-                     std::uint32_t reconnect_interval_ms) {
+                     uint_t timeout_ms, int_t max_reconnects,
+                     uint_t reconnect_interval_ms) {
   __CPP_REDIS_LOG(debug, "cpp_redis::client attempts to connect");
 
   //!
@@ -154,8 +154,8 @@ void client::cancel_reconnect() { m_cancel = true; }
 
 bool client::is_reconnecting() const { return m_reconnecting; }
 
-void client::add_sentinel(const std::string &host, std::size_t port,
-                          std::uint32_t timeout_ms) {
+void client::add_sentinel(const string_t &host, std::size_t port,
+                          uint_t timeout_ms) {
   m_sentinel.add_sentinel(host, port, timeout_ms);
 }
 
@@ -165,7 +165,7 @@ sentinel &client::get_sentinel() { return m_sentinel; }
 
 void client::clear_sentinels() { m_sentinel.clear_sentinels(); }
 
-client &client::send(const std::vector<std::string> &redis_cmd,
+client &client::send(const std::vector<string_t> &redis_cmd,
                      const reply_callback_t &callback) {
   std::lock_guard<std::mutex> lock_callback(m_callbacks_mutex);
 
@@ -179,7 +179,7 @@ client &client::send(const std::vector<std::string> &redis_cmd,
   return *this;
 }
 
-void client::unprotected_send(const std::vector<std::string> &redis_cmd,
+void client::unprotected_send(const std::vector<string_t> &redis_cmd,
                               const reply_callback_t &callback) {
   m_client.send(redis_cmd);
   m_commands.push({redis_cmd, callback});
@@ -269,7 +269,7 @@ void client::clear_callbacks() {
   }
 
   //!
-  //!  dequeue commands and move them to a local variable
+  //!  de-queue commands and move them to a local variable
   //!
   std::queue<command_request> commands = std::move(m_commands);
 
@@ -299,7 +299,7 @@ void client::resend_failed_commands() {
   }
 
   //!
-  //!  dequeue commands and move them to a local variable
+  //!  de-queue commands and move them to a local variable
   //!
   std::queue<command_request> commands = std::move(m_commands);
 
@@ -400,10 +400,9 @@ void client::re_auth() {
          if (reply.is_string() && reply.as_string() == "OK") {
            __CPP_REDIS_LOG(warn, "client successfully re-authenticated");
          } else {
-           __CPP_REDIS_LOG(warn,
-                           std::string("client failed to re-authenticate: " +
-                                       reply.as_string())
-                               .c_str());
+           __CPP_REDIS_LOG(warn, string_t("client failed to re-authenticate: " +
+                                          reply.as_string())
+                                     .c_str());
          }
        }});
 }
@@ -417,10 +416,9 @@ void client::re_select() {
     if (reply.is_string() && reply.as_string() == "OK") {
       __CPP_REDIS_LOG(warn, "client successfully re-selected redis database");
     } else {
-      __CPP_REDIS_LOG(warn,
-                      std::string("client failed to re-select database: " +
-                                  reply.as_string())
-                          .c_str());
+      __CPP_REDIS_LOG(warn, string_t("client failed to re-select database: " +
+                                     reply.as_string())
+                                .c_str());
     }
   });
 }
@@ -477,7 +475,7 @@ void client::reconnect() {
   try_commit();
 }
 
-std::string client::aggregate_method_to_string(aggregate_method method) const {
+string_t client::aggregate_method_to_string(aggregate_method method) const {
   switch (method) {
   case aggregate_method::sum:
     return "SUM";
@@ -490,7 +488,7 @@ std::string client::aggregate_method_to_string(aggregate_method method) const {
   }
 }
 
-std::string client::geo_unit_to_string(geo_unit unit) const {
+string_t client::geo_unit_to_string(geo_unit unit) const {
   switch (unit) {
   case geo_unit::m:
     return "m";
@@ -505,7 +503,7 @@ std::string client::geo_unit_to_string(geo_unit unit) const {
   }
 }
 
-std::string client::bitfield_operation_type_to_string(
+string_t client::bitfield_operation_type_to_string(
     bitfield_operation_type operation) const {
   switch (operation) {
   case bitfield_operation_type::get:
@@ -519,7 +517,7 @@ std::string client::bitfield_operation_type_to_string(
   }
 }
 
-std::string client::overflow_type_to_string(overflow_type type) const {
+string_t client::overflow_type_to_string(overflow_type type) const {
   switch (type) {
   case overflow_type::wrap:
     return "WRAP";
@@ -533,19 +531,19 @@ std::string client::overflow_type_to_string(overflow_type type) const {
 }
 
 client::bitfield_operation
-client::bitfield_operation::get(const std::string &type, int offset,
+client::bitfield_operation::get(const string_t &type, int offset,
                                 overflow_type overflow) {
   return {bitfield_operation_type::get, type, offset, 0, overflow};
 }
 
 client::bitfield_operation
-client::bitfield_operation::set(const std::string &type, int offset, int value,
+client::bitfield_operation::set(const string_t &type, int offset, int value,
                                 overflow_type overflow) {
   return {bitfield_operation_type::set, type, offset, value, overflow};
 }
 
 client::bitfield_operation
-client::bitfield_operation::incrby(const std::string &type, int offset,
+client::bitfield_operation::incrby(const string_t &type, int offset,
                                    int increment, overflow_type overflow) {
   return {bitfield_operation_type::incrby, type, offset, increment, overflow};
 }
@@ -555,13 +553,13 @@ client::bitfield_operation::incrby(const std::string &type, int offset,
 //!  Callback-based
 //!
 
-client &client::append(const std::string &key, const std::string &value,
+client &client::append(const string_t &key, const string_t &value,
                        const reply_callback_t &reply_callback) {
   send({"APPEND", key, value}, reply_callback);
   return *this;
 }
 
-client &client::auth(const std::string &password,
+client &client::auth(const string_t &password,
                      const reply_callback_t &reply_callback) {
   std::lock_guard<std::mutex> lock(m_callbacks_mutex);
 
@@ -570,7 +568,7 @@ client &client::auth(const std::string &password,
   return *this;
 }
 
-void client::unprotected_auth(const std::string &password,
+void client::unprotected_auth(const string_t &password,
                               const reply_callback_t &reply_callback) {
   //!
   //!  save the password for reconnect attempts.
@@ -592,23 +590,23 @@ client &client::bgsave(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::bitcount(const std::string &key,
+client &client::bitcount(const string_t &key,
                          const reply_callback_t &reply_callback) {
   send({"BITCOUNT", key}, reply_callback);
   return *this;
 }
 
-client &client::bitcount(const std::string &key, int start, int end,
+client &client::bitcount(const string_t &key, int start, int end,
                          const reply_callback_t &reply_callback) {
   send({"BITCOUNT", key, std::to_string(start), std::to_string(end)},
        reply_callback);
   return *this;
 }
 
-client &client::bitfield(const std::string &key,
+client &client::bitfield(const string_t &key,
                          const std::vector<bitfield_operation> &operations,
                          const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"BITFIELD", key};
+  std::vector<string_t> cmd = {"BITFIELD", key};
 
   for (const auto &operation : operations) {
     cmd.push_back(bitfield_operation_type_to_string(operation.operation_type));
@@ -630,29 +628,29 @@ client &client::bitfield(const std::string &key,
   return *this;
 }
 
-client &client::bitop(const std::string &operation, const std::string &destkey,
-                      const std::vector<std::string> &keys,
+client &client::bitop(const string_t &operation, const string_t &destkey,
+                      const std::vector<string_t> &keys,
                       const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"BITOP", operation, destkey};
+  std::vector<string_t> cmd = {"BITOP", operation, destkey};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::bitpos(const std::string &key, int bit,
+client &client::bitpos(const string_t &key, int bit,
                        const reply_callback_t &reply_callback) {
   send({"BITPOS", key, std::to_string(bit)}, reply_callback);
   return *this;
 }
 
-client &client::bitpos(const std::string &key, int bit, int start,
+client &client::bitpos(const string_t &key, int bit, int start,
                        const reply_callback_t &reply_callback) {
   send({"BITPOS", key, std::to_string(bit), std::to_string(start)},
        reply_callback);
   return *this;
 }
 
-client &client::bitpos(const std::string &key, int bit, int start, int end,
+client &client::bitpos(const string_t &key, int bit, int start, int end,
                        const reply_callback_t &reply_callback) {
   send({"BITPOS", key, std::to_string(bit), std::to_string(start),
         std::to_string(end)},
@@ -660,43 +658,43 @@ client &client::bitpos(const std::string &key, int bit, int start, int end,
   return *this;
 }
 
-client &client::blpop(const std::vector<std::string> &keys, int timeout,
+client &client::blpop(const std::vector<string_t> &keys, int timeout,
                       const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"BLPOP"};
+  std::vector<string_t> cmd = {"BLPOP"};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   cmd.push_back(std::to_string(timeout));
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::brpop(const std::vector<std::string> &keys, int timeout,
+client &client::brpop(const std::vector<string_t> &keys, int timeout,
                       const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"BRPOP"};
+  std::vector<string_t> cmd = {"BRPOP"};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   cmd.push_back(std::to_string(timeout));
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::brpoplpush(const std::string &src, const std::string &dst,
+client &client::brpoplpush(const string_t &src, const string_t &dst,
                            int timeout,
                            const reply_callback_t &reply_callback) {
   send({"BRPOPLPUSH", src, dst, std::to_string(timeout)}, reply_callback);
   return *this;
 }
 
-client &client::bzpopmin(const std::vector<std::string> &keys, int timeout,
+client &client::bzpopmin(const std::vector<string_t> &keys, int timeout,
                          const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"BZPOPMIN"};
+  std::vector<string_t> cmd = {"BZPOPMIN"};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   cmd.push_back(std::to_string(timeout));
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::bzpopmax(const std::vector<std::string> &keys, int timeout,
+client &client::bzpopmax(const std::vector<string_t> &keys, int timeout,
                          const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"BZPOPMAX"};
+  std::vector<string_t> cmd = {"BZPOPMAX"};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   cmd.push_back(std::to_string(timeout));
   send(cmd, reply_callback);
@@ -713,7 +711,8 @@ client &client::client_list(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::client_list_test(const client_list_reply_callback_t &reply_callback) {
+client &
+client::client_list_test(const client_list_reply_callback_t &reply_callback) {
   send({"CLIENT", "GETNAME"}, [&](const reply_t &repl) {
     client_list_payload_t clp(repl);
     reply_callback(clp);
@@ -732,13 +731,13 @@ client &client::client_pause(int timeout,
   return *this;
 }
 
-client &client::client_reply(const std::string &mode,
+client &client::client_reply(const string_t &mode,
                              const reply_callback_t &reply_callback) {
   send({"CLIENT", "REPLY", mode}, reply_callback);
   return *this;
 }
 
-client &client::client_setname(const std::string &name,
+client &client::client_setname(const string_t &name,
                                const reply_callback_t &reply_callback) {
   send({"CLIENT", "SETNAME", name}, reply_callback);
   return *this;
@@ -758,31 +757,31 @@ client &client::client_unblock(int id, bool witherror,
   return *this;
 }
 
-client &client::cluster_addslots(const std::vector<std::string> &p_slots,
+client &client::cluster_addslots(const std::vector<string_t> &p_slots,
                                  const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"CLUSTER", "ADDSLOTS"};
+  std::vector<string_t> cmd = {"CLUSTER", "ADDSLOTS"};
   cmd.insert(cmd.end(), p_slots.begin(), p_slots.end());
   send(cmd, reply_callback);
   return *this;
 }
 
 client &
-client::cluster_count_failure_reports(const std::string &node_id,
+client::cluster_count_failure_reports(const string_t &node_id,
                                       const reply_callback_t &reply_callback) {
   send({"CLUSTER", "COUNT-FAILURE-REPORTS", node_id}, reply_callback);
   return *this;
 }
 
 client &
-client::cluster_countkeysinslot(const std::string &slot,
+client::cluster_countkeysinslot(const string_t &slot,
                                 const reply_callback_t &reply_callback) {
   send({"CLUSTER", "COUNTKEYSINSLOT", slot}, reply_callback);
   return *this;
 }
 
-client &client::cluster_delslots(const std::vector<std::string> &p_slots,
+client &client::cluster_delslots(const std::vector<string_t> &p_slots,
                                  const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"CLUSTER", "DELSLOTS"};
+  std::vector<string_t> cmd = {"CLUSTER", "DELSLOTS"};
   cmd.insert(cmd.end(), p_slots.begin(), p_slots.end());
   send(cmd, reply_callback);
   return *this;
@@ -793,19 +792,19 @@ client &client::cluster_failover(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::cluster_failover(const std::string &mode,
+client &client::cluster_failover(const string_t &mode,
                                  const reply_callback_t &reply_callback) {
   send({"CLUSTER", "FAILOVER", mode}, reply_callback);
   return *this;
 }
 
-client &client::cluster_forget(const std::string &node_id,
+client &client::cluster_forget(const string_t &node_id,
                                const reply_callback_t &reply_callback) {
   send({"CLUSTER", "FORGET", node_id}, reply_callback);
   return *this;
 }
 
-client &client::cluster_getkeysinslot(const std::string &slot, int count,
+client &client::cluster_getkeysinslot(const string_t &slot, int count,
                                       const reply_callback_t &reply_callback) {
   send({"CLUSTER", "GETKEYSINSLOT", slot, std::to_string(count)},
        reply_callback);
@@ -817,13 +816,13 @@ client &client::cluster_info(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::cluster_keyslot(const std::string &key,
+client &client::cluster_keyslot(const string_t &key,
                                 const reply_callback_t &reply_callback) {
   send({"CLUSTER", "KEYSLOT", key}, reply_callback);
   return *this;
 }
 
-client &client::cluster_meet(const std::string &ip, int port,
+client &client::cluster_meet(const string_t &ip, int port,
                              const reply_callback_t &reply_callback) {
   send({"CLUSTER", "MEET", ip, std::to_string(port)}, reply_callback);
   return *this;
@@ -834,7 +833,7 @@ client &client::cluster_nodes(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::cluster_replicate(const std::string &node_id,
+client &client::cluster_replicate(const string_t &node_id,
                                   const reply_callback_t &reply_callback) {
   send({"CLUSTER", "REPLICATE", node_id}, reply_callback);
   return *this;
@@ -845,7 +844,7 @@ client &client::cluster_reset(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::cluster_reset(const std::string &mode,
+client &client::cluster_reset(const string_t &mode,
                               const reply_callback_t &reply_callback) {
   send({"CLUSTER", "RESET", mode}, reply_callback);
   return *this;
@@ -857,28 +856,26 @@ client &client::cluster_saveconfig(const reply_callback_t &reply_callback) {
 }
 
 client &
-client::cluster_set_config_epoch(const std::string &epoch,
+client::cluster_set_config_epoch(const string_t &epoch,
                                  const reply_callback_t &reply_callback) {
   send({"CLUSTER", "SET-CONFIG-EPOCH", epoch}, reply_callback);
   return *this;
 }
 
-client &client::cluster_setslot(const std::string &slot,
-                                const std::string &mode,
+client &client::cluster_setslot(const string_t &slot, const string_t &mode,
                                 const reply_callback_t &reply_callback) {
   send({"CLUSTER", "SETSLOT", slot, mode}, reply_callback);
   return *this;
 }
 
-client &client::cluster_setslot(const std::string &slot,
-                                const std::string &mode,
-                                const std::string &node_id,
+client &client::cluster_setslot(const string_t &slot, const string_t &mode,
+                                const string_t &node_id,
                                 const reply_callback_t &reply_callback) {
   send({"CLUSTER", "SETSLOT", slot, mode, node_id}, reply_callback);
   return *this;
 }
 
-client &client::cluster_slaves(const std::string &node_id,
+client &client::cluster_slaves(const string_t &node_id,
                                const reply_callback_t &reply_callback) {
   send({"CLUSTER", "SLAVES", node_id}, reply_callback);
   return *this;
@@ -904,15 +901,15 @@ client &client::command_getkeys(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::command_info(const std::vector<std::string> &command_name,
+client &client::command_info(const std::vector<string_t> &command_name,
                              const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"COMMAND", "COUNT"};
+  std::vector<string_t> cmd = {"COMMAND", "COUNT"};
   cmd.insert(cmd.end(), command_name.begin(), command_name.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::config_get(const std::string &param,
+client &client::config_get(const string_t &param,
                            const reply_callback_t &reply_callback) {
   send({"CONFIG", "GET", param}, reply_callback);
   return *this;
@@ -923,7 +920,7 @@ client &client::config_rewrite(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::config_set(const std::string &param, const std::string &val,
+client &client::config_set(const string_t &param, const string_t &val,
                            const reply_callback_t &reply_callback) {
   send({"CONFIG", "SET", param, val}, reply_callback);
   return *this;
@@ -939,7 +936,7 @@ client &client::dbsize(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::debug_object(const std::string &key,
+client &client::debug_object(const string_t &key,
                              const reply_callback_t &reply_callback) {
   send({"DEBUG", "OBJECT", key}, reply_callback);
   return *this;
@@ -950,21 +947,21 @@ client &client::debug_segfault(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::decr(const std::string &key,
+client &client::decr(const string_t &key,
                      const reply_callback_t &reply_callback) {
   send({"DECR", key}, reply_callback);
   return *this;
 }
 
-client &client::decrby(const std::string &key, int val,
+client &client::decrby(const string_t &key, int val,
                        const reply_callback_t &reply_callback) {
   send({"DECRBY", key, std::to_string(val)}, reply_callback);
   return *this;
 }
 
-client &client::del(const std::vector<std::string> &key,
+client &client::del(const std::vector<string_t> &key,
                     const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"DEL"};
+  std::vector<string_t> cmd = {"DEL"};
   cmd.insert(cmd.end(), key.begin(), key.end());
   send(cmd, reply_callback);
   return *this;
@@ -975,78 +972,80 @@ client &client::discard(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::dump(const std::string &key,
+client &client::dump(const string_t &key,
                      const reply_callback_t &reply_callback) {
   send({"DUMP", key}, reply_callback);
   return *this;
 }
 
-client &client::echo(const std::string &msg,
+client &client::echo(const string_t &msg,
                      const reply_callback_t &reply_callback) {
   send({"ECHO", msg}, reply_callback);
   return *this;
 }
 
-client &
-	client::eval(const std::string &script, int numkeys, const std::vector<std::string> &keys,
-	             const std::vector<std::string> &args, const reply_callback_t &reply_callback) {
-		std::vector<std::string> cmd = {"EVAL", script, std::to_string(numkeys)};
-		cmd.insert(cmd.end(), keys.begin(), keys.end());
-		cmd.insert(cmd.end(), args.begin(), args.end());
-		send(cmd, reply_callback);
-		return *this;
-	}
+client &client::eval(const string_t &script, int numkeys,
+                     const std::vector<string_t> &keys,
+                     const std::vector<string_t> &args,
+                     const reply_callback_t &reply_callback) {
+  std::vector<string_t> cmd = {"EVAL", script, std::to_string(numkeys)};
+  cmd.insert(cmd.end(), keys.begin(), keys.end());
+  cmd.insert(cmd.end(), args.begin(), args.end());
+  send(cmd, reply_callback);
+  return *this;
+}
 
-	client &
-	client::eval(const std::string &script, const std::vector<std::string> &keys,
-	             const std::vector<std::string> &args, const reply_callback_t &reply_callback) {
-		std::vector<std::string> cmd = {"EVAL", script, std::to_string(keys.size())};
-		cmd.insert(cmd.end(), keys.begin(), keys.end());
-		cmd.insert(cmd.end(), args.begin(), args.end());
-		send(cmd, reply_callback);
-		return *this;
-	}
+client &client::eval(const string_t &script, const std::vector<string_t> &keys,
+                     const std::vector<string_t> &args,
+                     const reply_callback_t &reply_callback) {
+  std::vector<string_t> cmd = {"EVAL", script, std::to_string(keys.size())};
+  cmd.insert(cmd.end(), keys.begin(), keys.end());
+  cmd.insert(cmd.end(), args.begin(), args.end());
+  send(cmd, reply_callback);
+  return *this;
+}
 
-	client &
-	client::evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
-	                const std::vector<std::string> &args, const reply_callback_t &reply_callback) {
-		std::vector<std::string> cmd = {"EVALSHA", sha1, std::to_string(numkeys)};
-		cmd.insert(cmd.end(), keys.begin(), keys.end());
-		cmd.insert(cmd.end(), args.begin(), args.end());
-		send(cmd, reply_callback);
-		return *this;
-	}
+client &client::evalsha(const string_t &sha1, int numkeys,
+                        const std::vector<string_t> &keys,
+                        const std::vector<string_t> &args,
+                        const reply_callback_t &reply_callback) {
+  std::vector<string_t> cmd = {"EVALSHA", sha1, std::to_string(numkeys)};
+  cmd.insert(cmd.end(), keys.begin(), keys.end());
+  cmd.insert(cmd.end(), args.begin(), args.end());
+  send(cmd, reply_callback);
+  return *this;
+}
 
-	client &
-	client::evalsha(const std::string &sha1, const std::vector<std::string> &keys,
-	                const std::vector<std::string> &args, const reply_callback_t &reply_callback) {
-		std::vector<std::string> cmd = {"EVALSHA", sha1, std::to_string(keys.size())};
-		cmd.insert(cmd.end(), keys.begin(), keys.end());
-		cmd.insert(cmd.end(), args.begin(), args.end());
-		send(cmd, reply_callback);
-		return *this;
-	}
+client &client::evalsha(const string_t &sha1, const std::vector<string_t> &keys,
+                        const std::vector<string_t> &args,
+                        const reply_callback_t &reply_callback) {
+  std::vector<string_t> cmd = {"EVALSHA", sha1, std::to_string(keys.size())};
+  cmd.insert(cmd.end(), keys.begin(), keys.end());
+  cmd.insert(cmd.end(), args.begin(), args.end());
+  send(cmd, reply_callback);
+  return *this;
+}
 
 client &client::exec(const reply_callback_t &reply_callback) {
   send({"EXEC"}, reply_callback);
   return *this;
 }
 
-client &client::exists(const std::vector<std::string> &keys,
+client &client::exists(const std::vector<string_t> &keys,
                        const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"EXISTS"};
+  std::vector<string_t> cmd = {"EXISTS"};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::expire(const std::string &key, int seconds,
+client &client::expire(const string_t &key, int seconds,
                        const reply_callback_t &reply_callback) {
   send({"EXPIRE", key, std::to_string(seconds)}, reply_callback);
   return *this;
 }
 
-client &client::expireat(const std::string &key, int timestamp,
+client &client::expireat(const string_t &key, int timestamp,
                          const reply_callback_t &reply_callback) {
   send({"EXPIREAT", key, std::to_string(timestamp)}, reply_callback);
   return *this;
@@ -1063,11 +1062,10 @@ client &client::flushdb(const reply_callback_t &reply_callback) {
 }
 
 client &client::geoadd(
-    const std::string &key,
-    const std::vector<std::tuple<std::string, std::string, std::string>>
-        &long_lat_memb,
+    const string_t &key,
+    const std::vector<std::tuple<string_t, string_t, string_t>> &long_lat_memb,
     const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"GEOADD", key};
+  std::vector<string_t> cmd = {"GEOADD", key};
   for (const auto &obj : long_lat_memb) {
     cmd.push_back(std::get<0>(obj));
     cmd.push_back(std::get<1>(obj));
@@ -1077,39 +1075,39 @@ client &client::geoadd(
   return *this;
 }
 
-client &client::geohash(const std::string &key,
-                        const std::vector<std::string> &members,
+client &client::geohash(const string_t &key,
+                        const std::vector<string_t> &members,
                         const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"GEOHASH", key};
+  std::vector<string_t> cmd = {"GEOHASH", key};
   cmd.insert(cmd.end(), members.begin(), members.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::geopos(const std::string &key,
-                       const std::vector<std::string> &members,
+client &client::geopos(const string_t &key,
+                       const std::vector<string_t> &members,
                        const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"GEOPOS", key};
+  std::vector<string_t> cmd = {"GEOPOS", key};
   cmd.insert(cmd.end(), members.begin(), members.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::geodist(const std::string &key, const std::string &member_1,
-                        const std::string &member_2,
+client &client::geodist(const string_t &key, const string_t &member_1,
+                        const string_t &member_2,
                         const reply_callback_t &reply_callback) {
   send({"GEODIST", key, member_1, member_2}, reply_callback);
   return *this;
 }
 
-client &client::geodist(const std::string &key, const std::string &member_1,
-                        const std::string &member_2, const std::string &unit,
+client &client::geodist(const string_t &key, const string_t &member_1,
+                        const string_t &member_2, const string_t &unit,
                         const reply_callback_t &reply_callback) {
   send({"GEODIST", key, member_1, member_2, unit}, reply_callback);
   return *this;
 }
 
-client &client::georadius(const std::string &key, double longitude,
+client &client::georadius(const string_t &key, double longitude,
                           double latitude, double radius, geo_unit unit,
                           bool with_coord, bool with_dist, bool with_hash,
                           bool asc_order,
@@ -1118,7 +1116,7 @@ client &client::georadius(const std::string &key, double longitude,
                    with_dist, with_hash, asc_order, 0, "", "", reply_callback);
 }
 
-client &client::georadius(const std::string &key, double longitude,
+client &client::georadius(const string_t &key, double longitude,
                           double latitude, double radius, geo_unit unit,
                           bool with_coord, bool with_dist, bool with_hash,
                           bool asc_order, std::size_t count,
@@ -1128,51 +1126,51 @@ client &client::georadius(const std::string &key, double longitude,
                    reply_callback);
 }
 
-client &client::georadius(const std::string &key, double longitude,
+client &client::georadius(const string_t &key, double longitude,
                           double latitude, double radius, geo_unit unit,
                           bool with_coord, bool with_dist, bool with_hash,
-                          bool asc_order, const std::string &store_key,
+                          bool asc_order, const string_t &store_key,
                           const reply_callback_t &reply_callback) {
   return georadius(key, longitude, latitude, radius, unit, with_coord,
                    with_dist, with_hash, asc_order, 0, store_key, "",
                    reply_callback);
 }
 
-client &client::georadius(const std::string &key, double longitude,
+client &client::georadius(const string_t &key, double longitude,
                           double latitude, double radius, geo_unit unit,
                           bool with_coord, bool with_dist, bool with_hash,
-                          bool asc_order, const std::string &store_key,
-                          const std::string &storedist_key,
+                          bool asc_order, const string_t &store_key,
+                          const string_t &storedist_key,
                           const reply_callback_t &reply_callback) {
   return georadius(key, longitude, latitude, radius, unit, with_coord,
                    with_dist, with_hash, asc_order, 0, store_key, storedist_key,
                    reply_callback);
 }
 
-client &client::georadius(const std::string &key, double longitude,
+client &client::georadius(const string_t &key, double longitude,
                           double latitude, double radius, geo_unit unit,
                           bool with_coord, bool with_dist, bool with_hash,
                           bool asc_order, std::size_t count,
-                          const std::string &store_key,
+                          const string_t &store_key,
                           const reply_callback_t &reply_callback) {
   return georadius(key, longitude, latitude, radius, unit, with_coord,
                    with_dist, with_hash, asc_order, count, store_key, "",
                    reply_callback);
 }
 
-client &client::georadius(const std::string &key, double longitude,
+client &client::georadius(const string_t &key, double longitude,
                           double latitude, double radius, geo_unit unit,
                           bool with_coord, bool with_dist, bool with_hash,
                           bool asc_order, std::size_t count,
-                          const std::string &store_key,
-                          const std::string &storedist_key,
+                          const string_t &store_key,
+                          const string_t &storedist_key,
                           const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"GEORADIUS",
-                                  key,
-                                  std::to_string(longitude),
-                                  std::to_string(latitude),
-                                  std::to_string(radius),
-                                  geo_unit_to_string(unit)};
+  std::vector<string_t> cmd = {"GEORADIUS",
+                               key,
+                               std::to_string(longitude),
+                               std::to_string(latitude),
+                               std::to_string(radius),
+                               geo_unit_to_string(unit)};
 
   //!
   //!  with_coord (optional)
@@ -1228,9 +1226,8 @@ client &client::georadius(const std::string &key, double longitude,
   return *this;
 }
 
-client &client::georadiusbymember(const std::string &key,
-                                  const std::string &member, double radius,
-                                  geo_unit unit, bool with_coord,
+client &client::georadiusbymember(const string_t &key, const string_t &member,
+                                  double radius, geo_unit unit, bool with_coord,
                                   bool with_dist, bool with_hash,
                                   bool asc_order,
                                   const reply_callback_t &reply_callback) {
@@ -1238,9 +1235,8 @@ client &client::georadiusbymember(const std::string &key,
                            with_hash, asc_order, 0, "", "", reply_callback);
 }
 
-client &client::georadiusbymember(const std::string &key,
-                                  const std::string &member, double radius,
-                                  geo_unit unit, bool with_coord,
+client &client::georadiusbymember(const string_t &key, const string_t &member,
+                                  double radius, geo_unit unit, bool with_coord,
                                   bool with_dist, bool with_hash,
                                   bool asc_order, std::size_t count,
                                   const reply_callback_t &reply_callback) {
@@ -1248,49 +1244,48 @@ client &client::georadiusbymember(const std::string &key,
                            with_hash, asc_order, count, "", "", reply_callback);
 }
 
-client &client::georadiusbymember(const std::string &key,
-                                  const std::string &member, double radius,
-                                  geo_unit unit, bool with_coord,
+client &client::georadiusbymember(const string_t &key, const string_t &member,
+                                  double radius, geo_unit unit, bool with_coord,
                                   bool with_dist, bool with_hash,
-                                  bool asc_order, const std::string &store_key,
+                                  bool asc_order, const string_t &store_key,
                                   const reply_callback_t &reply_callback) {
   return georadiusbymember(key, member, radius, unit, with_coord, with_dist,
                            with_hash, asc_order, 0, store_key, "",
                            reply_callback);
 }
 
-client &client::georadiusbymember(const std::string &key,
-                                  const std::string &member, double radius,
-                                  geo_unit unit, bool with_coord,
+client &client::georadiusbymember(const string_t &key, const string_t &member,
+                                  double radius, geo_unit unit, bool with_coord,
                                   bool with_dist, bool with_hash,
-                                  bool asc_order, const std::string &store_key,
-                                  const std::string &storedist_key,
+                                  bool asc_order, const string_t &store_key,
+                                  const string_t &storedist_key,
                                   const reply_callback_t &reply_callback) {
   return georadiusbymember(key, member, radius, unit, with_coord, with_dist,
                            with_hash, asc_order, 0, store_key, storedist_key,
                            reply_callback);
 }
 
-client &client::georadiusbymember(const std::string &key,
-                                  const std::string &member, double radius,
-                                  geo_unit unit, bool with_coord,
+client &client::georadiusbymember(const string_t &key, const string_t &member,
+                                  double radius, geo_unit unit, bool with_coord,
                                   bool with_dist, bool with_hash,
                                   bool asc_order, std::size_t count,
-                                  const std::string &store_key,
+                                  const string_t &store_key,
                                   const reply_callback_t &reply_callback) {
   return georadiusbymember(key, member, radius, unit, with_coord, with_dist,
                            with_hash, asc_order, count, store_key, "",
                            reply_callback);
 }
 
-client &client::georadiusbymember(
-    const std::string &key, const std::string &member, double radius,
-    geo_unit unit, bool with_coord, bool with_dist, bool with_hash,
-    bool asc_order, std::size_t count, const std::string &store_key,
-    const std::string &storedist_key, const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"GEORADIUSBYMEMBER", key, member,
-                                  std::to_string(radius),
-                                  geo_unit_to_string(unit)};
+client &client::georadiusbymember(const string_t &key, const string_t &member,
+                                  double radius, geo_unit unit, bool with_coord,
+                                  bool with_dist, bool with_hash,
+                                  bool asc_order, std::size_t count,
+                                  const string_t &store_key,
+                                  const string_t &storedist_key,
+                                  const reply_callback_t &reply_callback) {
+  std::vector<string_t> cmd = {"GEORADIUSBYMEMBER", key, member,
+                               std::to_string(radius),
+                               geo_unit_to_string(unit)};
 
   //!
   //!  with_coord (optional)
@@ -1346,97 +1341,95 @@ client &client::georadiusbymember(
   return *this;
 }
 
-client &client::get(const std::string &key,
+client &client::get(const string_t &key,
                     const reply_callback_t &reply_callback) {
   send({"GET", key}, reply_callback);
   return *this;
 }
 
-client &client::getbit(const std::string &key, int offset,
+client &client::getbit(const string_t &key, int offset,
                        const reply_callback_t &reply_callback) {
   send({"GETBIT", key, std::to_string(offset)}, reply_callback);
   return *this;
 }
 
-client &client::getrange(const std::string &key, int start, int end,
+client &client::getrange(const string_t &key, int start, int end,
                          const reply_callback_t &reply_callback) {
   send({"GETRANGE", key, std::to_string(start), std::to_string(end)},
        reply_callback);
   return *this;
 }
 
-client &client::getset(const std::string &key, const std::string &val,
+client &client::getset(const string_t &key, const string_t &val,
                        const reply_callback_t &reply_callback) {
   send({"GETSET", key, val}, reply_callback);
   return *this;
 }
 
-client &client::hdel(const std::string &key,
-                     const std::vector<std::string> &fields,
+client &client::hdel(const string_t &key, const std::vector<string_t> &fields,
                      const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"HDEL", key};
+  std::vector<string_t> cmd = {"HDEL", key};
   cmd.insert(cmd.end(), fields.begin(), fields.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::hexists(const std::string &key, const std::string &field,
+client &client::hexists(const string_t &key, const string_t &field,
                         const reply_callback_t &reply_callback) {
   send({"HEXISTS", key, field}, reply_callback);
   return *this;
 }
 
-client &client::hget(const std::string &key, const std::string &field,
+client &client::hget(const string_t &key, const string_t &field,
                      const reply_callback_t &reply_callback) {
   send({"HGET", key, field}, reply_callback);
   return *this;
 }
 
-client &client::hgetall(const std::string &key,
+client &client::hgetall(const string_t &key,
                         const reply_callback_t &reply_callback) {
   send({"HGETALL", key}, reply_callback);
   return *this;
 }
 
-client &client::hincrby(const std::string &key, const std::string &field,
-                        int incr, const reply_callback_t &reply_callback) {
+client &client::hincrby(const string_t &key, const string_t &field, int incr,
+                        const reply_callback_t &reply_callback) {
   send({"HINCRBY", key, field, std::to_string(incr)}, reply_callback);
   return *this;
 }
 
-client &client::hincrbyfloat(const std::string &key, const std::string &field,
+client &client::hincrbyfloat(const string_t &key, const string_t &field,
                              float incr,
                              const reply_callback_t &reply_callback) {
   send({"HINCRBYFLOAT", key, field, std::to_string(incr)}, reply_callback);
   return *this;
 }
 
-client &client::hkeys(const std::string &key,
+client &client::hkeys(const string_t &key,
                       const reply_callback_t &reply_callback) {
   send({"HKEYS", key}, reply_callback);
   return *this;
 }
 
-client &client::hlen(const std::string &key,
+client &client::hlen(const string_t &key,
                      const reply_callback_t &reply_callback) {
   send({"HLEN", key}, reply_callback);
   return *this;
 }
 
-client &client::hmget(const std::string &key,
-                      const std::vector<std::string> &fields,
+client &client::hmget(const string_t &key, const std::vector<string_t> &fields,
                       const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"HMGET", key};
+  std::vector<string_t> cmd = {"HMGET", key};
   cmd.insert(cmd.end(), fields.begin(), fields.end());
   send(cmd, reply_callback);
   return *this;
 }
 
 client &
-client::hmset(const std::string &key,
-              const std::vector<std::pair<std::string, std::string>> &field_val,
+client::hmset(const string_t &key,
+              const std::vector<std::pair<string_t, string_t>> &field_val,
               const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"HMSET", key};
+  std::vector<string_t> cmd = {"HMSET", key};
   for (const auto &obj : field_val) {
     cmd.push_back(obj.first);
     cmd.push_back(obj.second);
@@ -1445,27 +1438,27 @@ client::hmset(const std::string &key,
   return *this;
 }
 
-client &client::hscan(const std::string &key, std::size_t cursor,
+client &client::hscan(const string_t &key, std::size_t cursor,
                       const reply_callback_t &reply_callback) {
   return hscan(key, cursor, "", 0, reply_callback);
 }
 
-client &client::hscan(const std::string &key, std::size_t cursor,
-                      const std::string &pattern,
+client &client::hscan(const string_t &key, std::size_t cursor,
+                      const string_t &pattern,
                       const reply_callback_t &reply_callback) {
   return hscan(key, cursor, pattern, 0, reply_callback);
 }
 
-client &client::hscan(const std::string &key, std::size_t cursor,
+client &client::hscan(const string_t &key, std::size_t cursor,
                       std::size_t count,
                       const reply_callback_t &reply_callback) {
   return hscan(key, cursor, "", count, reply_callback);
 }
 
-client &client::hscan(const std::string &key, std::size_t cursor,
-                      const std::string &pattern, std::size_t count,
+client &client::hscan(const string_t &key, std::size_t cursor,
+                      const string_t &pattern, std::size_t count,
                       const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"HSCAN", key, std::to_string(cursor)};
+  std::vector<string_t> cmd = {"HSCAN", key, std::to_string(cursor)};
 
   if (!pattern.empty()) {
     cmd.emplace_back("MATCH");
@@ -1481,45 +1474,45 @@ client &client::hscan(const std::string &key, std::size_t cursor,
   return *this;
 }
 
-client &client::hset(const std::string &key, const std::string &field,
-                     const std::string &value,
+client &client::hset(const string_t &key, const string_t &field,
+                     const string_t &value,
                      const reply_callback_t &reply_callback) {
   send({"HSET", key, field, value}, reply_callback);
   return *this;
 }
 
-client &client::hsetnx(const std::string &key, const std::string &field,
-                       const std::string &value,
+client &client::hsetnx(const string_t &key, const string_t &field,
+                       const string_t &value,
                        const reply_callback_t &reply_callback) {
   send({"HSETNX", key, field, value}, reply_callback);
   return *this;
 }
 
-client &client::hstrlen(const std::string &key, const std::string &field,
+client &client::hstrlen(const string_t &key, const string_t &field,
                         const reply_callback_t &reply_callback) {
   send({"HSTRLEN", key, field}, reply_callback);
   return *this;
 }
 
-client &client::hvals(const std::string &key,
+client &client::hvals(const string_t &key,
                       const reply_callback_t &reply_callback) {
   send({"HVALS", key}, reply_callback);
   return *this;
 }
 
-client &client::incr(const std::string &key,
+client &client::incr(const string_t &key,
                      const reply_callback_t &reply_callback) {
   send({"INCR", key}, reply_callback);
   return *this;
 }
 
-client &client::incrby(const std::string &key, int incr,
+client &client::incrby(const string_t &key, int incr,
                        const reply_callback_t &reply_callback) {
   send({"INCRBY", key, std::to_string(incr)}, reply_callback);
   return *this;
 }
 
-client &client::incrbyfloat(const std::string &key, float incr,
+client &client::incrbyfloat(const string_t &key, float incr,
                             const reply_callback_t &reply_callback) {
   send({"INCRBYFLOAT", key, std::to_string(incr)}, reply_callback);
   return *this;
@@ -1530,13 +1523,13 @@ client &client::info(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::info(const std::string &section,
+client &client::info(const string_t &section,
                      const reply_callback_t &reply_callback) {
   send({"INFO", section}, reply_callback);
   return *this;
 }
 
-client &client::keys(const std::string &pattern,
+client &client::keys(const string_t &pattern,
                      const reply_callback_t &reply_callback) {
   send({"KEYS", pattern}, reply_callback);
   return *this;
@@ -1547,98 +1540,94 @@ client &client::lastsave(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::lindex(const std::string &key, int index,
+client &client::lindex(const string_t &key, int index,
                        const reply_callback_t &reply_callback) {
   send({"LINDEX", key, std::to_string(index)}, reply_callback);
   return *this;
 }
 
-client &client::linsert(const std::string &key, const std::string &before_after,
-                        const std::string &pivot, const std::string &value,
+client &client::linsert(const string_t &key, const string_t &before_after,
+                        const string_t &pivot, const string_t &value,
                         const reply_callback_t &reply_callback) {
   send({"LINSERT", key, before_after, pivot, value}, reply_callback);
   return *this;
 }
 
-client &client::llen(const std::string &key,
+client &client::llen(const string_t &key,
                      const reply_callback_t &reply_callback) {
   send({"LLEN", key}, reply_callback);
   return *this;
 }
 
-client &client::lpop(const std::string &key,
+client &client::lpop(const string_t &key,
                      const reply_callback_t &reply_callback) {
   send({"LPOP", key}, reply_callback);
   return *this;
 }
 
-client &client::lpush(const std::string &key,
-                      const std::vector<std::string> &values,
+client &client::lpush(const string_t &key, const std::vector<string_t> &values,
                       const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"LPUSH", key};
+  std::vector<string_t> cmd = {"LPUSH", key};
   cmd.insert(cmd.end(), values.begin(), values.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::lpushx(const std::string &key, const std::string &value,
+client &client::lpushx(const string_t &key, const string_t &value,
                        const reply_callback_t &reply_callback) {
   send({"LPUSHX", key, value}, reply_callback);
   return *this;
 }
 
-client &client::lrange(const std::string &key, int start, int stop,
+client &client::lrange(const string_t &key, int start, int stop,
                        const reply_callback_t &reply_callback) {
   send({"LRANGE", key, std::to_string(start), std::to_string(stop)},
        reply_callback);
   return *this;
 }
 
-client &client::lrem(const std::string &key, int count,
-                     const std::string &value,
+client &client::lrem(const string_t &key, int count, const string_t &value,
                      const reply_callback_t &reply_callback) {
   send({"LREM", key, std::to_string(count), value}, reply_callback);
   return *this;
 }
 
-client &client::lset(const std::string &key, int index,
-                     const std::string &value,
+client &client::lset(const string_t &key, int index, const string_t &value,
                      const reply_callback_t &reply_callback) {
   send({"LSET", key, std::to_string(index), value}, reply_callback);
   return *this;
 }
 
-client &client::ltrim(const std::string &key, int start, int stop,
+client &client::ltrim(const string_t &key, int start, int stop,
                       const reply_callback_t &reply_callback) {
   send({"LTRIM", key, std::to_string(start), std::to_string(stop)},
        reply_callback);
   return *this;
 }
 
-client &client::mget(const std::vector<std::string> &keys,
+client &client::mget(const std::vector<string_t> &keys,
                      const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"MGET"};
+  std::vector<string_t> cmd = {"MGET"};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::migrate(const std::string &host, int port,
-                        const std::string &key, const std::string &dest_db,
-                        int timeout, const reply_callback_t &reply_callback) {
+client &client::migrate(const string_t &host, int port, const string_t &key,
+                        const string_t &dest_db, int timeout,
+                        const reply_callback_t &reply_callback) {
   send({"MIGRATE", host, std::to_string(port), key, dest_db,
         std::to_string(timeout)},
        reply_callback);
   return *this;
 }
 
-client &client::migrate(const std::string &host, int port,
-                        const std::string &key, const std::string &dest_db,
-                        int timeout, bool copy, bool replace,
-                        const std::vector<std::string> &keys,
+client &client::migrate(const string_t &host, int port, const string_t &key,
+                        const string_t &dest_db, int timeout, bool copy,
+                        bool replace, const std::vector<string_t> &keys,
                         const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"MIGRATE", host,    std::to_string(port),
-                                  key,       dest_db, std::to_string(timeout)};
+  std::vector<string_t> cmd = {"MIGRATE", host,    std::to_string(port),
+                               key,       dest_db, std::to_string(timeout)};
   if (copy) {
     cmd.emplace_back("COPY");
   }
@@ -1658,16 +1647,15 @@ client &client::monitor(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::move(const std::string &key, const std::string &db,
+client &client::move(const string_t &key, const string_t &db,
                      const reply_callback_t &reply_callback) {
   send({"MOVE", key, db}, reply_callback);
   return *this;
 }
 
-client &
-client::mset(const std::vector<std::pair<std::string, std::string>> &key_vals,
-             const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"MSET"};
+client &client::mset(const std::vector<std::pair<string_t, string_t>> &key_vals,
+                     const reply_callback_t &reply_callback) {
+  std::vector<string_t> cmd = {"MSET"};
   for (const auto &obj : key_vals) {
     cmd.push_back(obj.first);
     cmd.push_back(obj.second);
@@ -1677,9 +1665,9 @@ client::mset(const std::vector<std::pair<std::string, std::string>> &key_vals,
 }
 
 client &
-client::msetnx(const std::vector<std::pair<std::string, std::string>> &key_vals,
+client::msetnx(const std::vector<std::pair<string_t, string_t>> &key_vals,
                const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"MSETNX"};
+  std::vector<string_t> cmd = {"MSETNX"};
   for (const auto &obj : key_vals) {
     cmd.push_back(obj.first);
     cmd.push_back(obj.second);
@@ -1693,54 +1681,54 @@ client &client::multi(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::object(const std::string &subcommand,
-                       const std::vector<std::string> &args,
+client &client::object(const string_t &subcommand,
+                       const std::vector<string_t> &args,
                        const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"OBJECT", subcommand};
+  std::vector<string_t> cmd = {"OBJECT", subcommand};
   cmd.insert(cmd.end(), args.begin(), args.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::persist(const std::string &key,
+client &client::persist(const string_t &key,
                         const reply_callback_t &reply_callback) {
   send({"PERSIST", key}, reply_callback);
   return *this;
 }
 
-client &client::pexpire(const std::string &key, int ms,
+client &client::pexpire(const string_t &key, int ms,
                         const reply_callback_t &reply_callback) {
   send({"PEXPIRE", key, std::to_string(ms)}, reply_callback);
   return *this;
 }
 
-client &client::pexpireat(const std::string &key, int ms_timestamp,
+client &client::pexpireat(const string_t &key, int ms_timestamp,
                           const reply_callback_t &reply_callback) {
   send({"PEXPIREAT", key, std::to_string(ms_timestamp)}, reply_callback);
   return *this;
 }
 
-client &client::pfadd(const std::string &key,
-                      const std::vector<std::string> &elements,
+client &client::pfadd(const string_t &key,
+                      const std::vector<string_t> &elements,
                       const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"PFADD", key};
+  std::vector<string_t> cmd = {"PFADD", key};
   cmd.insert(cmd.end(), elements.begin(), elements.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::pfcount(const std::vector<std::string> &keys,
+client &client::pfcount(const std::vector<string_t> &keys,
                         const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"PFCOUNT"};
+  std::vector<string_t> cmd = {"PFCOUNT"};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::pfmerge(const std::string &destkey,
-                        const std::vector<std::string> &sourcekeys,
+client &client::pfmerge(const string_t &destkey,
+                        const std::vector<string_t> &sourcekeys,
                         const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"PFMERGE", destkey};
+  std::vector<string_t> cmd = {"PFMERGE", destkey};
   cmd.insert(cmd.end(), sourcekeys.begin(), sourcekeys.end());
   send(cmd, reply_callback);
   return *this;
@@ -1751,35 +1739,34 @@ client &client::ping(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::ping(const std::string &message,
+client &client::ping(const string_t &message,
                      const reply_callback_t &reply_callback) {
   send({"PING", message}, reply_callback);
   return *this;
 }
 
-client &client::psetex(const std::string &key, int64_t ms,
-                       const std::string &val,
+client &client::psetex(const string_t &key, int64_t ms, const string_t &val,
                        const reply_callback_t &reply_callback) {
   send({"PSETEX", key, std::to_string(ms), val}, reply_callback);
   return *this;
 }
 
-client &client::publish(const std::string &channel, const std::string &message,
+client &client::publish(const string_t &channel, const string_t &message,
                         const reply_callback_t &reply_callback) {
   send({"PUBLISH", channel, message}, reply_callback);
   return *this;
 }
 
-client &client::pubsub(const std::string &subcommand,
-                       const std::vector<std::string> &args,
+client &client::pubsub(const string_t &subcommand,
+                       const std::vector<string_t> &args,
                        const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"PUBSUB", subcommand};
+  std::vector<string_t> cmd = {"PUBSUB", subcommand};
   cmd.insert(cmd.end(), args.begin(), args.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::pttl(const std::string &key,
+client &client::pttl(const string_t &key,
                      const reply_callback_t &reply_callback) {
   send({"PTTL", key}, reply_callback);
   return *this;
@@ -1805,28 +1792,28 @@ client &client::readwrite(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::rename(const std::string &key, const std::string &newkey,
+client &client::rename(const string_t &key, const string_t &newkey,
                        const reply_callback_t &reply_callback) {
   send({"RENAME", key, newkey}, reply_callback);
   return *this;
 }
 
-client &client::renamenx(const std::string &key, const std::string &newkey,
+client &client::renamenx(const string_t &key, const string_t &newkey,
                          const reply_callback_t &reply_callback) {
   send({"RENAMENX", key, newkey}, reply_callback);
   return *this;
 }
 
-client &client::restore(const std::string &key, int ttl,
-                        const std::string &serialized_value,
+client &client::restore(const string_t &key, int ttl,
+                        const string_t &serialized_value,
                         const reply_callback_t &reply_callback) {
   send({"RESTORE", key, std::to_string(ttl), serialized_value}, reply_callback);
   return *this;
 }
 
-client &client::restore(const std::string &key, int ttl,
-                        const std::string &serialized_value,
-                        const std::string &replace,
+client &client::restore(const string_t &key, int ttl,
+                        const string_t &serialized_value,
+                        const string_t &replace,
                         const reply_callback_t &reply_callback) {
   send({"RESTORE", key, std::to_string(ttl), serialized_value, replace},
        reply_callback);
@@ -1838,38 +1825,35 @@ client &client::role(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::rpop(const std::string &key,
+client &client::rpop(const string_t &key,
                      const reply_callback_t &reply_callback) {
   send({"RPOP", key}, reply_callback);
   return *this;
 }
 
-client &client::rpoplpush(const std::string &source,
-                          const std::string &destination,
+client &client::rpoplpush(const string_t &source, const string_t &destination,
                           const reply_callback_t &reply_callback) {
   send({"RPOPLPUSH", source, destination}, reply_callback);
   return *this;
 }
 
-client &client::rpush(const std::string &key,
-                      const std::vector<std::string> &values,
+client &client::rpush(const string_t &key, const std::vector<string_t> &values,
                       const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"RPUSH", key};
+  std::vector<string_t> cmd = {"RPUSH", key};
   cmd.insert(cmd.end(), values.begin(), values.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::rpushx(const std::string &key, const std::string &value,
+client &client::rpushx(const string_t &key, const string_t &value,
                        const reply_callback_t &reply_callback) {
   send({"RPUSHX", key, value}, reply_callback);
   return *this;
 }
 
-client &client::sadd(const std::string &key,
-                     const std::vector<std::string> &members,
+client &client::sadd(const string_t &key, const std::vector<string_t> &members,
                      const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"SADD", key};
+  std::vector<string_t> cmd = {"SADD", key};
   cmd.insert(cmd.end(), members.begin(), members.end());
   send(cmd, reply_callback);
   return *this;
@@ -1885,7 +1869,7 @@ client &client::scan(std::size_t cursor,
   return scan(cursor, "", 0, reply_callback);
 }
 
-client &client::scan(std::size_t cursor, const std::string &pattern,
+client &client::scan(std::size_t cursor, const string_t &pattern,
                      const reply_callback_t &reply_callback) {
   return scan(cursor, pattern, 0, reply_callback);
 }
@@ -1895,10 +1879,10 @@ client &client::scan(std::size_t cursor, std::size_t count,
   return scan(cursor, "", count, reply_callback);
 }
 
-client &client::scan(std::size_t cursor, const std::string &pattern,
+client &client::scan(std::size_t cursor, const string_t &pattern,
                      std::size_t count,
                      const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"SCAN", std::to_string(cursor)};
+  std::vector<string_t> cmd = {"SCAN", std::to_string(cursor)};
 
   if (!pattern.empty()) {
     cmd.emplace_back("MATCH");
@@ -1914,21 +1898,21 @@ client &client::scan(std::size_t cursor, const std::string &pattern,
   return *this;
 }
 
-client &client::scard(const std::string &key,
+client &client::scard(const string_t &key,
                       const reply_callback_t &reply_callback) {
   send({"SCARD", key}, reply_callback);
   return *this;
 }
 
-client &client::script_debug(const std::string &mode,
+client &client::script_debug(const string_t &mode,
                              const reply_callback_t &reply_callback) {
   send({"SCRIPT", "DEBUG", mode}, reply_callback);
   return *this;
 }
 
-client &client::script_exists(const std::vector<std::string> &scripts,
+client &client::script_exists(const std::vector<string_t> &scripts,
                               const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"SCRIPT", "EXISTS"};
+  std::vector<string_t> cmd = {"SCRIPT", "EXISTS"};
   cmd.insert(cmd.end(), scripts.begin(), scripts.end());
   send(cmd, reply_callback);
   return *this;
@@ -1944,24 +1928,24 @@ client &client::script_kill(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::script_load(const std::string &script,
+client &client::script_load(const string_t &script,
                             const reply_callback_t &reply_callback) {
   send({"SCRIPT", "LOAD", script}, reply_callback);
   return *this;
 }
 
-client &client::sdiff(const std::vector<std::string> &keys,
+client &client::sdiff(const std::vector<string_t> &keys,
                       const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"SDIFF"};
+  std::vector<string_t> cmd = {"SDIFF"};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::sdiffstore(const std::string &destination,
-                           const std::vector<std::string> &keys,
+client &client::sdiffstore(const string_t &destination,
+                           const std::vector<string_t> &keys,
                            const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"SDIFFSTORE", destination};
+  std::vector<string_t> cmd = {"SDIFFSTORE", destination};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   send(cmd, reply_callback);
   return *this;
@@ -1987,23 +1971,23 @@ void client::unprotected_select(int index,
   unprotected_send({"SELECT", std::to_string(index)}, reply_callback);
 }
 
-client &client::set(const std::string &key, const std::string &value,
+client &client::set(const string_t &key, const string_t &value,
                     const reply_callback_t &reply_callback) {
   send({"SET", key, value}, reply_callback);
   return *this;
 }
 
-client &client::set_advanced(const std::string &key, const std::string &value,
+client &client::set_advanced(const string_t &key, const string_t &value,
                              const reply_callback_t &reply_callback) {
   send({"SET", key, value}, reply_callback);
   return *this;
 }
 
-client &client::set_advanced(const std::string &key, const std::string &value,
+client &client::set_advanced(const string_t &key, const string_t &value,
                              bool ex, int ex_sec, bool px, int px_milli,
                              bool nx, bool xx,
                              const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"SET", key, value};
+  std::vector<string_t> cmd = {"SET", key, value};
   if (ex) {
     cmd.emplace_back("EX");
     cmd.push_back(std::to_string(ex_sec));
@@ -2022,29 +2006,28 @@ client &client::set_advanced(const std::string &key, const std::string &value,
   return *this;
 }
 
-client &client::setbit_(const std::string &key, int offset,
-                        const std::string &value,
-                        const reply_callback_t &reply_callback) {
+client &client::setbit(const string_t &key, int offset, const string_t &value,
+                       const reply_callback_t &reply_callback) {
   send({"SETBIT", key, std::to_string(offset), value}, reply_callback);
   return *this;
 }
 
-client &client::setex(const std::string &key, int64_t seconds,
-                      const std::string &value,
+client &client::setex(const string_t &key, int64_t seconds,
+                      const string_t &value,
                       const reply_callback_t &reply_callback) {
   send({"SETEX", key, std::to_string(seconds), value}, reply_callback);
   return *this;
 }
 
-client &client::setnx(const std::string &key, const std::string &value,
+client &client::setnx(const string_t &key, const string_t &value,
                       const reply_callback_t &reply_callback) {
   send({"SETNX", key, value}, reply_callback);
   return *this;
 }
 
-client &client::setrange(const std::string &key, int offset,
-                         const std::string &value,
-                         const reply_callback_t &reply_callback) {
+client &client::set_range(const string_t &key, int offset,
+                          const string_t &value,
+                          const reply_callback_t &reply_callback) {
   send({"SETRANGE", key, std::to_string(offset), value}, reply_callback);
   return *this;
 }
@@ -2054,147 +2037,146 @@ client &client::shutdown(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::shutdown(const std::string &save,
+client &client::shutdown(const string_t &save,
                          const reply_callback_t &reply_callback) {
   send({"SHUTDOWN", save}, reply_callback);
   return *this;
 }
 
-client &client::sinter(const std::vector<std::string> &keys,
+client &client::sinter(const std::vector<string_t> &keys,
                        const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"SINTER"};
+  std::vector<string_t> cmd = {"SINTER"};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::sinterstore(const std::string &destination,
-                            const std::vector<std::string> &keys,
+client &client::sinterstore(const string_t &destination,
+                            const std::vector<string_t> &keys,
                             const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"SINTERSTORE", destination};
+  std::vector<string_t> cmd = {"SINTERSTORE", destination};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::sismember(const std::string &key, const std::string &member,
+client &client::sismember(const string_t &key, const string_t &member,
                           const reply_callback_t &reply_callback) {
   send({"SISMEMBER", key, member}, reply_callback);
   return *this;
 }
 
-client &client::slaveof(const std::string &host, int port,
+client &client::slaveof(const string_t &host, int port,
                         const reply_callback_t &reply_callback) {
+  send({"REPLICAOF", host, std::to_string(port)}, reply_callback);
+  return *this;
+}
+
+client &client::replicaof(const string_t &host, int port,
+                          const reply_callback_t &reply_callback) {
   send({"SLAVEOF", host, std::to_string(port)}, reply_callback);
   return *this;
 }
 
-client &client::slowlog(const std::string subcommand,
+client &client::slowlog(const string_t subcommand,
                         const reply_callback_t &reply_callback) {
   send({"SLOWLOG", subcommand}, reply_callback);
   return *this;
 }
 
-client &client::slowlog(const std::string subcommand,
-                        const std::string &argument,
+client &client::slowlog(string_t sub_cmd, const string_t &argument,
                         const reply_callback_t &reply_callback) {
-  send({"SLOWLOG", subcommand, argument}, reply_callback);
+  send({"SLOWLOG", sub_cmd, argument}, reply_callback);
   return *this;
 }
 
-client &client::smembers(const std::string &key,
+client &client::smembers(const string_t &key,
                          const reply_callback_t &reply_callback) {
   send({"SMEMBERS", key}, reply_callback);
   return *this;
 }
 
-client &client::smove(const std::string &source, const std::string &destination,
-                      const std::string &member,
+client &client::smove(const string_t &source, const string_t &destination,
+                      const string_t &member,
                       const reply_callback_t &reply_callback) {
   send({"SMOVE", source, destination, member}, reply_callback);
   return *this;
 }
 
-client &client::sort(const std::string &key,
+client &client::sort(const string_t &key,
                      const reply_callback_t &reply_callback) {
   send({"SORT", key}, reply_callback);
   return *this;
 }
 
-client &client::sort(const std::string &key,
-                     const std::vector<std::string> &get_patterns,
-                     bool asc_order, bool alpha,
-                     const reply_callback_t &reply_callback) {
+client &client::sort(const string_t &key,
+                     const std::vector<string_t> &get_patterns, bool asc_order,
+                     bool alpha, const reply_callback_t &reply_callback) {
   return sort(key, "", false, 0, 0, get_patterns, asc_order, alpha, "",
               reply_callback);
 }
 
-client &client::sort(const std::string &key, std::size_t offset,
-                     std::size_t count,
-                     const std::vector<std::string> &get_patterns,
-                     bool asc_order, bool alpha,
-                     const reply_callback_t &reply_callback) {
+client &client::sort(const string_t &key, std::size_t offset, std::size_t count,
+                     const std::vector<string_t> &get_patterns, bool asc_order,
+                     bool alpha, const reply_callback_t &reply_callback) {
   return sort(key, "", true, offset, count, get_patterns, asc_order, alpha, "",
               reply_callback);
 }
 
-client &client::sort(const std::string &key, const std::string &by_pattern,
-                     const std::vector<std::string> &get_patterns,
-                     bool asc_order, bool alpha,
-                     const reply_callback_t &reply_callback) {
+client &client::sort(const string_t &key, const string_t &by_pattern,
+                     const std::vector<string_t> &get_patterns, bool asc_order,
+                     bool alpha, const reply_callback_t &reply_callback) {
   return sort(key, by_pattern, false, 0, 0, get_patterns, asc_order, alpha, "",
               reply_callback);
 }
 
-client &client::sort(const std::string &key,
-                     const std::vector<std::string> &get_patterns,
-                     bool asc_order, bool alpha, const std::string &store_dest,
+client &client::sort(const string_t &key,
+                     const std::vector<string_t> &get_patterns, bool asc_order,
+                     bool alpha, const string_t &store_dest,
                      const reply_callback_t &reply_callback) {
   return sort(key, "", false, 0, 0, get_patterns, asc_order, alpha, store_dest,
               reply_callback);
 }
 
-client &client::sort(const std::string &key, std::size_t offset,
-                     std::size_t count,
-                     const std::vector<std::string> &get_patterns,
-                     bool asc_order, bool alpha, const std::string &store_dest,
+client &client::sort(const string_t &key, std::size_t offset, std::size_t count,
+                     const std::vector<string_t> &get_patterns, bool asc_order,
+                     bool alpha, const string_t &store_dest,
                      const reply_callback_t &reply_callback) {
   return sort(key, "", true, offset, count, get_patterns, asc_order, alpha,
               store_dest, reply_callback);
 }
 
-client &client::sort(const std::string &key, const std::string &by_pattern,
-                     const std::vector<std::string> &get_patterns,
-                     bool asc_order, bool alpha, const std::string &store_dest,
+client &client::sort(const string_t &key, const string_t &by_pattern,
+                     const std::vector<string_t> &get_patterns, bool asc_order,
+                     bool alpha, const string_t &store_dest,
                      const reply_callback_t &reply_callback) {
   return sort(key, by_pattern, false, 0, 0, get_patterns, asc_order, alpha,
               store_dest, reply_callback);
 }
 
-client &client::sort(const std::string &key, const std::string &by_pattern,
+client &client::sort(const string_t &key, const string_t &by_pattern,
                      std::size_t offset, std::size_t count,
-                     const std::vector<std::string> &get_patterns,
-                     bool asc_order, bool alpha,
-                     const reply_callback_t &reply_callback) {
+                     const std::vector<string_t> &get_patterns, bool asc_order,
+                     bool alpha, const reply_callback_t &reply_callback) {
   return sort(key, by_pattern, true, offset, count, get_patterns, asc_order,
               alpha, "", reply_callback);
 }
 
-client &client::sort(const std::string &key, const std::string &by_pattern,
+client &client::sort(const string_t &key, const string_t &by_pattern,
                      std::size_t offset, std::size_t count,
-                     const std::vector<std::string> &get_patterns,
-                     bool asc_order, bool alpha, const std::string &store_dest,
+                     const std::vector<string_t> &get_patterns, bool asc_order,
+                     bool alpha, const string_t &store_dest,
                      const reply_callback_t &reply_callback) {
   return sort(key, by_pattern, true, offset, count, get_patterns, asc_order,
               alpha, store_dest, reply_callback);
 }
 
-client &client::sort(const std::string &key, const std::string &by_pattern,
+client &client::sort(const string_t &key, const string_t &by_pattern,
                      bool limit, std::size_t offset, std::size_t count,
-                     const std::vector<std::string> &get_patterns,
-                     bool asc_order, bool alpha, const std::string &store_dest,
+                     const std::vector<string_t> &get_patterns, bool asc_order,
+                     bool alpha, const string_t &store_dest,
                      const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"SORT", key};
+  std::vector<string_t> cmd = {"SORT", key};
 
   //!
   //!  add by pattern (optional)
@@ -2249,60 +2231,59 @@ client &client::sort(const std::string &key, const std::string &by_pattern,
   return *this;
 }
 
-client &client::spop(const std::string &key,
+client &client::spop(const string_t &key,
                      const reply_callback_t &reply_callback) {
   send({"SPOP", key}, reply_callback);
   return *this;
 }
 
-client &client::spop(const std::string &key, int count,
+client &client::spop(const string_t &key, int count,
                      const reply_callback_t &reply_callback) {
   send({"SPOP", key, std::to_string(count)}, reply_callback);
   return *this;
 }
 
-client &client::srandmember(const std::string &key,
+client &client::srandmember(const string_t &key,
                             const reply_callback_t &reply_callback) {
   send({"SRANDMEMBER", key}, reply_callback);
   return *this;
 }
 
-client &client::srandmember(const std::string &key, int count,
+client &client::srandmember(const string_t &key, int count,
                             const reply_callback_t &reply_callback) {
   send({"SRANDMEMBER", key, std::to_string(count)}, reply_callback);
   return *this;
 }
 
-client &client::srem(const std::string &key,
-                     const std::vector<std::string> &members,
+client &client::srem(const string_t &key, const std::vector<string_t> &members,
                      const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"SREM", key};
+  std::vector<string_t> cmd = {"SREM", key};
   cmd.insert(cmd.end(), members.begin(), members.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::sscan(const std::string &key, std::size_t cursor,
+client &client::sscan(const string_t &key, std::size_t cursor,
                       const reply_callback_t &reply_callback) {
   return sscan(key, cursor, "", 0, reply_callback);
 }
 
-client &client::sscan(const std::string &key, std::size_t cursor,
-                      const std::string &pattern,
+client &client::sscan(const string_t &key, std::size_t cursor,
+                      const string_t &pattern,
                       const reply_callback_t &reply_callback) {
   return sscan(key, cursor, pattern, 0, reply_callback);
 }
 
-client &client::sscan(const std::string &key, std::size_t cursor,
+client &client::sscan(const string_t &key, std::size_t cursor,
                       std::size_t count,
                       const reply_callback_t &reply_callback) {
   return sscan(key, cursor, "", count, reply_callback);
 }
 
-client &client::sscan(const std::string &key, std::size_t cursor,
-                      const std::string &pattern, std::size_t count,
+client &client::sscan(const string_t &key, std::size_t cursor,
+                      const string_t &pattern, std::size_t count,
                       const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"SSCAN", key, std::to_string(cursor)};
+  std::vector<string_t> cmd = {"SSCAN", key, std::to_string(cursor)};
 
   if (!pattern.empty()) {
     cmd.emplace_back("MATCH");
@@ -2318,24 +2299,24 @@ client &client::sscan(const std::string &key, std::size_t cursor,
   return *this;
 }
 
-client &client::strlen(const std::string &key,
+client &client::strlen(const string_t &key,
                        const reply_callback_t &reply_callback) {
   send({"STRLEN", key}, reply_callback);
   return *this;
 }
 
-client &client::sunion(const std::vector<std::string> &keys,
+client &client::sunion(const std::vector<string_t> &keys,
                        const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"SUNION"};
+  std::vector<string_t> cmd = {"SUNION"};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::sunionstore(const std::string &destination,
-                            const std::vector<std::string> &keys,
+client &client::sunionstore(const string_t &destination,
+                            const std::vector<string_t> &keys,
                             const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"SUNIONSTORE", destination};
+  std::vector<string_t> cmd = {"SUNIONSTORE", destination};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   send(cmd, reply_callback);
   return *this;
@@ -2351,13 +2332,13 @@ client &client::time(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::ttl(const std::string &key,
+client &client::ttl(const string_t &key,
                     const reply_callback_t &reply_callback) {
   send({"TTL", key}, reply_callback);
   return *this;
 }
 
-client &client::type(const std::string &key,
+client &client::type(const string_t &key,
                      const reply_callback_t &reply_callback) {
   send({"TYPE", key}, reply_callback);
   return *this;
@@ -2368,25 +2349,25 @@ client &client::unwatch(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-client &client::wait(int numslaves, int timeout,
+client &client::wait(int num_replicas, int timeout,
                      const reply_callback_t &reply_callback) {
-  send({"WAIT", std::to_string(numslaves), std::to_string(timeout)},
+  send({"WAIT", std::to_string(num_replicas), std::to_string(timeout)},
        reply_callback);
   return *this;
 }
 
-client &client::watch(const std::vector<std::string> &keys,
+client &client::watch(const std::vector<string_t> &keys,
                       const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"WATCH"};
+  std::vector<string_t> cmd = {"WATCH"};
   cmd.insert(cmd.end(), keys.begin(), keys.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::xack(const std::string &stream, const std::string &group,
-                     const std::vector<std::string> &message_ids,
+client &client::xack(const string_t &stream, const string_t &group,
+                     const std::vector<string_t> &message_ids,
                      const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"XACK", stream, group};
+  std::vector<string_t> cmd = {"XACK", stream, group};
 
   //!
   //!  ids
@@ -2399,11 +2380,10 @@ client &client::xack(const std::string &stream, const std::string &group,
   return *this;
 }
 
-client &
-client::xadd(const std::string &key, const std::string &id,
-             const std::multimap<std::string, std::string> &field_members,
-             const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"XADD", key, id};
+client &client::xadd(const string_t &key, const string_t &id,
+                     const std::multimap<string_t, string_t> &field_members,
+                     const reply_callback_t &reply_callback) {
+  std::vector<string_t> cmd = {"XADD", key, id};
 
   //!
   //!  score members
@@ -2417,13 +2397,13 @@ client::xadd(const std::string &key, const std::string &id,
   return *this;
 }
 
-client &client::xclaim(const std::string &stream, const std::string &group,
-                       const std::string &consumer, int min_idle_time,
-                       const std::vector<std::string> &message_ids,
+client &client::xclaim(const string_t &stream, const string_t &group,
+                       const string_t &consumer, int min_idle_time,
+                       const std::vector<string_t> &message_ids,
                        const xclaim_options_t &options,
                        const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"XCLAIM", stream, group, consumer,
-                                  std::to_string(min_idle_time)};
+  std::vector<string_t> cmd = {"XCLAIM", stream, group, consumer,
+                               std::to_string(min_idle_time)};
 
   //!
   //!  ids
@@ -2454,10 +2434,10 @@ client &client::xclaim(const std::string &stream, const std::string &group,
   return *this;
 }
 
-client &client::xdel(const std::string &key,
-                     const std::vector<std::string> &id_members,
+client &client::xdel(const string_t &key,
+                     const std::vector<string_t> &id_members,
                      const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"XDEL", key};
+  std::vector<string_t> cmd = {"XDEL", key};
 
   //!
   //!  ids
@@ -2471,46 +2451,41 @@ client &client::xdel(const std::string &key,
 }
 
 //<editor-fold desc="XGroup">
-client &client::xgroup_create(const std::string &key,
-                              const std::string &group_name,
+client &client::xgroup_create(const string_t &key, const string_t &group_name,
                               const reply_callback_t &reply_callback) {
   send({"XGROUP", "CREATE", key, group_name, "$"}, reply_callback);
   return *this;
 }
 
-client &client::xgroup_create(const std::string &key,
-                              const std::string &group_name,
-                              const std::string &id,
+client &client::xgroup_create(const string_t &key, const string_t &group_name,
+                              const string_t &id,
                               const reply_callback_t &reply_callback) {
   send({"XGROUP", "CREATE", key, group_name, id}, reply_callback);
   return *this;
 }
 
-client &client::xgroup_set_id(const std::string &key,
-                              const std::string &group_name,
+client &client::xgroup_set_id(const string_t &key, const string_t &group_name,
                               const reply_callback_t &reply_callback) {
   send({"XGROUP", "SETID", key, group_name, "$"}, reply_callback);
   return *this;
 }
 
-client &client::xgroup_set_id(const std::string &key,
-                              const std::string &group_name,
-                              const std::string &id,
+client &client::xgroup_set_id(const string_t &key, const string_t &group_name,
+                              const string_t &id,
                               const reply_callback_t &reply_callback) {
   send({"XGROUP", "SETID", key, group_name, id}, reply_callback);
   return *this;
 }
 
-client &client::xgroup_destroy(const std::string &key,
-                               const std::string &group_name,
+client &client::xgroup_destroy(const string_t &key, const string_t &group_name,
                                const reply_callback_t &reply_callback) {
   send({"XGROUP", "DESTROY", key, group_name}, reply_callback);
   return *this;
 }
 
-client &client::xgroup_del_consumer(const std::string &key,
-                                    const std::string &group_name,
-                                    const std::string &consumer_name,
+client &client::xgroup_del_consumer(const string_t &key,
+                                    const string_t &group_name,
+                                    const string_t &consumer_name,
                                     const reply_callback_t &reply_callback) {
   send({"XGROUP", "DELCONSUMER", key, group_name, consumer_name},
        reply_callback);
@@ -2518,20 +2493,19 @@ client &client::xgroup_del_consumer(const std::string &key,
 }
 //</editor-fold>
 
-client &client::xinfo_consumers(const std::string &key,
-                                const std::string &group_name,
+client &client::xinfo_consumers(const string_t &key, const string_t &group_name,
                                 const reply_callback_t &reply_callback) {
   send({"XINFO", "CONSUMERS", key, group_name}, reply_callback);
   return *this;
 }
 
-client &client::xinfo_groups(const std::string &key,
+client &client::xinfo_groups(const string_t &key,
                              const reply_callback_t &reply_callback) {
   send({"XINFO", "GROUPS", key}, reply_callback);
   return *this;
 }
 
-client &client::xinfo_stream(const std::string &stream,
+client &client::xinfo_stream(const string_t &stream,
                              const reply_callback_t &reply_callback) {
   send({"XINFO", "STREAM", stream}, reply_callback);
   return *this;
@@ -2549,16 +2523,16 @@ client &client::xinfo_stream(const std::string &stream,
 //!  @param reply_callback
 //!  @return Integer reply: the number of entries of the stream at key.
 //!
-client &client::xlen(const std::string &stream,
+client &client::xlen(const string_t &stream,
                      const reply_callback_t &reply_callback) {
   send({"XLEN", stream}, reply_callback);
   return *this;
 }
 
-client &client::xpending(const std::string &stream, const std::string &group,
+client &client::xpending(const string_t &stream, const string_t &group,
                          const xpending_options_t &options,
                          const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"XPENDING", stream, group};
+  std::vector<string_t> cmd = {"XPENDING", stream, group};
   if (!options.Range.Start.empty()) {
     cmd.emplace_back(options.Range.Start);
     cmd.emplace_back(options.Range.Stop);
@@ -2572,11 +2546,9 @@ client &client::xpending(const std::string &stream, const std::string &group,
   return *this;
 }
 
-client &client::xrange(const std::string &stream,
-                       const range_options_t &options,
+client &client::xrange(const string_t &stream, const range_options_t &options,
                        const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"XRANGE", stream, options.Start,
-                                  options.Stop};
+  std::vector<string_t> cmd = {"XRANGE", stream, options.Start, options.Stop};
   if (options.Count > 0) {
     cmd.emplace_back("COUNT");
     cmd.emplace_back(std::to_string(options.Count));
@@ -2587,7 +2559,7 @@ client &client::xrange(const std::string &stream,
 
 client &client::xread(const xread_options_t &a,
                       const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"XREAD"};
+  std::vector<string_t> cmd = {"XREAD"};
   if (a.Count > 0) {
     cmd.emplace_back("COUNT");
     cmd.push_back(std::to_string(a.Count));
@@ -2610,7 +2582,7 @@ client &client::xread(const xread_options_t &a,
 
 client &client::xreadgroup(const xreadgroup_options_t &a,
                            const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"XREADGROUP", "GROUP", a.Group, a.Consumer};
+  std::vector<string_t> cmd = {"XREADGROUP", "GROUP", a.Group, a.Consumer};
   if (a.Count > 0) {
     cmd.emplace_back("COUNT");
     cmd.push_back(std::to_string(a.Count));
@@ -2635,11 +2607,11 @@ client &client::xreadgroup(const xreadgroup_options_t &a,
   return *this;
 }
 
-client &client::xrevrange(const std::string &key,
+client &client::xrevrange(const string_t &key,
                           const range_options_t &range_args,
                           const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"XREVRANGE", key, range_args.Start,
-                                  range_args.Stop};
+  std::vector<string_t> cmd = {"XREVRANGE", key, range_args.Start,
+                               range_args.Stop};
   if (range_args.Count > 0) {
     cmd.emplace_back(std::to_string(range_args.Count));
   }
@@ -2647,28 +2619,27 @@ client &client::xrevrange(const std::string &key,
   return *this;
 }
 
-client &client::xtrim(const std::string &stream, int max_len,
+client &client::xtrim(const string_t &stream, int max_len,
                       const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"XTRIM", stream, "MAXLEN",
-                                  std::to_string(max_len)};
+  std::vector<string_t> cmd = {"XTRIM", stream, "MAXLEN",
+                               std::to_string(max_len)};
   send(cmd, reply_callback);
   return *this;
 }
 
 client &
-client::xtrim_approx(const std::string &key, int max_len,
+client::xtrim_approx(const string_t &key, int max_len,
                      const cpp_redis::reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"XTRIM", key, "MAXLEN", "~",
-                                  std::to_string(max_len)};
+  std::vector<string_t> cmd = {"XTRIM", key, "MAXLEN", "~",
+                               std::to_string(max_len)};
   send(cmd, reply_callback);
   return *this;
 }
 
-client &
-client::zadd(const std::string &key, const std::vector<std::string> &options,
-             const std::multimap<std::string, std::string> &score_members,
-             const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"ZADD", key};
+client &client::zadd(const string_t &key, const std::vector<string_t> &options,
+                     const std::multimap<string_t, string_t> &score_members,
+                     const reply_callback_t &reply_callback) {
+  std::vector<string_t> cmd = {"ZADD", key};
 
   //!
   //!  options
@@ -2687,61 +2658,60 @@ client::zadd(const std::string &key, const std::vector<std::string> &options,
   return *this;
 }
 
-client &client::zcard(const std::string &key,
+client &client::zcard(const string_t &key,
                       const reply_callback_t &reply_callback) {
   send({"ZCARD", key}, reply_callback);
   return *this;
 }
 
-client &client::zcount(const std::string &key, int min, int max,
+client &client::zcount(const string_t &key, int min, int max,
                        const reply_callback_t &reply_callback) {
   send({"ZCOUNT", key, std::to_string(min), std::to_string(max)},
        reply_callback);
   return *this;
 }
 
-client &client::zcount(const std::string &key, double min, double max,
+client &client::zcount(const string_t &key, double min, double max,
                        const reply_callback_t &reply_callback) {
   send({"ZCOUNT", key, std::to_string(min), std::to_string(max)},
        reply_callback);
   return *this;
 }
 
-client &client::zcount(const std::string &key, const std::string &min,
-                       const std::string &max,
+client &client::zcount(const string_t &key, const string_t &min,
+                       const string_t &max,
                        const reply_callback_t &reply_callback) {
   send({"ZCOUNT", key, min, max}, reply_callback);
   return *this;
 }
 
-client &client::zincrby(const std::string &key, int incr,
-                        const std::string &member,
+client &client::zincrby(const string_t &key, int incr, const string_t &member,
                         const reply_callback_t &reply_callback) {
   send({"ZINCRBY", key, std::to_string(incr), member}, reply_callback);
   return *this;
 }
 
-client &client::zincrby(const std::string &key, double incr,
-                        const std::string &member,
+client &client::zincrby(const string_t &key, double incr,
+                        const string_t &member,
                         const reply_callback_t &reply_callback) {
   send({"ZINCRBY", key, std::to_string(incr), member}, reply_callback);
   return *this;
 }
 
-client &client::zincrby(const std::string &key, const std::string &incr,
-                        const std::string &member,
+client &client::zincrby(const string_t &key, const string_t &incr,
+                        const string_t &member,
                         const reply_callback_t &reply_callback) {
   send({"ZINCRBY", key, incr, member}, reply_callback);
   return *this;
 }
 
-client &client::zinterstore(const std::string &destination, std::size_t numkeys,
-                            const std::vector<std::string> &keys,
+client &client::zinterstore(const string_t &destination, std::size_t numkeys,
+                            const std::vector<string_t> &keys,
                             const std::vector<std::size_t> weights,
                             aggregate_method method,
                             const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"ZINTERSTORE", destination,
-                                  std::to_string(numkeys)};
+  std::vector<string_t> cmd = {"ZINTERSTORE", destination,
+                               std::to_string(numkeys)};
 
   //!
   //!  keys
@@ -2773,50 +2743,50 @@ client &client::zinterstore(const std::string &destination, std::size_t numkeys,
   return *this;
 }
 
-client &client::zlexcount(const std::string &key, int min, int max,
+client &client::zlexcount(const string_t &key, int min, int max,
                           const reply_callback_t &reply_callback) {
   send({"ZLEXCOUNT", key, std::to_string(min), std::to_string(max)},
        reply_callback);
   return *this;
 }
 
-client &client::zlexcount(const std::string &key, double min, double max,
+client &client::zlexcount(const string_t &key, double min, double max,
                           const reply_callback_t &reply_callback) {
   send({"ZLEXCOUNT", key, std::to_string(min), std::to_string(max)},
        reply_callback);
   return *this;
 }
 
-client &client::zlexcount(const std::string &key, const std::string &min,
-                          const std::string &max,
+client &client::zlexcount(const string_t &key, const string_t &min,
+                          const string_t &max,
                           const reply_callback_t &reply_callback) {
   send({"ZLEXCOUNT", key, min, max}, reply_callback);
   return *this;
 }
 
-client &client::zpopmin(const std::string &key, int count,
+client &client::zpopmin(const string_t &key, int count,
                         const reply_callback_t &reply_callback) {
   send({"ZPOPMIN", key, std::to_string(count)}, reply_callback);
   return *this;
 }
 
-client &client::zpopmax(const std::string &key, int count,
+client &client::zpopmax(const string_t &key, int count,
                         const reply_callback_t &reply_callback) {
   send({"ZPOPMAX", key, std::to_string(count)}, reply_callback);
   return *this;
 }
 
-client &client::zrange(const std::string &key, int start, int stop,
+client &client::zrange(const string_t &key, int start, int stop,
                        const reply_callback_t &reply_callback) {
   send({"ZRANGE", key, std::to_string(start), std::to_string(stop)},
        reply_callback);
   return *this;
 }
 
-client &client::zrange(const std::string &key, int start, int stop,
-                       bool withscores,
+client &client::zrange(const string_t &key, int start, int stop,
+                       bool with_scores,
                        const reply_callback_t &reply_callback) {
-  if (withscores)
+  if (with_scores)
     send({"ZRANGE", key, std::to_string(start), std::to_string(stop),
           "WITHSCORES"},
          reply_callback);
@@ -2826,17 +2796,17 @@ client &client::zrange(const std::string &key, int start, int stop,
   return *this;
 }
 
-client &client::zrange(const std::string &key, double start, double stop,
+client &client::zrange(const string_t &key, double start, double stop,
                        const reply_callback_t &reply_callback) {
   send({"ZRANGE", key, std::to_string(start), std::to_string(stop)},
        reply_callback);
   return *this;
 }
 
-client &client::zrange(const std::string &key, double start, double stop,
-                       bool withscores,
+client &client::zrange(const string_t &key, double start, double stop,
+                       bool with_scores,
                        const reply_callback_t &reply_callback) {
-  if (withscores)
+  if (with_scores)
     send({"ZRANGE", key, std::to_string(start), std::to_string(stop),
           "WITHSCORES"},
          reply_callback);
@@ -2846,117 +2816,116 @@ client &client::zrange(const std::string &key, double start, double stop,
   return *this;
 }
 
-client &client::zrange(const std::string &key, const std::string &start,
-                       const std::string &stop,
+client &client::zrange(const string_t &key, const string_t &start,
+                       const string_t &stop,
                        const reply_callback_t &reply_callback) {
   send({"ZRANGE", key, start, stop}, reply_callback);
   return *this;
 }
 
-client &client::zrange(const std::string &key, const std::string &start,
-                       const std::string &stop, bool withscores,
+client &client::zrange(const string_t &key, const string_t &start,
+                       const string_t &stop, bool with_scores,
                        const reply_callback_t &reply_callback) {
-  if (withscores)
+  if (with_scores)
     send({"ZRANGE", key, start, stop, "WITHSCORES"}, reply_callback);
   else
     send({"ZRANGE", key, start, stop}, reply_callback);
   return *this;
 }
 
-client &client::zrangebylex(const std::string &key, int min, int max,
+client &client::zrangebylex(const string_t &key, int min, int max,
                             const reply_callback_t &reply_callback) {
   return zrangebylex(key, std::to_string(min), std::to_string(max), false, 0, 0,
                      false, reply_callback);
 }
 
-client &client::zrangebylex(const std::string &key, int min, int max,
-                            bool withscores,
+client &client::zrangebylex(const string_t &key, int min, int max,
+                            bool with_scores,
                             const reply_callback_t &reply_callback) {
   return zrangebylex(key, std::to_string(min), std::to_string(max), false, 0, 0,
-                     withscores, reply_callback);
+                     with_scores, reply_callback);
 }
 
-client &client::zrangebylex(const std::string &key, double min, double max,
+client &client::zrangebylex(const string_t &key, double min, double max,
                             const reply_callback_t &reply_callback) {
   return zrangebylex(key, std::to_string(min), std::to_string(max), false, 0, 0,
                      false, reply_callback);
 }
 
-client &client::zrangebylex(const std::string &key, double min, double max,
-                            bool withscores,
+client &client::zrangebylex(const string_t &key, double min, double max,
+                            bool with_scores,
                             const reply_callback_t &reply_callback) {
   return zrangebylex(key, std::to_string(min), std::to_string(max), false, 0, 0,
-                     withscores, reply_callback);
+                     with_scores, reply_callback);
 }
 
-client &client::zrangebylex(const std::string &key, const std::string &min,
-                            const std::string &max,
+client &client::zrangebylex(const string_t &key, const string_t &min,
+                            const string_t &max,
                             const reply_callback_t &reply_callback) {
   return zrangebylex(key, min, max, false, 0, 0, false, reply_callback);
 }
 
-client &client::zrangebylex(const std::string &key, const std::string &min,
-                            const std::string &max, bool withscores,
+client &client::zrangebylex(const string_t &key, const string_t &min,
+                            const string_t &max, bool with_scores,
                             const reply_callback_t &reply_callback) {
-  return zrangebylex(key, min, max, false, 0, 0, withscores, reply_callback);
+  return zrangebylex(key, min, max, false, 0, 0, with_scores, reply_callback);
 }
 
-client &client::zrangebylex(const std::string &key, int min, int max,
+client &client::zrangebylex(const string_t &key, int min, int max,
                             std::size_t offset, std::size_t count,
                             const reply_callback_t &reply_callback) {
   return zrangebylex(key, std::to_string(min), std::to_string(max), true,
                      offset, count, false, reply_callback);
 }
 
-client &client::zrangebylex(const std::string &key, int min, int max,
+client &client::zrangebylex(const string_t &key, int min, int max,
                             std::size_t offset, std::size_t count,
-                            bool withscores,
+                            bool with_scores,
                             const reply_callback_t &reply_callback) {
   return zrangebylex(key, std::to_string(min), std::to_string(max), true,
-                     offset, count, withscores, reply_callback);
+                     offset, count, with_scores, reply_callback);
 }
 
-client &client::zrangebylex(const std::string &key, double min, double max,
+client &client::zrangebylex(const string_t &key, double min, double max,
                             std::size_t offset, std::size_t count,
                             const reply_callback_t &reply_callback) {
   return zrangebylex(key, std::to_string(min), std::to_string(max), true,
                      offset, count, false, reply_callback);
 }
 
-client &client::zrangebylex(const std::string &key, double min, double max,
+client &client::zrangebylex(const string_t &key, double min, double max,
                             std::size_t offset, std::size_t count,
-                            bool withscores,
+                            bool with_scores,
                             const reply_callback_t &reply_callback) {
   return zrangebylex(key, std::to_string(min), std::to_string(max), true,
-                     offset, count, withscores, reply_callback);
+                     offset, count, with_scores, reply_callback);
 }
 
-client &client::zrangebylex(const std::string &key, const std::string &min,
-                            const std::string &max, std::size_t offset,
+client &client::zrangebylex(const string_t &key, const string_t &min,
+                            const string_t &max, std::size_t offset,
                             std::size_t count,
                             const reply_callback_t &reply_callback) {
   return zrangebylex(key, min, max, true, offset, count, false, reply_callback);
 }
 
-client &client::zrangebylex(const std::string &key, const std::string &min,
-                            const std::string &max, std::size_t offset,
-                            std::size_t count, bool withscores,
+client &client::zrangebylex(const string_t &key, const string_t &min,
+                            const string_t &max, std::size_t offset,
+                            std::size_t count, bool with_scores,
                             const reply_callback_t &reply_callback) {
-  return zrangebylex(key, min, max, true, offset, count, withscores,
+  return zrangebylex(key, min, max, true, offset, count, with_scores,
                      reply_callback);
 }
 
-client &client::zrangebylex(const std::string &key, const std::string &min,
-                            const std::string &max, bool limit,
-                            std::size_t offset, std::size_t count,
-                            bool withscores,
+client &client::zrangebylex(const string_t &key, const string_t &min,
+                            const string_t &max, bool limit, std::size_t offset,
+                            std::size_t count, bool with_scores,
                             const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"ZRANGEBYLEX", key, min, max};
+  std::vector<string_t> cmd = {"ZRANGEBYLEX", key, min, max};
 
   //!
-  //!  withscores (optional)
+  //!  with_scores (optional)
   //!
-  if (withscores) {
+  if (with_scores) {
     cmd.emplace_back("WITHSCORES");
   }
 
@@ -2973,101 +2942,101 @@ client &client::zrangebylex(const std::string &key, const std::string &min,
   return *this;
 }
 
-client &client::zrangebyscore(const std::string &key, int min, int max,
+client &client::zrangebyscore(const string_t &key, int min, int max,
                               const reply_callback_t &reply_callback) {
   return zrangebyscore(key, std::to_string(min), std::to_string(max), false, 0,
                        0, false, reply_callback);
 }
 
-client &client::zrangebyscore(const std::string &key, int min, int max,
-                              bool withscores,
+client &client::zrangebyscore(const string_t &key, int min, int max,
+                              bool with_scores,
                               const reply_callback_t &reply_callback) {
   return zrangebyscore(key, std::to_string(min), std::to_string(max), false, 0,
-                       0, withscores, reply_callback);
+                       0, with_scores, reply_callback);
 }
 
-client &client::zrangebyscore(const std::string &key, double min, double max,
+client &client::zrangebyscore(const string_t &key, double min, double max,
                               const reply_callback_t &reply_callback) {
   return zrangebyscore(key, std::to_string(min), std::to_string(max), false, 0,
                        0, false, reply_callback);
 }
 
-client &client::zrangebyscore(const std::string &key, double min, double max,
-                              bool withscores,
+client &client::zrangebyscore(const string_t &key, double min, double max,
+                              bool with_scores,
                               const reply_callback_t &reply_callback) {
   return zrangebyscore(key, std::to_string(min), std::to_string(max), false, 0,
-                       0, withscores, reply_callback);
+                       0, with_scores, reply_callback);
 }
 
-client &client::zrangebyscore(const std::string &key, const std::string &min,
-                              const std::string &max,
+client &client::zrangebyscore(const string_t &key, const string_t &min,
+                              const string_t &max,
                               const reply_callback_t &reply_callback) {
   return zrangebyscore(key, min, max, false, 0, 0, false, reply_callback);
 }
 
-client &client::zrangebyscore(const std::string &key, const std::string &min,
-                              const std::string &max, bool withscores,
+client &client::zrangebyscore(const string_t &key, const string_t &min,
+                              const string_t &max, bool with_scores,
                               const reply_callback_t &reply_callback) {
-  return zrangebyscore(key, min, max, false, 0, 0, withscores, reply_callback);
+  return zrangebyscore(key, min, max, false, 0, 0, with_scores, reply_callback);
 }
 
-client &client::zrangebyscore(const std::string &key, int min, int max,
+client &client::zrangebyscore(const string_t &key, int min, int max,
                               std::size_t offset, std::size_t count,
                               const reply_callback_t &reply_callback) {
   return zrangebyscore(key, std::to_string(min), std::to_string(max), true,
                        offset, count, false, reply_callback);
 }
 
-client &client::zrangebyscore(const std::string &key, int min, int max,
+client &client::zrangebyscore(const string_t &key, int min, int max,
                               std::size_t offset, std::size_t count,
-                              bool withscores,
+                              bool with_scores,
                               const reply_callback_t &reply_callback) {
   return zrangebyscore(key, std::to_string(min), std::to_string(max), true,
-                       offset, count, withscores, reply_callback);
+                       offset, count, with_scores, reply_callback);
 }
 
-client &client::zrangebyscore(const std::string &key, double min, double max,
+client &client::zrangebyscore(const string_t &key, double min, double max,
                               std::size_t offset, std::size_t count,
                               const reply_callback_t &reply_callback) {
   return zrangebyscore(key, std::to_string(min), std::to_string(max), true,
                        offset, count, false, reply_callback);
 }
 
-client &client::zrangebyscore(const std::string &key, double min, double max,
+client &client::zrangebyscore(const string_t &key, double min, double max,
                               std::size_t offset, std::size_t count,
-                              bool withscores,
+                              bool with_scores,
                               const reply_callback_t &reply_callback) {
   return zrangebyscore(key, std::to_string(min), std::to_string(max), true,
-                       offset, count, withscores, reply_callback);
+                       offset, count, with_scores, reply_callback);
 }
 
-client &client::zrangebyscore(const std::string &key, const std::string &min,
-                              const std::string &max, std::size_t offset,
+client &client::zrangebyscore(const string_t &key, const string_t &min,
+                              const string_t &max, std::size_t offset,
                               std::size_t count,
                               const reply_callback_t &reply_callback) {
   return zrangebyscore(key, min, max, true, offset, count, false,
                        reply_callback);
 }
 
-client &client::zrangebyscore(const std::string &key, const std::string &min,
-                              const std::string &max, std::size_t offset,
-                              std::size_t count, bool withscores,
+client &client::zrangebyscore(const string_t &key, const string_t &min,
+                              const string_t &max, std::size_t offset,
+                              std::size_t count, bool with_scores,
                               const reply_callback_t &reply_callback) {
-  return zrangebyscore(key, min, max, true, offset, count, withscores,
+  return zrangebyscore(key, min, max, true, offset, count, with_scores,
                        reply_callback);
 }
 
-client &client::zrangebyscore(const std::string &key, const std::string &min,
-                              const std::string &max, bool limit,
+client &client::zrangebyscore(const string_t &key, const string_t &min,
+                              const string_t &max, bool limit,
                               std::size_t offset, std::size_t count,
-                              bool withscores,
+                              bool with_scores,
                               const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"ZRANGEBYSCORE", key, min, max};
+  std::vector<string_t> cmd = {"ZRANGEBYSCORE", key, min, max};
 
   //!
-  //!  withscores (optional)
+  //!  with_scores (optional)
   //!
-  if (withscores) {
+  if (with_scores) {
     cmd.emplace_back("WITHSCORES");
   }
 
@@ -3084,97 +3053,94 @@ client &client::zrangebyscore(const std::string &key, const std::string &min,
   return *this;
 }
 
-client &client::zrank(const std::string &key, const std::string &member,
+client &client::zrank(const string_t &key, const string_t &member,
                       const reply_callback_t &reply_callback) {
   send({"ZRANK", key, member}, reply_callback);
   return *this;
 }
 
-client &client::zrem(const std::string &key,
-                     const std::vector<std::string> &members,
+client &client::zrem(const string_t &key, const std::vector<string_t> &members,
                      const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"ZREM", key};
+  std::vector<string_t> cmd = {"ZREM", key};
   cmd.insert(cmd.end(), members.begin(), members.end());
   send(cmd, reply_callback);
   return *this;
 }
 
-client &client::zremrangebylex(const std::string &key, int min, int max,
+client &client::zremrangebylex(const string_t &key, int min, int max,
                                const reply_callback_t &reply_callback) {
   send({"ZREMRANGEBYLEX", key, std::to_string(min), std::to_string(max)},
        reply_callback);
   return *this;
 }
 
-client &client::zremrangebylex(const std::string &key, double min, double max,
+client &client::zremrangebylex(const string_t &key, double min, double max,
                                const reply_callback_t &reply_callback) {
   send({"ZREMRANGEBYLEX", key, std::to_string(min), std::to_string(max)},
        reply_callback);
   return *this;
 }
 
-client &client::zremrangebylex(const std::string &key, const std::string &min,
-                               const std::string &max,
+client &client::zremrangebylex(const string_t &key, const string_t &min,
+                               const string_t &max,
                                const reply_callback_t &reply_callback) {
   send({"ZREMRANGEBYLEX", key, min, max}, reply_callback);
   return *this;
 }
 
-client &client::zremrangebyrank(const std::string &key, int start, int stop,
+client &client::zremrangebyrank(const string_t &key, int start, int stop,
                                 const reply_callback_t &reply_callback) {
   send({"ZREMRANGEBYRANK", key, std::to_string(start), std::to_string(stop)},
        reply_callback);
   return *this;
 }
 
-client &client::zremrangebyrank(const std::string &key, double start,
-                                double stop,
+client &client::zremrangebyrank(const string_t &key, double start, double stop,
                                 const reply_callback_t &reply_callback) {
   send({"ZREMRANGEBYRANK", key, std::to_string(start), std::to_string(stop)},
        reply_callback);
   return *this;
 }
 
-client &client::zremrangebyrank(const std::string &key,
-                                const std::string &start,
-                                const std::string &stop,
+client &client::zremrangebyrank(const string_t &key, const string_t &start,
+                                const string_t &stop,
                                 const reply_callback_t &reply_callback) {
   send({"ZREMRANGEBYRANK", key, start, stop}, reply_callback);
   return *this;
 }
 
-client &client::zremrangebyscore(const std::string &key, int min, int max,
+client &client::zremrangebyscore(const string_t &key, int min, int max,
                                  const reply_callback_t &reply_callback) {
   send({"ZREMRANGEBYSCORE", key, std::to_string(min), std::to_string(max)},
        reply_callback);
   return *this;
 }
 
-client &client::zremrangebyscore(const std::string &key, double min, double max,
+client &client::zremrangebyscore(const string_t &key, double min, double max,
                                  const reply_callback_t &reply_callback) {
   send({"ZREMRANGEBYSCORE", key, std::to_string(min), std::to_string(max)},
        reply_callback);
   return *this;
 }
 
-client &client::zremrangebyscore(const std::string &key, const std::string &min,
-                                 const std::string &max,
+client &client::zremrangebyscore(const string_t &key, const string_t &min,
+                                 const string_t &max,
                                  const reply_callback_t &reply_callback) {
   send({"ZREMRANGEBYSCORE", key, min, max}, reply_callback);
   return *this;
 }
 
-client &client::zrevrange(const std::string &key, int start, int stop,
+client &client::zrevrange(const string_t &key, int start, int stop,
                           const reply_callback_t &reply_callback) {
   send({"ZREVRANGE", key, std::to_string(start), std::to_string(stop)},
        reply_callback);
   return *this;
 }
 
-client &client::zrevrange(const std::string &key, int start, int stop,
-                          bool withscores,
+client &client::zrevrange(const string_t &key, int start, int stop,
+                          bool with_scores,
                           const reply_callback_t &reply_callback) {
-  if (withscores)
+  if (with_scores)
     send({"ZREVRANGE", key, std::to_string(start), std::to_string(stop),
           "WITHSCORES"},
          reply_callback);
@@ -3184,17 +3150,17 @@ client &client::zrevrange(const std::string &key, int start, int stop,
   return *this;
 }
 
-client &client::zrevrange(const std::string &key, double start, double stop,
+client &client::zrevrange(const string_t &key, double start, double stop,
                           const reply_callback_t &reply_callback) {
   send({"ZREVRANGE", key, std::to_string(start), std::to_string(stop)},
        reply_callback);
   return *this;
 }
 
-client &client::zrevrange(const std::string &key, double start, double stop,
-                          bool withscores,
+client &client::zrevrange(const string_t &key, double start, double stop,
+                          bool with_scores,
                           const reply_callback_t &reply_callback) {
-  if (withscores)
+  if (with_scores)
     send({"ZREVRANGE", key, std::to_string(start), std::to_string(stop),
           "WITHSCORES"},
          reply_callback);
@@ -3204,118 +3170,119 @@ client &client::zrevrange(const std::string &key, double start, double stop,
   return *this;
 }
 
-client &client::zrevrange(const std::string &key, const std::string &start,
-                          const std::string &stop,
+client &client::zrevrange(const string_t &key, const string_t &start,
+                          const string_t &stop,
                           const reply_callback_t &reply_callback) {
   send({"ZREVRANGE", key, start, stop}, reply_callback);
   return *this;
 }
 
-client &client::zrevrange(const std::string &key, const std::string &start,
-                          const std::string &stop, bool withscores,
+client &client::zrevrange(const string_t &key, const string_t &start,
+                          const string_t &stop, bool with_scores,
                           const reply_callback_t &reply_callback) {
-  if (withscores)
+  if (with_scores)
     send({"ZREVRANGE", key, start, stop, "WITHSCORES"}, reply_callback);
   else
     send({"ZREVRANGE", key, start, stop}, reply_callback);
   return *this;
 }
 
-client &client::zrevrangebylex(const std::string &key, int max, int min,
+client &client::zrevrangebylex(const string_t &key, int max, int min,
                                const reply_callback_t &reply_callback) {
   return zrevrangebylex(key, std::to_string(max), std::to_string(min), false, 0,
                         0, false, reply_callback);
 }
 
-client &client::zrevrangebylex(const std::string &key, int max, int min,
-                               bool withscores,
+client &client::zrevrangebylex(const string_t &key, int max, int min,
+                               bool with_scores,
                                const reply_callback_t &reply_callback) {
   return zrevrangebylex(key, std::to_string(max), std::to_string(min), false, 0,
-                        0, withscores, reply_callback);
+                        0, with_scores, reply_callback);
 }
 
-client &client::zrevrangebylex(const std::string &key, double max, double min,
+client &client::zrevrangebylex(const string_t &key, double max, double min,
                                const reply_callback_t &reply_callback) {
   return zrevrangebylex(key, std::to_string(max), std::to_string(min), false, 0,
                         0, false, reply_callback);
 }
 
-client &client::zrevrangebylex(const std::string &key, double max, double min,
-                               bool withscores,
+client &client::zrevrangebylex(const string_t &key, double max, double min,
+                               bool with_scores,
                                const reply_callback_t &reply_callback) {
   return zrevrangebylex(key, std::to_string(max), std::to_string(min), false, 0,
-                        0, withscores, reply_callback);
+                        0, with_scores, reply_callback);
 }
 
-client &client::zrevrangebylex(const std::string &key, const std::string &max,
-                               const std::string &min,
+client &client::zrevrangebylex(const string_t &key, const string_t &max,
+                               const string_t &min,
                                const reply_callback_t &reply_callback) {
   return zrevrangebylex(key, max, min, false, 0, 0, false, reply_callback);
 }
 
-client &client::zrevrangebylex(const std::string &key, const std::string &max,
-                               const std::string &min, bool withscores,
+client &client::zrevrangebylex(const string_t &key, const string_t &max,
+                               const string_t &min, bool with_scores,
                                const reply_callback_t &reply_callback) {
-  return zrevrangebylex(key, max, min, false, 0, 0, withscores, reply_callback);
+  return zrevrangebylex(key, max, min, false, 0, 0, with_scores,
+                        reply_callback);
 }
 
-client &client::zrevrangebylex(const std::string &key, int max, int min,
+client &client::zrevrangebylex(const string_t &key, int max, int min,
                                std::size_t offset, std::size_t count,
                                const reply_callback_t &reply_callback) {
   return zrevrangebylex(key, std::to_string(max), std::to_string(min), true,
                         offset, count, false, reply_callback);
 }
 
-client &client::zrevrangebylex(const std::string &key, int max, int min,
+client &client::zrevrangebylex(const string_t &key, int max, int min,
                                std::size_t offset, std::size_t count,
-                               bool withscores,
+                               bool with_scores,
                                const reply_callback_t &reply_callback) {
   return zrevrangebylex(key, std::to_string(max), std::to_string(min), true,
-                        offset, count, withscores, reply_callback);
+                        offset, count, with_scores, reply_callback);
 }
 
-client &client::zrevrangebylex(const std::string &key, double max, double min,
+client &client::zrevrangebylex(const string_t &key, double max, double min,
                                std::size_t offset, std::size_t count,
                                const reply_callback_t &reply_callback) {
   return zrevrangebylex(key, std::to_string(max), std::to_string(min), true,
                         offset, count, false, reply_callback);
 }
 
-client &client::zrevrangebylex(const std::string &key, double max, double min,
+client &client::zrevrangebylex(const string_t &key, double max, double min,
                                std::size_t offset, std::size_t count,
-                               bool withscores,
+                               bool with_scores,
                                const reply_callback_t &reply_callback) {
   return zrevrangebylex(key, std::to_string(max), std::to_string(min), true,
-                        offset, count, withscores, reply_callback);
+                        offset, count, with_scores, reply_callback);
 }
 
-client &client::zrevrangebylex(const std::string &key, const std::string &max,
-                               const std::string &min, std::size_t offset,
+client &client::zrevrangebylex(const string_t &key, const string_t &max,
+                               const string_t &min, std::size_t offset,
                                std::size_t count,
                                const reply_callback_t &reply_callback) {
   return zrevrangebylex(key, max, min, true, offset, count, false,
                         reply_callback);
 }
 
-client &client::zrevrangebylex(const std::string &key, const std::string &max,
-                               const std::string &min, std::size_t offset,
-                               std::size_t count, bool withscores,
+client &client::zrevrangebylex(const string_t &key, const string_t &max,
+                               const string_t &min, std::size_t offset,
+                               std::size_t count, bool with_scores,
                                const reply_callback_t &reply_callback) {
-  return zrevrangebylex(key, max, min, true, offset, count, withscores,
+  return zrevrangebylex(key, max, min, true, offset, count, with_scores,
                         reply_callback);
 }
 
-client &client::zrevrangebylex(const std::string &key, const std::string &max,
-                               const std::string &min, bool limit,
+client &client::zrevrangebylex(const string_t &key, const string_t &max,
+                               const string_t &min, bool limit,
                                std::size_t offset, std::size_t count,
-                               bool withscores,
+                               bool with_scores,
                                const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"ZREVRANGEBYLEX", key, max, min};
+  std::vector<string_t> cmd = {"ZREVRANGEBYLEX", key, max, min};
 
   //!
-  //!  withscores (optional)
+  //!  with_scores (optional)
   //!
-  if (withscores) {
+  if (with_scores) {
     cmd.emplace_back("WITHSCORES");
   }
 
@@ -3332,102 +3299,102 @@ client &client::zrevrangebylex(const std::string &key, const std::string &max,
   return *this;
 }
 
-client &client::zrevrangebyscore(const std::string &key, int max, int min,
+client &client::zrevrangebyscore(const string_t &key, int max, int min,
                                  const reply_callback_t &reply_callback) {
   return zrevrangebyscore(key, std::to_string(max), std::to_string(min), false,
                           0, 0, false, reply_callback);
 }
 
-client &client::zrevrangebyscore(const std::string &key, int max, int min,
-                                 bool withscores,
+client &client::zrevrangebyscore(const string_t &key, int max, int min,
+                                 bool with_scores,
                                  const reply_callback_t &reply_callback) {
   return zrevrangebyscore(key, std::to_string(max), std::to_string(min), false,
-                          0, 0, withscores, reply_callback);
+                          0, 0, with_scores, reply_callback);
 }
 
-client &client::zrevrangebyscore(const std::string &key, double max, double min,
+client &client::zrevrangebyscore(const string_t &key, double max, double min,
                                  const reply_callback_t &reply_callback) {
   return zrevrangebyscore(key, std::to_string(max), std::to_string(min), false,
                           0, 0, false, reply_callback);
 }
 
-client &client::zrevrangebyscore(const std::string &key, double max, double min,
-                                 bool withscores,
+client &client::zrevrangebyscore(const string_t &key, double max, double min,
+                                 bool with_scores,
                                  const reply_callback_t &reply_callback) {
   return zrevrangebyscore(key, std::to_string(max), std::to_string(min), false,
-                          0, 0, withscores, reply_callback);
+                          0, 0, with_scores, reply_callback);
 }
 
-client &client::zrevrangebyscore(const std::string &key, const std::string &max,
-                                 const std::string &min,
+client &client::zrevrangebyscore(const string_t &key, const string_t &max,
+                                 const string_t &min,
                                  const reply_callback_t &reply_callback) {
   return zrevrangebyscore(key, max, min, false, 0, 0, false, reply_callback);
 }
 
-client &client::zrevrangebyscore(const std::string &key, const std::string &max,
-                                 const std::string &min, bool withscores,
+client &client::zrevrangebyscore(const string_t &key, const string_t &max,
+                                 const string_t &min, bool with_scores,
                                  const reply_callback_t &reply_callback) {
-  return zrevrangebyscore(key, max, min, false, 0, 0, withscores,
+  return zrevrangebyscore(key, max, min, false, 0, 0, with_scores,
                           reply_callback);
 }
 
-client &client::zrevrangebyscore(const std::string &key, int max, int min,
+client &client::zrevrangebyscore(const string_t &key, int max, int min,
                                  std::size_t offset, std::size_t count,
                                  const reply_callback_t &reply_callback) {
   return zrevrangebyscore(key, std::to_string(max), std::to_string(min), true,
                           offset, count, false, reply_callback);
 }
 
-client &client::zrevrangebyscore(const std::string &key, int max, int min,
+client &client::zrevrangebyscore(const string_t &key, int max, int min,
                                  std::size_t offset, std::size_t count,
-                                 bool withscores,
+                                 bool with_scores,
                                  const reply_callback_t &reply_callback) {
   return zrevrangebyscore(key, std::to_string(max), std::to_string(min), true,
-                          offset, count, withscores, reply_callback);
+                          offset, count, with_scores, reply_callback);
 }
 
-client &client::zrevrangebyscore(const std::string &key, double max, double min,
+client &client::zrevrangebyscore(const string_t &key, double max, double min,
                                  std::size_t offset, std::size_t count,
                                  const reply_callback_t &reply_callback) {
   return zrevrangebyscore(key, std::to_string(max), std::to_string(min), true,
                           offset, count, false, reply_callback);
 }
 
-client &client::zrevrangebyscore(const std::string &key, double max, double min,
+client &client::zrevrangebyscore(const string_t &key, double max, double min,
                                  std::size_t offset, std::size_t count,
-                                 bool withscores,
+                                 bool with_scores,
                                  const reply_callback_t &reply_callback) {
   return zrevrangebyscore(key, std::to_string(max), std::to_string(min), true,
-                          offset, count, withscores, reply_callback);
+                          offset, count, with_scores, reply_callback);
 }
 
-client &client::zrevrangebyscore(const std::string &key, const std::string &max,
-                                 const std::string &min, std::size_t offset,
+client &client::zrevrangebyscore(const string_t &key, const string_t &max,
+                                 const string_t &min, std::size_t offset,
                                  std::size_t count,
                                  const reply_callback_t &reply_callback) {
   return zrevrangebyscore(key, max, min, true, offset, count, false,
                           reply_callback);
 }
 
-client &client::zrevrangebyscore(const std::string &key, const std::string &max,
-                                 const std::string &min, std::size_t offset,
-                                 std::size_t count, bool withscores,
+client &client::zrevrangebyscore(const string_t &key, const string_t &max,
+                                 const string_t &min, std::size_t offset,
+                                 std::size_t count, bool with_scores,
                                  const reply_callback_t &reply_callback) {
-  return zrevrangebyscore(key, max, min, true, offset, count, withscores,
+  return zrevrangebyscore(key, max, min, true, offset, count, with_scores,
                           reply_callback);
 }
 
-client &client::zrevrangebyscore(const std::string &key, const std::string &max,
-                                 const std::string &min, bool limit,
+client &client::zrevrangebyscore(const string_t &key, const string_t &max,
+                                 const string_t &min, bool limit,
                                  std::size_t offset, std::size_t count,
-                                 bool withscores,
+                                 bool with_scores,
                                  const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"ZREVRANGEBYSCORE", key, max, min};
+  std::vector<string_t> cmd = {"ZREVRANGEBYSCORE", key, max, min};
 
   //!
-  //!  withscores (optional)
+  //!  with_scores (optional)
   //!
-  if (withscores) {
+  if (with_scores) {
     cmd.emplace_back("WITHSCORES");
   }
 
@@ -3444,33 +3411,33 @@ client &client::zrevrangebyscore(const std::string &key, const std::string &max,
   return *this;
 }
 
-client &client::zrevrank(const std::string &key, const std::string &member,
+client &client::zrevrank(const string_t &key, const string_t &member,
                          const reply_callback_t &reply_callback) {
   send({"ZREVRANK", key, member}, reply_callback);
   return *this;
 }
 
-client &client::zscan(const std::string &key, std::size_t cursor,
+client &client::zscan(const string_t &key, std::size_t cursor,
                       const reply_callback_t &reply_callback) {
   return zscan(key, cursor, "", 0, reply_callback);
 }
 
-client &client::zscan(const std::string &key, std::size_t cursor,
-                      const std::string &pattern,
+client &client::zscan(const string_t &key, std::size_t cursor,
+                      const string_t &pattern,
                       const reply_callback_t &reply_callback) {
   return zscan(key, cursor, pattern, 0, reply_callback);
 }
 
-client &client::zscan(const std::string &key, std::size_t cursor,
+client &client::zscan(const string_t &key, std::size_t cursor,
                       std::size_t count,
                       const reply_callback_t &reply_callback) {
   return zscan(key, cursor, "", count, reply_callback);
 }
 
-client &client::zscan(const std::string &key, std::size_t cursor,
-                      const std::string &pattern, std::size_t count,
+client &client::zscan(const string_t &key, std::size_t cursor,
+                      const string_t &pattern, std::size_t count,
                       const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"ZSCAN", key, std::to_string(cursor)};
+  std::vector<string_t> cmd = {"ZSCAN", key, std::to_string(cursor)};
 
   if (!pattern.empty()) {
     cmd.emplace_back("MATCH");
@@ -3486,19 +3453,19 @@ client &client::zscan(const std::string &key, std::size_t cursor,
   return *this;
 }
 
-client &client::zscore(const std::string &key, const std::string &member,
+client &client::zscore(const string_t &key, const string_t &member,
                        const reply_callback_t &reply_callback) {
   send({"ZSCORE", key, member}, reply_callback);
   return *this;
 }
 
-client &client::zunionstore(const std::string &destination, std::size_t numkeys,
-                            const std::vector<std::string> &keys,
+client &client::zunionstore(const string_t &destination, std::size_t numkeys,
+                            const std::vector<string_t> &keys,
                             const std::vector<std::size_t> weights,
                             aggregate_method method,
                             const reply_callback_t &reply_callback) {
-  std::vector<std::string> cmd = {"ZUNIONSTORE", destination,
-                                  std::to_string(numkeys)};
+  std::vector<string_t> cmd = {"ZUNIONSTORE", destination,
+                               std::to_string(numkeys)};
 
   //!
   //!  keys
@@ -3544,20 +3511,19 @@ client::exec_cmd(const std::function<client &(const reply_callback_t &)> &f) {
   return prms->get_future();
 }
 
-future_reply_t client::send(const std::vector<std::string> &redis_cmd) {
+future_reply_t client::send(const std::vector<string_t> &redis_cmd) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return send(redis_cmd, cb);
   });
 }
 
-future_reply_t client::append(const std::string &key,
-                              const std::string &value) {
+future_reply_t client::append(const string_t &key, const string_t &value) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return append(key, value, cb);
   });
 }
 
-future_reply_t client::auth(const std::string &password) {
+future_reply_t client::auth(const string_t &password) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return auth(password, cb);
   });
@@ -3573,82 +3539,79 @@ future_reply_t client::bgsave() {
       [=](const reply_callback_t &cb) -> client & { return bgsave(cb); });
 }
 
-future_reply_t client::bitcount(const std::string &key) {
+future_reply_t client::bitcount(const string_t &key) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return bitcount(key, cb);
   });
 }
 
-future_reply_t client::bitcount(const std::string &key, int start, int end) {
+future_reply_t client::bitcount(const string_t &key, int start, int end) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return bitcount(key, start, end, cb);
   });
 }
 
 future_reply_t
-client::bitfield(const std::string &key,
+client::bitfield(const string_t &key,
                  const std::vector<bitfield_operation> &operations) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return bitfield(key, operations, cb);
   });
 }
 
-future_reply_t client::bitop(const std::string &operation,
-                             const std::string &destkey,
-                             const std::vector<std::string> &keys) {
+future_reply_t client::bitop(const string_t &operation, const string_t &destkey,
+                             const std::vector<string_t> &keys) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return bitop(operation, destkey, keys, cb);
   });
 }
 
-future_reply_t client::bitpos(const std::string &key, int bit) {
+future_reply_t client::bitpos(const string_t &key, int bit) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return bitpos(key, bit, cb);
   });
 }
 
-future_reply_t client::bitpos(const std::string &key, int bit, int start) {
+future_reply_t client::bitpos(const string_t &key, int bit, int start) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return bitpos(key, bit, start, cb);
   });
 }
 
-future_reply_t client::bitpos(const std::string &key, int bit, int start,
+future_reply_t client::bitpos(const string_t &key, int bit, int start,
                               int end) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return bitpos(key, bit, start, end, cb);
   });
 }
 
-future_reply_t client::blpop(const std::vector<std::string> &keys,
-                             int timeout) {
+future_reply_t client::blpop(const std::vector<string_t> &keys, int timeout) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return blpop(keys, timeout, cb);
   });
 }
 
-future_reply_t client::brpop(const std::vector<std::string> &keys,
-                             int timeout) {
+future_reply_t client::brpop(const std::vector<string_t> &keys, int timeout) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return brpop(keys, timeout, cb);
   });
 }
 
-future_reply_t client::brpoplpush(const std::string &src,
-                                  const std::string &dst, int timeout) {
+future_reply_t client::brpoplpush(const string_t &src, const string_t &dst,
+                                  int timeout) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return brpoplpush(src, dst, timeout, cb);
   });
 }
 
-future_reply_t client::bzpopmin(const std::vector<std::string> &keys,
+future_reply_t client::bzpopmin(const std::vector<string_t> &keys,
                                 int timeout) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return bzpopmin(keys, timeout, cb);
   });
 }
 
-future_reply_t client::bzpopmax(const std::vector<std::string> &keys,
+future_reply_t client::bzpopmax(const std::vector<string_t> &keys,
                                 int timeout) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return bzpopmax(keys, timeout, cb);
@@ -3677,13 +3640,13 @@ future_reply_t client::client_pause(int timeout) {
   });
 }
 
-future_reply_t client::client_reply(const std::string &mode) {
+future_reply_t client::client_reply(const string_t &mode) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return client_reply(mode, cb);
   });
 }
 
-future_reply_t client::client_setname(const std::string &name) {
+future_reply_t client::client_setname(const string_t &name) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return client_setname(name, cb);
   });
@@ -3695,28 +3658,25 @@ future_reply_t client::client_unblock(int id, bool witherror) {
   });
 }
 
-future_reply_t
-client::cluster_addslots(const std::vector<std::string> &p_slots) {
+future_reply_t client::cluster_addslots(const std::vector<string_t> &p_slots) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_addslots(p_slots, cb);
   });
 }
 
-future_reply_t
-client::cluster_count_failure_reports(const std::string &node_id) {
+future_reply_t client::cluster_count_failure_reports(const string_t &node_id) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_count_failure_reports(node_id, cb);
   });
 }
 
-future_reply_t client::cluster_countkeysinslot(const std::string &slot) {
+future_reply_t client::cluster_countkeysinslot(const string_t &slot) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_countkeysinslot(slot, cb);
   });
 }
 
-future_reply_t
-client::cluster_delslots(const std::vector<std::string> &p_slots) {
+future_reply_t client::cluster_delslots(const std::vector<string_t> &p_slots) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_delslots(p_slots, cb);
   });
@@ -3728,20 +3688,19 @@ future_reply_t client::cluster_failover() {
   });
 }
 
-future_reply_t client::cluster_failover(const std::string &mode) {
+future_reply_t client::cluster_failover(const string_t &mode) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_failover(mode, cb);
   });
 }
 
-future_reply_t client::cluster_forget(const std::string &node_id) {
+future_reply_t client::cluster_forget(const string_t &node_id) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_forget(node_id, cb);
   });
 }
 
-future_reply_t client::cluster_getkeysinslot(const std::string &slot,
-                                             int count) {
+future_reply_t client::cluster_getkeysinslot(const string_t &slot, int count) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_getkeysinslot(slot, count, cb);
   });
@@ -3752,13 +3711,13 @@ future_reply_t client::cluster_info() {
       [=](const reply_callback_t &cb) -> client & { return cluster_info(cb); });
 }
 
-future_reply_t client::cluster_keyslot(const std::string &key) {
+future_reply_t client::cluster_keyslot(const string_t &key) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_keyslot(key, cb);
   });
 }
 
-future_reply_t client::cluster_meet(const std::string &ip, int port) {
+future_reply_t client::cluster_meet(const string_t &ip, int port) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_meet(ip, port, cb);
   });
@@ -3770,13 +3729,13 @@ future_reply_t client::cluster_nodes() {
   });
 }
 
-future_reply_t client::cluster_replicate(const std::string &node_id) {
+future_reply_t client::cluster_replicate(const string_t &node_id) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_replicate(node_id, cb);
   });
 }
 
-future_reply_t client::cluster_reset(const std::string &mode) {
+future_reply_t client::cluster_reset(const string_t &mode) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_reset(mode, cb);
   });
@@ -3788,28 +3747,28 @@ future_reply_t client::cluster_saveconfig() {
   });
 }
 
-future_reply_t client::cluster_set_config_epoch(const std::string &epoch) {
+future_reply_t client::cluster_set_config_epoch(const string_t &epoch) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_set_config_epoch(epoch, cb);
   });
 }
 
-future_reply_t client::cluster_setslot(const std::string &slot,
-                                       const std::string &mode) {
+future_reply_t client::cluster_setslot(const string_t &slot,
+                                       const string_t &mode) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_setslot(slot, mode, cb);
   });
 }
 
-future_reply_t client::cluster_setslot(const std::string &slot,
-                                       const std::string &mode,
-                                       const std::string &node_id) {
+future_reply_t client::cluster_setslot(const string_t &slot,
+                                       const string_t &mode,
+                                       const string_t &node_id) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_setslot(slot, mode, node_id, cb);
   });
 }
 
-future_reply_t client::cluster_slaves(const std::string &node_id) {
+future_reply_t client::cluster_slaves(const string_t &node_id) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return cluster_slaves(node_id, cb);
   });
@@ -3838,14 +3797,13 @@ future_reply_t client::command_getkeys() {
   });
 }
 
-future_reply_t
-client::command_info(const std::vector<std::string> &command_name) {
+future_reply_t client::command_info(const std::vector<string_t> &command_name) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return command_info(command_name, cb);
   });
 }
 
-future_reply_t client::config_get(const std::string &param) {
+future_reply_t client::config_get(const string_t &param) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return config_get(param, cb);
   });
@@ -3857,8 +3815,7 @@ future_reply_t client::config_rewrite() {
   });
 }
 
-future_reply_t client::config_set(const std::string &param,
-                                  const std::string &val) {
+future_reply_t client::config_set(const string_t &param, const string_t &val) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return config_set(param, val, cb);
   });
@@ -3875,7 +3832,7 @@ future_reply_t client::dbsize() {
       [=](const reply_callback_t &cb) -> client & { return dbsize(cb); });
 }
 
-future_reply_t client::debug_object(const std::string &key) {
+future_reply_t client::debug_object(const string_t &key) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return debug_object(key, cb);
   });
@@ -3887,18 +3844,18 @@ future_reply_t client::debug_segfault() {
   });
 }
 
-future_reply_t client::decr(const std::string &key) {
+future_reply_t client::decr(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return decr(key, cb); });
 }
 
-future_reply_t client::decrby(const std::string &key, int val) {
+future_reply_t client::decrby(const string_t &key, int val) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return decrby(key, val, cb);
   });
 }
 
-future_reply_t client::del(const std::vector<std::string> &key) {
+future_reply_t client::del(const std::vector<string_t> &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return del(key, cb); });
 }
@@ -3908,40 +3865,48 @@ future_reply_t client::discard() {
       [=](const reply_callback_t &cb) -> client & { return discard(cb); });
 }
 
-future_reply_t client::dump(const std::string &key) {
+future_reply_t client::dump(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return dump(key, cb); });
 }
 
-future_reply_t client::echo(const std::string &msg) {
+future_reply_t client::echo(const string_t &msg) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return echo(msg, cb); });
 }
 
-future_reply_t
-client::eval(const std::string &script, int numkeys, const std::vector<std::string> &keys,
-              const std::vector<std::string> &args) {
-  (void) numkeys;
-  return exec_cmd([=](const reply_callback_t &cb) -> client & { return eval(script, keys, args, cb); });
+future_reply_t client::eval(const string_t &script, int numkeys,
+                            const std::vector<string_t> &keys,
+                            const std::vector<string_t> &args) {
+  (void)numkeys;
+  return exec_cmd([=](const reply_callback_t &cb) -> client & {
+    return eval(script, keys, args, cb);
+  });
 }
 
-future_reply_t
-client::eval(const std::string &script, const std::vector<std::string> &keys,
-              const std::vector<std::string> &args) {
-  return exec_cmd([=](const reply_callback_t &cb) -> client & { return eval(script, keys, args, cb); });
+future_reply_t client::eval(const string_t &script,
+                            const std::vector<string_t> &keys,
+                            const std::vector<string_t> &args) {
+  return exec_cmd([=](const reply_callback_t &cb) -> client & {
+    return eval(script, keys, args, cb);
+  });
 }
 
-future_reply_t
-client::evalsha(const std::string &sha1, const std::vector<std::string> &keys,
-                const std::vector<std::string> &args) {
-  return exec_cmd([=](const reply_callback_t &cb) -> client & { return evalsha(sha1, keys, args, cb); });
+future_reply_t client::evalsha(const string_t &sha1,
+                               const std::vector<string_t> &keys,
+                               const std::vector<string_t> &args) {
+  return exec_cmd([=](const reply_callback_t &cb) -> client & {
+    return evalsha(sha1, keys, args, cb);
+  });
 }
 
-future_reply_t
-client::evalsha(const std::string &sha1, int numkeys, const std::vector<std::string> &keys,
-                const std::vector<std::string> &args) {
-  (void) numkeys;
-  return exec_cmd([=](const reply_callback_t &cb) -> client & { return evalsha(sha1, keys, args, cb); });
+future_reply_t client::evalsha(const string_t &sha1, int numkeys,
+                               const std::vector<string_t> &keys,
+                               const std::vector<string_t> &args) {
+  (void)numkeys;
+  return exec_cmd([=](const reply_callback_t &cb) -> client & {
+    return evalsha(sha1, keys, args, cb);
+  });
 }
 
 future_reply_t client::exec() {
@@ -3949,18 +3914,18 @@ future_reply_t client::exec() {
       [=](const reply_callback_t &cb) -> client & { return exec(cb); });
 }
 
-future_reply_t client::exists(const std::vector<std::string> &keys) {
+future_reply_t client::exists(const std::vector<string_t> &keys) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return exists(keys, cb); });
 }
 
-future_reply_t client::expire(const std::string &key, int seconds) {
+future_reply_t client::expire(const string_t &key, int seconds) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return expire(key, seconds, cb);
   });
 }
 
-future_reply_t client::expireat(const std::string &key, int timestamp) {
+future_reply_t client::expireat(const string_t &key, int timestamp) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return expireat(key, timestamp, cb);
   });
@@ -3976,45 +3941,42 @@ future_reply_t client::flushdb() {
       [=](const reply_callback_t &cb) -> client & { return flushdb(cb); });
 }
 
-future_reply_t client::geoadd(
-    const std::string &key,
-    const std::vector<std::tuple<std::string, std::string, std::string>>
-        &long_lat_memb) {
+future_reply_t
+client::geoadd(const string_t &key,
+               const std::vector<std::tuple<string_t, string_t, string_t>>
+                   &long_lat_memb) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return geoadd(key, long_lat_memb, cb);
   });
 }
 
-future_reply_t client::geohash(const std::string &key,
-                               const std::vector<std::string> &members) {
+future_reply_t client::geohash(const string_t &key,
+                               const std::vector<string_t> &members) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return geohash(key, members, cb);
   });
 }
 
-future_reply_t client::geopos(const std::string &key,
-                              const std::vector<std::string> &members) {
+future_reply_t client::geopos(const string_t &key,
+                              const std::vector<string_t> &members) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return geopos(key, members, cb);
   });
 }
 
-future_reply_t client::geodist(const std::string &key,
-                               const std::string &member_1,
-                               const std::string &member_2,
-                               const std::string &unit) {
+future_reply_t client::geodist(const string_t &key, const string_t &member_1,
+                               const string_t &member_2, const string_t &unit) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return geodist(key, member_1, member_2, unit, cb);
   });
 }
 
-future_reply_t client::georadius(const std::string &key, double longitude,
+future_reply_t client::georadius(const string_t &key, double longitude,
                                  double latitude, double radius, geo_unit unit,
                                  bool with_coord, bool with_dist,
                                  bool with_hash, bool asc_order,
-                                 std::size_t count,
-                                 const std::string &store_key,
-                                 const std::string &storedist_key) {
+                                 std::size_t count, const string_t &store_key,
+                                 const string_t &storedist_key) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return georadius(key, longitude, latitude, radius, unit, with_coord,
                      with_dist, with_hash, asc_order, count, store_key,
@@ -4022,12 +3984,13 @@ future_reply_t client::georadius(const std::string &key, double longitude,
   });
 }
 
-future_reply_t
-client::georadiusbymember(const std::string &key, const std::string &member,
-                          double radius, geo_unit unit, bool with_coord,
-                          bool with_dist, bool with_hash, bool asc_order,
-                          std::size_t count, const std::string &store_key,
-                          const std::string &storedist_key) {
+future_reply_t client::georadiusbymember(const string_t &key,
+                                         const string_t &member, double radius,
+                                         geo_unit unit, bool with_coord,
+                                         bool with_dist, bool with_hash,
+                                         bool asc_order, std::size_t count,
+                                         const string_t &store_key,
+                                         const string_t &storedist_key) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return georadiusbymember(key, member, radius, unit, with_coord, with_dist,
                              with_hash, asc_order, count, store_key,
@@ -4035,170 +3998,168 @@ client::georadiusbymember(const std::string &key, const std::string &member,
   });
 }
 
-future_reply_t client::get(const std::string &key) {
+future_reply_t client::get(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return get(key, cb); });
 }
 
-future_reply_t client::getbit(const std::string &key, int offset) {
+future_reply_t client::getbit(const string_t &key, int offset) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return getbit(key, offset, cb);
   });
 }
 
-future_reply_t client::getrange(const std::string &key, int start, int end) {
+future_reply_t client::getrange(const string_t &key, int start, int end) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return getrange(key, start, end, cb);
   });
 }
 
-future_reply_t client::getset(const std::string &key, const std::string &val) {
+future_reply_t client::getset(const string_t &key, const string_t &val) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return getset(key, val, cb);
   });
 }
 
-future_reply_t client::hdel(const std::string &key,
-                            const std::vector<std::string> &fields) {
+future_reply_t client::hdel(const string_t &key,
+                            const std::vector<string_t> &fields) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return hdel(key, fields, cb);
   });
 }
 
-future_reply_t client::hexists(const std::string &key,
-                               const std::string &field) {
+future_reply_t client::hexists(const string_t &key, const string_t &field) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return hexists(key, field, cb);
   });
 }
 
-future_reply_t client::hget(const std::string &key, const std::string &field) {
+future_reply_t client::hget(const string_t &key, const string_t &field) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return hget(key, field, cb);
   });
 }
 
-future_reply_t client::hgetall(const std::string &key) {
+future_reply_t client::hgetall(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return hgetall(key, cb); });
 }
 
-future_reply_t client::hincrby(const std::string &key, const std::string &field,
+future_reply_t client::hincrby(const string_t &key, const string_t &field,
                                int incr) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return hincrby(key, field, incr, cb);
   });
 }
 
-future_reply_t client::hincrbyfloat(const std::string &key,
-                                    const std::string &field, float incr) {
+future_reply_t client::hincrbyfloat(const string_t &key, const string_t &field,
+                                    float incr) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return hincrbyfloat(key, field, incr, cb);
   });
 }
 
-future_reply_t client::hkeys(const std::string &key) {
+future_reply_t client::hkeys(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return hkeys(key, cb); });
 }
 
-future_reply_t client::hlen(const std::string &key) {
+future_reply_t client::hlen(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return hlen(key, cb); });
 }
 
-future_reply_t client::hmget(const std::string &key,
-                             const std::vector<std::string> &fields) {
+future_reply_t client::hmget(const string_t &key,
+                             const std::vector<string_t> &fields) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return hmget(key, fields, cb);
   });
 }
 
-future_reply_t client::hmset(
-    const std::string &key,
-    const std::vector<std::pair<std::string, std::string>> &field_val) {
+future_reply_t
+client::hmset(const string_t &key,
+              const std::vector<std::pair<string_t, string_t>> &field_val) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return hmset(key, field_val, cb);
   });
 }
 
-future_reply_t client::hscan(const std::string &key, std::size_t cursor) {
+future_reply_t client::hscan(const string_t &key, std::size_t cursor) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return hscan(key, cursor, cb);
   });
 }
 
-future_reply_t client::hscan(const std::string &key, std::size_t cursor,
-                             const std::string &pattern) {
+future_reply_t client::hscan(const string_t &key, std::size_t cursor,
+                             const string_t &pattern) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return hscan(key, cursor, pattern, cb);
   });
 }
 
-future_reply_t client::hscan(const std::string &key, std::size_t cursor,
+future_reply_t client::hscan(const string_t &key, std::size_t cursor,
                              std::size_t count) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return hscan(key, cursor, count, cb);
   });
 }
 
-future_reply_t client::hscan(const std::string &key, std::size_t cursor,
-                             const std::string &pattern, std::size_t count) {
+future_reply_t client::hscan(const string_t &key, std::size_t cursor,
+                             const string_t &pattern, std::size_t count) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return hscan(key, cursor, pattern, count, cb);
   });
 }
 
-future_reply_t client::hset(const std::string &key, const std::string &field,
-                            const std::string &value) {
+future_reply_t client::hset(const string_t &key, const string_t &field,
+                            const string_t &value) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return hset(key, field, value, cb);
   });
 }
 
-future_reply_t client::hsetnx(const std::string &key, const std::string &field,
-                              const std::string &value) {
+future_reply_t client::hsetnx(const string_t &key, const string_t &field,
+                              const string_t &value) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return hsetnx(key, field, value, cb);
   });
 }
 
-future_reply_t client::hstrlen(const std::string &key,
-                               const std::string &field) {
+future_reply_t client::hstrlen(const string_t &key, const string_t &field) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return hstrlen(key, field, cb);
   });
 }
 
-future_reply_t client::hvals(const std::string &key) {
+future_reply_t client::hvals(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return hvals(key, cb); });
 }
 
-future_reply_t client::incr(const std::string &key) {
+future_reply_t client::incr(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return incr(key, cb); });
 }
 
-future_reply_t client::incrby(const std::string &key, int incr) {
+future_reply_t client::incrby(const string_t &key, int incr) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return incrby(key, incr, cb);
   });
 }
 
-future_reply_t client::incrbyfloat(const std::string &key, float incr) {
+future_reply_t client::incrbyfloat(const string_t &key, float incr) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return incrbyfloat(key, incr, cb);
   });
 }
 
-future_reply_t client::info(const std::string &section) {
+future_reply_t client::info(const string_t &section) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return info(section, cb);
   });
 }
 
-future_reply_t client::keys(const std::string &pattern) {
+future_reply_t client::keys(const string_t &pattern) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return keys(pattern, cb);
   });
@@ -4209,81 +4170,78 @@ future_reply_t client::lastsave() {
       [=](const reply_callback_t &cb) -> client & { return lastsave(cb); });
 }
 
-future_reply_t client::lindex(const std::string &key, int index) {
+future_reply_t client::lindex(const string_t &key, int index) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return lindex(key, index, cb);
   });
 }
 
-future_reply_t client::linsert(const std::string &key,
-                               const std::string &before_after,
-                               const std::string &pivot,
-                               const std::string &value) {
+future_reply_t client::linsert(const string_t &key,
+                               const string_t &before_after,
+                               const string_t &pivot, const string_t &value) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return linsert(key, before_after, pivot, value, cb);
   });
 }
 
-future_reply_t client::llen(const std::string &key) {
+future_reply_t client::llen(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return llen(key, cb); });
 }
 
-future_reply_t client::lpop(const std::string &key) {
+future_reply_t client::lpop(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return lpop(key, cb); });
 }
 
-future_reply_t client::lpush(const std::string &key,
-                             const std::vector<std::string> &values) {
+future_reply_t client::lpush(const string_t &key,
+                             const std::vector<string_t> &values) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return lpush(key, values, cb);
   });
 }
 
-future_reply_t client::lpushx(const std::string &key,
-                              const std::string &value) {
+future_reply_t client::lpushx(const string_t &key, const string_t &value) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return lpushx(key, value, cb);
   });
 }
 
-future_reply_t client::lrange(const std::string &key, int start, int stop) {
+future_reply_t client::lrange(const string_t &key, int start, int stop) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return lrange(key, start, stop, cb);
   });
 }
 
-future_reply_t client::lrem(const std::string &key, int count,
-                            const std::string &value) {
+future_reply_t client::lrem(const string_t &key, int count,
+                            const string_t &value) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return lrem(key, count, value, cb);
   });
 }
 
-future_reply_t client::lset(const std::string &key, int index,
-                            const std::string &value) {
+future_reply_t client::lset(const string_t &key, int index,
+                            const string_t &value) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return lset(key, index, value, cb);
   });
 }
 
-future_reply_t client::ltrim(const std::string &key, int start, int stop) {
+future_reply_t client::ltrim(const string_t &key, int start, int stop) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return ltrim(key, start, stop, cb);
   });
 }
 
-future_reply_t client::mget(const std::vector<std::string> &keys) {
+future_reply_t client::mget(const std::vector<string_t> &keys) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return mget(keys, cb); });
 }
 
-future_reply_t client::migrate(const std::string &host, int port,
-                               const std::string &key,
-                               const std::string &dest_db, int timeout,
-                               bool copy, bool replace,
-                               const std::vector<std::string> &keys) {
+future_reply_t client::migrate(const string_t &host, int port,
+                               const string_t &key, const string_t &dest_db,
+                               int timeout, bool copy, bool replace,
+                               const std::vector<string_t> &keys) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return migrate(host, port, key, dest_db, timeout, copy, replace, keys, cb);
   });
@@ -4294,21 +4252,21 @@ future_reply_t client::monitor() {
       [=](const reply_callback_t &cb) -> client & { return monitor(cb); });
 }
 
-future_reply_t client::move(const std::string &key, const std::string &db) {
+future_reply_t client::move(const string_t &key, const string_t &db) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return move(key, db, cb);
   });
 }
 
 future_reply_t
-client::mset(const std::vector<std::pair<std::string, std::string>> &key_vals) {
+client::mset(const std::vector<std::pair<string_t, string_t>> &key_vals) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return mset(key_vals, cb);
   });
 }
 
-future_reply_t client::msetnx(
-    const std::vector<std::pair<std::string, std::string>> &key_vals) {
+future_reply_t
+client::msetnx(const std::vector<std::pair<string_t, string_t>> &key_vals) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return msetnx(key_vals, cb);
   });
@@ -4319,45 +4277,45 @@ future_reply_t client::multi() {
       [=](const reply_callback_t &cb) -> client & { return multi(cb); });
 }
 
-future_reply_t client::object(const std::string &subcommand,
-                              const std::vector<std::string> &args) {
+future_reply_t client::object(const string_t &subcommand,
+                              const std::vector<string_t> &args) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return object(subcommand, args, cb);
   });
 }
 
-future_reply_t client::persist(const std::string &key) {
+future_reply_t client::persist(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return persist(key, cb); });
 }
 
-future_reply_t client::pexpire(const std::string &key, int ms) {
+future_reply_t client::pexpire(const string_t &key, int ms) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return pexpire(key, ms, cb);
   });
 }
 
-future_reply_t client::pexpireat(const std::string &key, int ms_timestamp) {
+future_reply_t client::pexpireat(const string_t &key, int ms_timestamp) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return pexpireat(key, ms_timestamp, cb);
   });
 }
 
-future_reply_t client::pfadd(const std::string &key,
-                             const std::vector<std::string> &elements) {
+future_reply_t client::pfadd(const string_t &key,
+                             const std::vector<string_t> &elements) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return pfadd(key, elements, cb);
   });
 }
 
-future_reply_t client::pfcount(const std::vector<std::string> &keys) {
+future_reply_t client::pfcount(const std::vector<string_t> &keys) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return pfcount(keys, cb);
   });
 }
 
-future_reply_t client::pfmerge(const std::string &destkey,
-                               const std::vector<std::string> &sourcekeys) {
+future_reply_t client::pfmerge(const string_t &destkey,
+                               const std::vector<string_t> &sourcekeys) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return pfmerge(destkey, sourcekeys, cb);
   });
@@ -4368,34 +4326,34 @@ future_reply_t client::ping() {
       [=](const reply_callback_t &cb) -> client & { return ping(cb); });
 }
 
-future_reply_t client::ping(const std::string &message) {
+future_reply_t client::ping(const string_t &message) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return ping(message, cb);
   });
 }
 
-future_reply_t client::psetex(const std::string &key, int64_t ms,
-                              const std::string &val) {
+future_reply_t client::psetex(const string_t &key, int64_t ms,
+                              const string_t &val) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return psetex(key, ms, val, cb);
   });
 }
 
-future_reply_t client::publish(const std::string &channel,
-                               const std::string &message) {
+future_reply_t client::publish(const string_t &channel,
+                               const string_t &message) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return publish(channel, message, cb);
   });
 }
 
-future_reply_t client::pubsub(const std::string &subcommand,
-                              const std::vector<std::string> &args) {
+future_reply_t client::pubsub(const string_t &subcommand,
+                              const std::vector<string_t> &args) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return pubsub(subcommand, args, cb);
   });
 }
 
-future_reply_t client::pttl(const std::string &key) {
+future_reply_t client::pttl(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return pttl(key, cb); });
 }
@@ -4420,30 +4378,28 @@ future_reply_t client::readwrite() {
       [=](const reply_callback_t &cb) -> client & { return readwrite(cb); });
 }
 
-future_reply_t client::rename(const std::string &key,
-                              const std::string &newkey) {
+future_reply_t client::rename(const string_t &key, const string_t &newkey) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return rename(key, newkey, cb);
   });
 }
 
-future_reply_t client::renamenx(const std::string &key,
-                                const std::string &newkey) {
+future_reply_t client::renamenx(const string_t &key, const string_t &newkey) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return renamenx(key, newkey, cb);
   });
 }
 
-future_reply_t client::restore(const std::string &key, int ttl,
-                               const std::string &serialized_value) {
+future_reply_t client::restore(const string_t &key, int ttl,
+                               const string_t &serialized_value) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return restore(key, ttl, serialized_value, cb);
   });
 }
 
-future_reply_t client::restore(const std::string &key, int ttl,
-                               const std::string &serialized_value,
-                               const std::string &replace) {
+future_reply_t client::restore(const string_t &key, int ttl,
+                               const string_t &serialized_value,
+                               const string_t &replace) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return restore(key, ttl, serialized_value, replace, cb);
   });
@@ -4454,34 +4410,32 @@ future_reply_t client::role() {
       [=](const reply_callback_t &cb) -> client & { return role(cb); });
 }
 
-future_reply_t client::rpop(const std::string &key) {
+future_reply_t client::rpop(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return rpop(key, cb); });
 }
 
-future_reply_t client::rpoplpush(const std::string &src,
-                                 const std::string &dst) {
+future_reply_t client::rpoplpush(const string_t &src, const string_t &dst) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return rpoplpush(src, dst, cb);
   });
 }
 
-future_reply_t client::rpush(const std::string &key,
-                             const std::vector<std::string> &values) {
+future_reply_t client::rpush(const string_t &key,
+                             const std::vector<string_t> &values) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return rpush(key, values, cb);
   });
 }
 
-future_reply_t client::rpushx(const std::string &key,
-                              const std::string &value) {
+future_reply_t client::rpushx(const string_t &key, const string_t &value) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return rpushx(key, value, cb);
   });
 }
 
-future_reply_t client::sadd(const std::string &key,
-                            const std::vector<std::string> &members) {
+future_reply_t client::sadd(const string_t &key,
+                            const std::vector<string_t> &members) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sadd(key, members, cb);
   });
@@ -4492,7 +4446,7 @@ future_reply_t client::scan(std::size_t cursor) {
       [=](const reply_callback_t &cb) -> client & { return scan(cursor, cb); });
 }
 
-future_reply_t client::scan(std::size_t cursor, const std::string &pattern) {
+future_reply_t client::scan(std::size_t cursor, const string_t &pattern) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return scan(cursor, pattern, cb);
   });
@@ -4504,7 +4458,7 @@ future_reply_t client::scan(std::size_t cursor, std::size_t count) {
   });
 }
 
-future_reply_t client::scan(std::size_t cursor, const std::string &pattern,
+future_reply_t client::scan(std::size_t cursor, const string_t &pattern,
                             std::size_t count) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return scan(cursor, pattern, count, cb);
@@ -4516,18 +4470,18 @@ future_reply_t client::save() {
       [=](const reply_callback_t &cb) -> client & { return save(cb); });
 }
 
-future_reply_t client::scard(const std::string &key) {
+future_reply_t client::scard(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return scard(key, cb); });
 }
 
-future_reply_t client::script_debug(const std::string &mode) {
+future_reply_t client::script_debug(const string_t &mode) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return script_debug(mode, cb);
   });
 }
 
-future_reply_t client::script_exists(const std::vector<std::string> &scripts) {
+future_reply_t client::script_exists(const std::vector<string_t> &scripts) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return script_exists(scripts, cb);
   });
@@ -4543,19 +4497,19 @@ future_reply_t client::script_kill() {
       [=](const reply_callback_t &cb) -> client & { return script_kill(cb); });
 }
 
-future_reply_t client::script_load(const std::string &script) {
+future_reply_t client::script_load(const string_t &script) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return script_load(script, cb);
   });
 }
 
-future_reply_t client::sdiff(const std::vector<std::string> &keys) {
+future_reply_t client::sdiff(const std::vector<string_t> &keys) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return sdiff(keys, cb); });
 }
 
-future_reply_t client::sdiffstore(const std::string &dst,
-                                  const std::vector<std::string> &keys) {
+future_reply_t client::sdiffstore(const string_t &dst,
+                                  const std::vector<string_t> &keys) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sdiffstore(dst, keys, cb);
   });
@@ -4567,45 +4521,44 @@ future_reply_t client::select(int index) {
   });
 }
 
-future_reply_t client::set(const std::string &key, const std::string &value) {
+future_reply_t client::set(const string_t &key, const string_t &value) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return set(key, value, cb);
   });
 }
 
-future_reply_t client::set_advanced(const std::string &key,
-                                    const std::string &value, bool ex,
-                                    int ex_sec, bool px, int px_milli, bool nx,
-                                    bool xx) {
+future_reply_t client::set_advanced(const string_t &key, const string_t &value,
+                                    bool ex, int ex_sec, bool px, int px_milli,
+                                    bool nx, bool xx) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return set_advanced(key, value, ex, ex_sec, px, px_milli, nx, xx, cb);
   });
 }
 
-future_reply_t client::setbit_(const std::string &key, int offset,
-                               const std::string &value) {
+future_reply_t client::setbit(const string_t &key, int offset,
+                              const string_t &value) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return setbit_(key, offset, value, cb);
+    return setbit(key, offset, value, cb);
   });
 }
 
-future_reply_t client::setex(const std::string &key, int64_t seconds,
-                             const std::string &value) {
+future_reply_t client::setex(const string_t &key, int64_t seconds,
+                             const string_t &value) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return setex(key, seconds, value, cb);
   });
 }
 
-future_reply_t client::setnx(const std::string &key, const std::string &value) {
+future_reply_t client::setnx(const string_t &key, const string_t &value) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return setnx(key, value, cb);
   });
 }
 
-future_reply_t client::setrange(const std::string &key, int offset,
-                                const std::string &value) {
+future_reply_t client::set_range(const string_t &key, int offset,
+                                 const string_t &value) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return setrange(key, offset, value, cb);
+    return set_range(key, offset, value, cb);
   });
 }
 
@@ -4614,129 +4567,131 @@ future_reply_t client::shutdown() {
       [=](const reply_callback_t &cb) -> client & { return shutdown(cb); });
 }
 
-future_reply_t client::shutdown(const std::string &save) {
+future_reply_t client::shutdown(const string_t &save) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return shutdown(save, cb);
   });
 }
 
-future_reply_t client::sinter(const std::vector<std::string> &keys) {
+future_reply_t client::sinter(const std::vector<string_t> &keys) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return sinter(keys, cb); });
 }
 
-future_reply_t client::sinterstore(const std::string &dst,
-                                   const std::vector<std::string> &keys) {
+future_reply_t client::sinterstore(const string_t &dst,
+                                   const std::vector<string_t> &keys) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sinterstore(dst, keys, cb);
   });
 }
 
-future_reply_t client::sismember(const std::string &key,
-                                 const std::string &member) {
+future_reply_t client::sismember(const string_t &key, const string_t &member) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sismember(key, member, cb);
   });
 }
 
-future_reply_t client::slaveof(const std::string &host, int port) {
+future_reply_t client::slaveof(const string_t &host, int port) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return slaveof(host, port, cb);
   });
 }
 
-future_reply_t client::slowlog(const std::string &subcommand) {
+future_reply_t client::replicaof(const string_t &host, int port) {
+  return exec_cmd([=](const reply_callback_t &cb) -> client & {
+    return replicaof(host, port, cb);
+  });
+}
+
+future_reply_t client::slowlog(const string_t &subcommand) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return slowlog(subcommand, cb);
   });
 }
 
-future_reply_t client::slowlog(const std::string &subcommand,
-                               const std::string &argument) {
+future_reply_t client::slowlog(const string_t &sub_cmd,
+                               const string_t &argument) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return slowlog(subcommand, argument, cb);
+    return slowlog(sub_cmd, argument, cb);
   });
 }
 
-future_reply_t client::smembers(const std::string &key) {
+future_reply_t client::smembers(const string_t &key) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return smembers(key, cb);
   });
 }
 
-future_reply_t client::smove(const std::string &src, const std::string &dst,
-                             const std::string &member) {
+future_reply_t client::smove(const string_t &src, const string_t &dst,
+                             const string_t &member) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return smove(src, dst, member, cb);
   });
 }
 
-future_reply_t client::sort(const std::string &key) {
+future_reply_t client::sort(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return sort(key, cb); });
 }
 
-future_reply_t client::sort(const std::string &key,
-                            const std::vector<std::string> &get_patterns,
+future_reply_t client::sort(const string_t &key,
+                            const std::vector<string_t> &get_patterns,
                             bool asc_order, bool alpha) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sort(key, get_patterns, asc_order, alpha, cb);
   });
 }
 
-future_reply_t client::sort(const std::string &key, std::size_t offset,
+future_reply_t client::sort(const string_t &key, std::size_t offset,
                             std::size_t count,
-                            const std::vector<std::string> &get_patterns,
+                            const std::vector<string_t> &get_patterns,
                             bool asc_order, bool alpha) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sort(key, offset, count, get_patterns, asc_order, alpha, cb);
   });
 }
 
-future_reply_t client::sort(const std::string &key,
-                            const std::string &by_pattern,
-                            const std::vector<std::string> &get_patterns,
+future_reply_t client::sort(const string_t &key, const string_t &by_pattern,
+                            const std::vector<string_t> &get_patterns,
                             bool asc_order, bool alpha) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sort(key, by_pattern, get_patterns, asc_order, alpha, cb);
   });
 }
 
-future_reply_t client::sort(const std::string &key,
-                            const std::vector<std::string> &get_patterns,
+future_reply_t client::sort(const string_t &key,
+                            const std::vector<string_t> &get_patterns,
                             bool asc_order, bool alpha,
-                            const std::string &store_dest) {
+                            const string_t &store_dest) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sort(key, get_patterns, asc_order, alpha, store_dest, cb);
   });
 }
 
-future_reply_t client::sort(const std::string &key, std::size_t offset,
+future_reply_t client::sort(const string_t &key, std::size_t offset,
                             std::size_t count,
-                            const std::vector<std::string> &get_patterns,
+                            const std::vector<string_t> &get_patterns,
                             bool asc_order, bool alpha,
-                            const std::string &store_dest) {
+                            const string_t &store_dest) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sort(key, offset, count, get_patterns, asc_order, alpha, store_dest,
                 cb);
   });
 }
 
-future_reply_t client::sort(const std::string &key,
-                            const std::string &by_pattern,
-                            const std::vector<std::string> &get_patterns,
+future_reply_t client::sort(const string_t &key, const string_t &by_pattern,
+                            const std::vector<string_t> &get_patterns,
                             bool asc_order, bool alpha,
-                            const std::string &store_dest) {
+                            const string_t &store_dest) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sort(key, by_pattern, get_patterns, asc_order, alpha, store_dest,
                 cb);
   });
 }
 
-future_reply_t client::sort(const std::string &key,
-                            const std::string &by_pattern, std::size_t offset,
-                            std::size_t count,
-                            const std::vector<std::string> &get_patterns,
+future_reply_t client::sort(const string_t &key, const string_t &by_pattern,
+                            std::size_t offset, std::size_t count,
+                            const std::vector<string_t> &get_patterns,
                             bool asc_order, bool alpha) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sort(key, by_pattern, offset, count, get_patterns, asc_order, alpha,
@@ -4744,87 +4699,86 @@ future_reply_t client::sort(const std::string &key,
   });
 }
 
-future_reply_t client::sort(const std::string &key,
-                            const std::string &by_pattern, std::size_t offset,
-                            std::size_t count,
-                            const std::vector<std::string> &get_patterns,
+future_reply_t client::sort(const string_t &key, const string_t &by_pattern,
+                            std::size_t offset, std::size_t count,
+                            const std::vector<string_t> &get_patterns,
                             bool asc_order, bool alpha,
-                            const std::string &store_dest) {
+                            const string_t &store_dest) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sort(key, by_pattern, offset, count, get_patterns, asc_order, alpha,
                 store_dest, cb);
   });
 }
 
-future_reply_t client::spop(const std::string &key) {
+future_reply_t client::spop(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return spop(key, cb); });
 }
 
-future_reply_t client::spop(const std::string &key, int count) {
+future_reply_t client::spop(const string_t &key, int count) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return spop(key, count, cb);
   });
 }
 
-future_reply_t client::srandmember(const std::string &key) {
+future_reply_t client::srandmember(const string_t &key) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return srandmember(key, cb);
   });
 }
 
-future_reply_t client::srandmember(const std::string &key, int count) {
+future_reply_t client::srandmember(const string_t &key, int count) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return srandmember(key, count, cb);
   });
 }
 
-future_reply_t client::srem(const std::string &key,
-                            const std::vector<std::string> &members) {
+future_reply_t client::srem(const string_t &key,
+                            const std::vector<string_t> &members) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return srem(key, members, cb);
   });
 }
 
-future_reply_t client::sscan(const std::string &key, std::size_t cursor) {
+future_reply_t client::sscan(const string_t &key, std::size_t cursor) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sscan(key, cursor, cb);
   });
 }
 
-future_reply_t client::sscan(const std::string &key, std::size_t cursor,
-                             const std::string &pattern) {
+future_reply_t client::sscan(const string_t &key, std::size_t cursor,
+                             const string_t &pattern) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sscan(key, cursor, pattern, cb);
   });
 }
 
-future_reply_t client::sscan(const std::string &key, std::size_t cursor,
+future_reply_t client::sscan(const string_t &key, std::size_t cursor,
                              std::size_t count) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sscan(key, cursor, count, cb);
   });
 }
 
-future_reply_t client::sscan(const std::string &key, std::size_t cursor,
-                             const std::string &pattern, std::size_t count) {
+future_reply_t client::sscan(const string_t &key, std::size_t cursor,
+                             const string_t &pattern, std::size_t count) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sscan(key, cursor, pattern, count, cb);
   });
 }
 
-future_reply_t client::strlen(const std::string &key) {
+future_reply_t client::strlen(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return strlen(key, cb); });
 }
 
-future_reply_t client::sunion(const std::vector<std::string> &keys) {
+future_reply_t client::sunion(const std::vector<string_t> &keys) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return sunion(keys, cb); });
 }
 
-future_reply_t client::sunionstore(const std::string &dst,
-                                   const std::vector<std::string> &keys) {
+future_reply_t client::sunionstore(const string_t &dst,
+                                   const std::vector<string_t> &keys) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return sunionstore(dst, keys, cb);
   });
@@ -4840,12 +4794,12 @@ future_reply_t client::time() {
       [=](const reply_callback_t &cb) -> client & { return time(cb); });
 }
 
-future_reply_t client::ttl(const std::string &key) {
+future_reply_t client::ttl(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return ttl(key, cb); });
 }
 
-future_reply_t client::type(const std::string &key) {
+future_reply_t client::type(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return type(key, cb); });
 }
@@ -4855,75 +4809,75 @@ future_reply_t client::unwatch() {
       [=](const reply_callback_t &cb) -> client & { return unwatch(cb); });
 }
 
-future_reply_t client::wait(int numslaves, int timeout) {
+future_reply_t client::wait(int num_replicas, int timeout) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return wait(numslaves, timeout, cb);
+    return wait(num_replicas, timeout, cb);
   });
 }
 
-future_reply_t client::watch(const std::vector<std::string> &keys) {
+future_reply_t client::watch(const std::vector<string_t> &keys) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return watch(keys, cb); });
 }
 
-future_reply_t client::xack(const std::string &key, const std::string &group,
-                            const std::vector<std::string> &id_members) {
+future_reply_t client::xack(const string_t &key, const string_t &group,
+                            const std::vector<string_t> &id_members) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xack(key, group, id_members, cb);
   });
 }
 
 future_reply_t
-client::xadd(const std::string &key, const std::string &id,
-             const std::multimap<std::string, std::string> &field_members) {
+client::xadd(const string_t &key, const string_t &id,
+             const std::multimap<string_t, string_t> &field_members) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xadd(key, id, field_members, cb);
   });
 }
 
-future_reply_t client::xclaim(const std::string &key, const std::string &group,
-                              const std::string &consumer,
+future_reply_t client::xclaim(const string_t &key, const string_t &group,
+                              const string_t &consumer,
                               const int &min_idle_time,
-                              const std::vector<std::string> &id_members,
+                              const std::vector<string_t> &id_members,
                               const xclaim_options_t &options) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xclaim(key, group, consumer, min_idle_time, id_members, options, cb);
   });
 }
 
-future_reply_t client::xdel(const std::string &key,
-                            const std::vector<std::string> &id_members) {
+future_reply_t client::xdel(const string_t &key,
+                            const std::vector<string_t> &id_members) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xdel(key, id_members, cb);
   });
 }
 
-future_reply_t client::xgroup_create(const std::string &key,
-                                     const std::string &group_name,
-                                     const std::string &id) {
+future_reply_t client::xgroup_create(const string_t &key,
+                                     const string_t &group_name,
+                                     const string_t &id) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xgroup_create(key, group_name, id, cb);
   });
 }
 
-future_reply_t client::xgroup_set_id(const std::string &key,
-                                     const std::string &group_name,
-                                     const std::string &id) {
+future_reply_t client::xgroup_set_id(const string_t &key,
+                                     const string_t &group_name,
+                                     const string_t &id) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xgroup_set_id(key, group_name, id, cb);
   });
 }
 
-future_reply_t client::xgroup_destroy(const std::string &key,
-                                      const std::string &group_name) {
+future_reply_t client::xgroup_destroy(const string_t &key,
+                                      const string_t &group_name) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xgroup_destroy(key, group_name, cb);
   });
 }
 
-future_reply_t client::xgroup_del_consumer(const std::string &key,
-                                           const std::string &group_name,
-                                           const std::string &consumer_name) {
+future_reply_t client::xgroup_del_consumer(const string_t &key,
+                                           const string_t &group_name,
+                                           const string_t &consumer_name) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xgroup_del_consumer(key, group_name, consumer_name, cb);
   });
@@ -4936,39 +4890,38 @@ future_reply_t client::xgroup_del_consumer(const std::string &key,
 //!  @param group_name stream consumer group name
 //!  @return
 //!
-future_reply_t client::xinfo_consumers(const std::string &key,
-                                       const std::string &group_name) {
+future_reply_t client::xinfo_consumers(const string_t &key,
+                                       const string_t &group_name) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xinfo_consumers(key, group_name, cb);
   });
 }
 
-future_reply_t client::xinfo_groups(const std::string &stream) {
+future_reply_t client::xinfo_groups(const string_t &stream) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xinfo_groups(stream, cb);
   });
 }
 
-future_reply_t client::xinfo_stream(const std::string &stream) {
+future_reply_t client::xinfo_stream(const string_t &stream) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xinfo_stream(stream, cb);
   });
 }
 
-future_reply_t client::xlen(const std::string &key) {
+future_reply_t client::xlen(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return xlen(key, cb); });
 }
 
-future_reply_t client::xpending(const std::string &stream,
-                                const std::string &group,
+future_reply_t client::xpending(const string_t &stream, const string_t &group,
                                 const xpending_options_t &options) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xpending(stream, group, options, cb);
   });
 }
 
-future_reply_t client::xrange(const std::string &stream,
+future_reply_t client::xrange(const string_t &stream,
                               const range_options_t &range_args) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xrange(stream, range_args, cb);
@@ -4986,80 +4939,80 @@ future_reply_t client::xread(const xread_options_t &a) {
       [=](const reply_callback_t &cb) -> client & { return xread(a, cb); });
 }
 
-future_reply_t client::xrevrange(const std::string &key,
+future_reply_t client::xrevrange(const string_t &key,
                                  const range_options_t &range_args) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xrevrange(key, range_args, cb);
   });
 }
 
-future_reply_t client::xtrim(const std::string &key, int max_len) {
+future_reply_t client::xtrim(const string_t &key, int max_len) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xtrim(key, max_len, cb);
   });
 }
-future_reply_t client::xtrim_approx(const std::string &key, int max_len) {
+future_reply_t client::xtrim_approx(const string_t &key, int max_len) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return xtrim_approx(key, max_len, cb);
   });
 }
 
 future_reply_t
-client::zadd(const std::string &key, const std::vector<std::string> &options,
-             const std::multimap<std::string, std::string> &score_members) {
+client::zadd(const string_t &key, const std::vector<string_t> &options,
+             const std::multimap<string_t, string_t> &score_members) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zadd(key, options, score_members, cb);
   });
 }
 
-future_reply_t client::zcard(const std::string &key) {
+future_reply_t client::zcard(const string_t &key) {
   return exec_cmd(
       [=](const reply_callback_t &cb) -> client & { return zcard(key, cb); });
 }
 
-future_reply_t client::zcount(const std::string &key, int min, int max) {
+future_reply_t client::zcount(const string_t &key, int min, int max) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zcount(key, min, max, cb);
   });
 }
 
-future_reply_t client::zcount(const std::string &key, double min, double max) {
+future_reply_t client::zcount(const string_t &key, double min, double max) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zcount(key, min, max, cb);
   });
 }
 
-future_reply_t client::zcount(const std::string &key, const std::string &min,
-                              const std::string &max) {
+future_reply_t client::zcount(const string_t &key, const string_t &min,
+                              const string_t &max) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zcount(key, min, max, cb);
   });
 }
 
-future_reply_t client::zincrby(const std::string &key, int incr,
-                               const std::string &member) {
+future_reply_t client::zincrby(const string_t &key, int incr,
+                               const string_t &member) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zincrby(key, incr, member, cb);
   });
 }
 
-future_reply_t client::zincrby(const std::string &key, double incr,
-                               const std::string &member) {
+future_reply_t client::zincrby(const string_t &key, double incr,
+                               const string_t &member) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zincrby(key, incr, member, cb);
   });
 }
 
-future_reply_t client::zincrby(const std::string &key, const std::string &incr,
-                               const std::string &member) {
+future_reply_t client::zincrby(const string_t &key, const string_t &incr,
+                               const string_t &member) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zincrby(key, incr, member, cb);
   });
 }
 
-future_reply_t client::zinterstore(const std::string &destination,
+future_reply_t client::zinterstore(const string_t &destination,
                                    std::size_t numkeys,
-                                   const std::vector<std::string> &keys,
+                                   const std::vector<string_t> &keys,
                                    const std::vector<std::size_t> weights,
                                    aggregate_method method) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
@@ -5067,395 +5020,378 @@ future_reply_t client::zinterstore(const std::string &destination,
   });
 }
 
-future_reply_t client::zlexcount(const std::string &key, int min, int max) {
+future_reply_t client::zlexcount(const string_t &key, int min, int max) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zlexcount(key, min, max, cb);
   });
 }
 
-future_reply_t client::zlexcount(const std::string &key, double min,
-                                 double max) {
+future_reply_t client::zlexcount(const string_t &key, double min, double max) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zlexcount(key, min, max, cb);
   });
 }
 
-future_reply_t client::zlexcount(const std::string &key, const std::string &min,
-                                 const std::string &max) {
+future_reply_t client::zlexcount(const string_t &key, const string_t &min,
+                                 const string_t &max) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zlexcount(key, min, max, cb);
   });
 }
 
-future_reply_t client::zpopmin(const std::string &key, int count) {
+future_reply_t client::zpopmin(const string_t &key, int count) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zpopmin(key, count, cb);
   });
 }
-future_reply_t client::zpopmax(const std::string &key, int count) {
+future_reply_t client::zpopmax(const string_t &key, int count) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zpopmax(key, count, cb);
   });
 }
 
-future_reply_t client::zrange(const std::string &key, int start, int stop,
-                              bool withscores) {
+future_reply_t client::zrange(const string_t &key, int start, int stop,
+                              bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrange(key, start, stop, withscores, cb);
+    return zrange(key, start, stop, with_scores, cb);
   });
 }
 
-future_reply_t client::zrange(const std::string &key, double start, double stop,
-                              bool withscores) {
+future_reply_t client::zrange(const string_t &key, double start, double stop,
+                              bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrange(key, start, stop, withscores, cb);
+    return zrange(key, start, stop, with_scores, cb);
   });
 }
 
-future_reply_t client::zrange(const std::string &key, const std::string &start,
-                              const std::string &stop, bool withscores) {
+future_reply_t client::zrange(const string_t &key, const string_t &start,
+                              const string_t &stop, bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrange(key, start, stop, withscores, cb);
+    return zrange(key, start, stop, with_scores, cb);
   });
 }
 
-future_reply_t client::zrangebylex(const std::string &key, int min, int max,
-                                   bool withscores) {
+future_reply_t client::zrangebylex(const string_t &key, int min, int max,
+                                   bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrangebylex(key, min, max, withscores, cb);
+    return zrangebylex(key, min, max, with_scores, cb);
   });
 }
 
-future_reply_t client::zrangebylex(const std::string &key, double min,
-                                   double max, bool withscores) {
+future_reply_t client::zrangebylex(const string_t &key, double min, double max,
+                                   bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrangebylex(key, min, max, withscores, cb);
+    return zrangebylex(key, min, max, with_scores, cb);
   });
 }
 
-future_reply_t client::zrangebylex(const std::string &key,
-                                   const std::string &min,
-                                   const std::string &max, bool withscores) {
+future_reply_t client::zrangebylex(const string_t &key, const string_t &min,
+                                   const string_t &max, bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrangebylex(key, min, max, withscores, cb);
+    return zrangebylex(key, min, max, with_scores, cb);
   });
 }
 
-future_reply_t client::zrangebylex(const std::string &key, int min, int max,
+future_reply_t client::zrangebylex(const string_t &key, int min, int max,
                                    std::size_t offset, std::size_t count,
-                                   bool withscores) {
+                                   bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrangebylex(key, min, max, offset, count, withscores, cb);
+    return zrangebylex(key, min, max, offset, count, with_scores, cb);
   });
 }
 
-future_reply_t client::zrangebylex(const std::string &key, double min,
-                                   double max, std::size_t offset,
-                                   std::size_t count, bool withscores) {
+future_reply_t client::zrangebylex(const string_t &key, double min, double max,
+                                   std::size_t offset, std::size_t count,
+                                   bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrangebylex(key, min, max, offset, count, withscores, cb);
+    return zrangebylex(key, min, max, offset, count, with_scores, cb);
   });
 }
 
-future_reply_t client::zrangebylex(const std::string &key,
-                                   const std::string &min,
-                                   const std::string &max, std::size_t offset,
-                                   std::size_t count, bool withscores) {
+future_reply_t client::zrangebylex(const string_t &key, const string_t &min,
+                                   const string_t &max, std::size_t offset,
+                                   std::size_t count, bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrangebylex(key, min, max, offset, count, withscores, cb);
+    return zrangebylex(key, min, max, offset, count, with_scores, cb);
   });
 }
 
-future_reply_t client::zrangebyscore(const std::string &key, int min, int max,
-                                     bool withscores) {
+future_reply_t client::zrangebyscore(const string_t &key, int min, int max,
+                                     bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrangebyscore(key, min, max, withscores, cb);
+    return zrangebyscore(key, min, max, with_scores, cb);
   });
 }
 
-future_reply_t client::zrangebyscore(const std::string &key, double min,
-                                     double max, bool withscores) {
+future_reply_t client::zrangebyscore(const string_t &key, double min,
+                                     double max, bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrangebyscore(key, min, max, withscores, cb);
+    return zrangebyscore(key, min, max, with_scores, cb);
   });
 }
 
-future_reply_t client::zrangebyscore(const std::string &key,
-                                     const std::string &min,
-                                     const std::string &max, bool withscores) {
+future_reply_t client::zrangebyscore(const string_t &key, const string_t &min,
+                                     const string_t &max, bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrangebyscore(key, min, max, withscores, cb);
+    return zrangebyscore(key, min, max, with_scores, cb);
   });
 }
 
-future_reply_t client::zrangebyscore(const std::string &key, int min, int max,
+future_reply_t client::zrangebyscore(const string_t &key, int min, int max,
                                      std::size_t offset, std::size_t count,
-                                     bool withscores) {
+                                     bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrangebyscore(key, min, max, offset, count, withscores, cb);
+    return zrangebyscore(key, min, max, offset, count, with_scores, cb);
   });
 }
 
-future_reply_t client::zrangebyscore(const std::string &key, double min,
+future_reply_t client::zrangebyscore(const string_t &key, double min,
                                      double max, std::size_t offset,
-                                     std::size_t count, bool withscores) {
+                                     std::size_t count, bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrangebyscore(key, min, max, offset, count, withscores, cb);
+    return zrangebyscore(key, min, max, offset, count, with_scores, cb);
   });
 }
 
-future_reply_t client::zrangebyscore(const std::string &key,
-                                     const std::string &min,
-                                     const std::string &max, std::size_t offset,
-                                     std::size_t count, bool withscores) {
+future_reply_t client::zrangebyscore(const string_t &key, const string_t &min,
+                                     const string_t &max, std::size_t offset,
+                                     std::size_t count, bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrangebyscore(key, min, max, offset, count, withscores, cb);
+    return zrangebyscore(key, min, max, offset, count, with_scores, cb);
   });
 }
 
-future_reply_t client::zrank(const std::string &key,
-                             const std::string &member) {
+future_reply_t client::zrank(const string_t &key, const string_t &member) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zrank(key, member, cb);
   });
 }
 
-future_reply_t client::zrem(const std::string &key,
-                            const std::vector<std::string> &members) {
+future_reply_t client::zrem(const string_t &key,
+                            const std::vector<string_t> &members) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zrem(key, members, cb);
   });
 }
 
-future_reply_t client::zremrangebylex(const std::string &key, int min,
-                                      int max) {
+future_reply_t client::zremrangebylex(const string_t &key, int min, int max) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zremrangebylex(key, min, max, cb);
   });
 }
 
-future_reply_t client::zremrangebylex(const std::string &key, double min,
+future_reply_t client::zremrangebylex(const string_t &key, double min,
                                       double max) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zremrangebylex(key, min, max, cb);
   });
 }
 
-future_reply_t client::zremrangebylex(const std::string &key,
-                                      const std::string &min,
-                                      const std::string &max) {
+future_reply_t client::zremrangebylex(const string_t &key, const string_t &min,
+                                      const string_t &max) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zremrangebylex(key, min, max, cb);
   });
 }
 
-future_reply_t client::zremrangebyrank(const std::string &key, int start,
+future_reply_t client::zremrangebyrank(const string_t &key, int start,
                                        int stop) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zremrangebyrank(key, start, stop, cb);
   });
 }
 
-future_reply_t client::zremrangebyrank(const std::string &key, double start,
+future_reply_t client::zremrangebyrank(const string_t &key, double start,
                                        double stop) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zremrangebyrank(key, start, stop, cb);
   });
 }
 
-future_reply_t client::zremrangebyrank(const std::string &key,
-                                       const std::string &start,
-                                       const std::string &stop) {
+future_reply_t client::zremrangebyrank(const string_t &key,
+                                       const string_t &start,
+                                       const string_t &stop) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zremrangebyrank(key, start, stop, cb);
   });
 }
 
-future_reply_t client::zremrangebyscore(const std::string &key, int min,
-                                        int max) {
+future_reply_t client::zremrangebyscore(const string_t &key, int min, int max) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zremrangebyscore(key, min, max, cb);
   });
 }
 
-future_reply_t client::zremrangebyscore(const std::string &key, double min,
+future_reply_t client::zremrangebyscore(const string_t &key, double min,
                                         double max) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zremrangebyscore(key, min, max, cb);
   });
 }
 
-future_reply_t client::zremrangebyscore(const std::string &key,
-                                        const std::string &min,
-                                        const std::string &max) {
+future_reply_t client::zremrangebyscore(const string_t &key,
+                                        const string_t &min,
+                                        const string_t &max) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zremrangebyscore(key, min, max, cb);
   });
 }
 
-future_reply_t client::zrevrange(const std::string &key, int start, int stop,
-                                 bool withscores) {
+future_reply_t client::zrevrange(const string_t &key, int start, int stop,
+                                 bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrange(key, start, stop, withscores, cb);
+    return zrevrange(key, start, stop, with_scores, cb);
   });
 }
 
-future_reply_t client::zrevrange(const std::string &key, double start,
-                                 double stop, bool withscores) {
+future_reply_t client::zrevrange(const string_t &key, double start, double stop,
+                                 bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrange(key, start, stop, withscores, cb);
+    return zrevrange(key, start, stop, with_scores, cb);
   });
 }
 
-future_reply_t client::zrevrange(const std::string &key,
-                                 const std::string &start,
-                                 const std::string &stop, bool withscores) {
+future_reply_t client::zrevrange(const string_t &key, const string_t &start,
+                                 const string_t &stop, bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrange(key, start, stop, withscores, cb);
+    return zrevrange(key, start, stop, with_scores, cb);
   });
 }
 
-future_reply_t client::zrevrangebylex(const std::string &key, int max, int min,
-                                      bool withscores) {
+future_reply_t client::zrevrangebylex(const string_t &key, int max, int min,
+                                      bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrangebylex(key, max, min, withscores, cb);
+    return zrevrangebylex(key, max, min, with_scores, cb);
   });
 }
 
-future_reply_t client::zrevrangebylex(const std::string &key, double max,
-                                      double min, bool withscores) {
+future_reply_t client::zrevrangebylex(const string_t &key, double max,
+                                      double min, bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrangebylex(key, max, min, withscores, cb);
+    return zrevrangebylex(key, max, min, with_scores, cb);
   });
 }
 
-future_reply_t client::zrevrangebylex(const std::string &key,
-                                      const std::string &max,
-                                      const std::string &min, bool withscores) {
+future_reply_t client::zrevrangebylex(const string_t &key, const string_t &max,
+                                      const string_t &min, bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrangebylex(key, max, min, withscores, cb);
+    return zrevrangebylex(key, max, min, with_scores, cb);
   });
 }
 
-future_reply_t client::zrevrangebylex(const std::string &key, int max, int min,
+future_reply_t client::zrevrangebylex(const string_t &key, int max, int min,
                                       std::size_t offset, std::size_t count,
-                                      bool withscores) {
+                                      bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrangebylex(key, max, min, offset, count, withscores, cb);
+    return zrevrangebylex(key, max, min, offset, count, with_scores, cb);
   });
 }
 
-future_reply_t client::zrevrangebylex(const std::string &key, double max,
+future_reply_t client::zrevrangebylex(const string_t &key, double max,
                                       double min, std::size_t offset,
-                                      std::size_t count, bool withscores) {
+                                      std::size_t count, bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrangebylex(key, max, min, offset, count, withscores, cb);
+    return zrevrangebylex(key, max, min, offset, count, with_scores, cb);
   });
 }
 
-future_reply_t client::zrevrangebylex(const std::string &key,
-                                      const std::string &max,
-                                      const std::string &min,
-                                      std::size_t offset, std::size_t count,
-                                      bool withscores) {
+future_reply_t client::zrevrangebylex(const string_t &key, const string_t &max,
+                                      const string_t &min, std::size_t offset,
+                                      std::size_t count, bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrangebylex(key, max, min, offset, count, withscores, cb);
+    return zrevrangebylex(key, max, min, offset, count, with_scores, cb);
   });
 }
 
-future_reply_t client::zrevrangebyscore(const std::string &key, int max,
-                                        int min, bool withscores) {
+future_reply_t client::zrevrangebyscore(const string_t &key, int max, int min,
+                                        bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrangebyscore(key, max, min, withscores, cb);
+    return zrevrangebyscore(key, max, min, with_scores, cb);
   });
 }
 
-future_reply_t client::zrevrangebyscore(const std::string &key, double max,
-                                        double min, bool withscores) {
+future_reply_t client::zrevrangebyscore(const string_t &key, double max,
+                                        double min, bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrangebyscore(key, max, min, withscores, cb);
+    return zrevrangebyscore(key, max, min, with_scores, cb);
   });
 }
 
-future_reply_t client::zrevrangebyscore(const std::string &key,
-                                        const std::string &max,
-                                        const std::string &min,
-                                        bool withscores) {
+future_reply_t client::zrevrangebyscore(const string_t &key,
+                                        const string_t &max,
+                                        const string_t &min, bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrangebyscore(key, max, min, withscores, cb);
+    return zrevrangebyscore(key, max, min, with_scores, cb);
   });
 }
 
-future_reply_t client::zrevrangebyscore(const std::string &key, int max,
-                                        int min, std::size_t offset,
-                                        std::size_t count, bool withscores) {
-  return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrangebyscore(key, max, min, offset, count, withscores, cb);
-  });
-}
-
-future_reply_t client::zrevrangebyscore(const std::string &key, double max,
-                                        double min, std::size_t offset,
-                                        std::size_t count, bool withscores) {
-  return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrangebyscore(key, max, min, offset, count, withscores, cb);
-  });
-}
-
-future_reply_t client::zrevrangebyscore(const std::string &key,
-                                        const std::string &max,
-                                        const std::string &min,
+future_reply_t client::zrevrangebyscore(const string_t &key, int max, int min,
                                         std::size_t offset, std::size_t count,
-                                        bool withscores) {
+                                        bool with_scores) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
-    return zrevrangebyscore(key, max, min, offset, count, withscores, cb);
+    return zrevrangebyscore(key, max, min, offset, count, with_scores, cb);
   });
 }
 
-future_reply_t client::zrevrank(const std::string &key,
-                                const std::string &member) {
+future_reply_t client::zrevrangebyscore(const string_t &key, double max,
+                                        double min, std::size_t offset,
+                                        std::size_t count, bool with_scores) {
+  return exec_cmd([=](const reply_callback_t &cb) -> client & {
+    return zrevrangebyscore(key, max, min, offset, count, with_scores, cb);
+  });
+}
+
+future_reply_t client::zrevrangebyscore(const string_t &key,
+                                        const string_t &max,
+                                        const string_t &min, std::size_t offset,
+                                        std::size_t count, bool with_scores) {
+  return exec_cmd([=](const reply_callback_t &cb) -> client & {
+    return zrevrangebyscore(key, max, min, offset, count, with_scores, cb);
+  });
+}
+
+future_reply_t client::zrevrank(const string_t &key, const string_t &member) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zrevrank(key, member, cb);
   });
 }
 
-future_reply_t client::zscan(const std::string &key, std::size_t cursor) {
+future_reply_t client::zscan(const string_t &key, std::size_t cursor) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zscan(key, cursor, cb);
   });
 }
 
-future_reply_t client::zscan(const std::string &key, std::size_t cursor,
-                             const std::string &pattern) {
+future_reply_t client::zscan(const string_t &key, std::size_t cursor,
+                             const string_t &pattern) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zscan(key, cursor, pattern, cb);
   });
 }
 
-future_reply_t client::zscan(const std::string &key, std::size_t cursor,
+future_reply_t client::zscan(const string_t &key, std::size_t cursor,
                              std::size_t count) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zscan(key, cursor, count, cb);
   });
 }
 
-future_reply_t client::zscan(const std::string &key, std::size_t cursor,
-                             const std::string &pattern, std::size_t count) {
+future_reply_t client::zscan(const string_t &key, std::size_t cursor,
+                             const string_t &pattern, std::size_t count) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zscan(key, cursor, pattern, count, cb);
   });
 }
 
-future_reply_t client::zscore(const std::string &key,
-                              const std::string &member) {
+future_reply_t client::zscore(const string_t &key, const string_t &member) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {
     return zscore(key, member, cb);
   });
 }
 
-future_reply_t client::zunionstore(const std::string &destination,
+future_reply_t client::zunionstore(const string_t &destination,
                                    std::size_t numkeys,
-                                   const std::vector<std::string> &keys,
+                                   const std::vector<string_t> &keys,
                                    const std::vector<std::size_t> weights,
                                    aggregate_method method) {
   return exec_cmd([=](const reply_callback_t &cb) -> client & {

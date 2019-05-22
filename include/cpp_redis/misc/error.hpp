@@ -25,6 +25,8 @@
 #include <stdexcept>
 #include <string>
 
+#include <cpp_redis/types/common_types.hpp>
+
 namespace cpp_redis {
 
 //!
@@ -40,8 +42,7 @@ public:
   //!  ctor (string)
   //!
   //!
-  explicit redis_error(const std::string &err)
-      : std::runtime_error(err.c_str()) {}
+  explicit redis_error(const string_t &err) : std::runtime_error(err.c_str()) {}
 
   //!
   //!  ctor(char*)

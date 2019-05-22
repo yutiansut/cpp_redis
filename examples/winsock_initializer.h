@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CPP_REDIS_WINSOCK_INITIALIZER_H_
+#define CPP_REDIS_WINSOCK_INITIALIZER_H_
 
 #ifdef _WIN32
 #include <Winsock2.h>
@@ -17,6 +18,11 @@ public:
   }
   ~winsock_initializer() { WSACleanup(); }
 };
+
+#define WINSOCK_INITIALIZER() winsock_initializer winsock_init;
 #else
 class winsock_initializer {};
+#define WINSOCK_INITIALIZER()
 #endif /* _WIN32 */
+
+#endif // !CPP_REDIS_WINSOCK_INITIALIZER_H_

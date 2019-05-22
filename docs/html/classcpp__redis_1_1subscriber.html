@@ -95,14 +95,14 @@ Public Types</h2></td></tr>
  }</td></tr>
 <tr class="separator:afc976757efd9d0ac4def6935546a2338"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f9e56873e5b96ad9cb2395dadae1a7a"><td class="memItemLeft" align="right" valign="top"><a id="a7f9e56873e5b96ad9cb2395dadae1a7a"></a>
-typedef std::function&lt; void(const std::string &amp;host, std::size_t port, <a class="el" href="classcpp__redis_1_1subscriber.html#afc976757efd9d0ac4def6935546a2338">connect_state</a> status)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a7f9e56873e5b96ad9cb2395dadae1a7a">connect_callback_t</a></td></tr>
+typedef std::function&lt; void(const string_t &amp;host, std::size_t port, <a class="el" href="classcpp__redis_1_1subscriber.html#afc976757efd9d0ac4def6935546a2338">connect_state</a> status)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a7f9e56873e5b96ad9cb2395dadae1a7a">connect_callback_t</a></td></tr>
 <tr class="memdesc:a7f9e56873e5b96ad9cb2395dadae1a7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">connect handler, called whenever a new connection even occurred <br /></td></tr>
 <tr class="separator:a7f9e56873e5b96ad9cb2395dadae1a7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5533ac876d3116911b54ff0dce28f61c"><td class="memItemLeft" align="right" valign="top"><a id="a5533ac876d3116911b54ff0dce28f61c"></a>
 typedef std::function&lt; void(<a class="el" href="classcpp__redis_1_1reply.html">reply</a> &amp;)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a5533ac876d3116911b54ff0dce28f61c">reply_callback_t</a></td></tr>
 <tr class="memdesc:a5533ac876d3116911b54ff0dce28f61c"><td class="mdescLeft">&#160;</td><td class="mdescRight">reply callback called whenever a reply is received, takes as parameter the received reply <br /></td></tr>
 <tr class="separator:a5533ac876d3116911b54ff0dce28f61c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ac29261280f488dab483866ae875656"><td class="memItemLeft" align="right" valign="top">typedef std::function&lt; void(const std::string &amp;, const std::string &amp;)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a2ac29261280f488dab483866ae875656">read_callback_t</a></td></tr>
+<tr class="memitem:a2ac29261280f488dab483866ae875656"><td class="memItemLeft" align="right" valign="top">typedef std::function&lt; void(const string_t &amp;, const string_t &amp;)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a2ac29261280f488dab483866ae875656">read_callback_t</a></td></tr>
 <tr class="separator:a2ac29261280f488dab483866ae875656"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19ea39dfabeb19937a9ce4c8d21781b4"><td class="memItemLeft" align="right" valign="top">typedef std::function&lt; void(int64_t)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a19ea39dfabeb19937a9ce4c8d21781b4">acknowledgement_callback_t</a></td></tr>
 <tr class="separator:a19ea39dfabeb19937a9ce4c8d21781b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -127,10 +127,10 @@ Public Member Functions</h2></td></tr>
 <a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#ac60f83e6e915073bda6853baaeb39485">operator=</a> (const <a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a> &amp;)=delete</td></tr>
 <tr class="memdesc:ac60f83e6e915073bda6853baaeb39485"><td class="mdescLeft">&#160;</td><td class="mdescRight">assignment operator <br /></td></tr>
 <tr class="separator:ac60f83e6e915073bda6853baaeb39485"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ae8134a9a9b31d6f2434ec4f6e86d3a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a6ae8134a9a9b31d6f2434ec4f6e86d3a">connect</a> (const std::string &amp;host=&quot;127.0.0.1&quot;, std::size_t port=6379, const <a class="el" href="classcpp__redis_1_1subscriber.html#a7f9e56873e5b96ad9cb2395dadae1a7a">connect_callback_t</a> &amp;connect_callback=nullptr, std::uint32_t timeout_ms=0, std::int32_t max_reconnects=0, std::uint32_t reconnect_interval_ms=0)</td></tr>
+<tr class="memitem:a6ae8134a9a9b31d6f2434ec4f6e86d3a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a6ae8134a9a9b31d6f2434ec4f6e86d3a">connect</a> (const string_t &amp;host=&quot;127.0.0.1&quot;, std::size_t port=6379, const <a class="el" href="classcpp__redis_1_1subscriber.html#a7f9e56873e5b96ad9cb2395dadae1a7a">connect_callback_t</a> &amp;connect_callback=nullptr, std::uint32_t timeout_ms=0, std::int32_t max_reconnects=0, std::uint32_t reconnect_interval_ms=0)</td></tr>
 <tr class="memdesc:a6ae8134a9a9b31d6f2434ec4f6e86d3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connect to redis server.  <a href="#a6ae8134a9a9b31d6f2434ec4f6e86d3a">More...</a><br /></td></tr>
 <tr class="separator:a6ae8134a9a9b31d6f2434ec4f6e86d3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8fb77a44a1e1f0d99dec639658e2aa7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a8fb77a44a1e1f0d99dec639658e2aa7e">connect</a> (const std::string &amp;m_name, const <a class="el" href="classcpp__redis_1_1subscriber.html#a7f9e56873e5b96ad9cb2395dadae1a7a">connect_callback_t</a> &amp;connect_callback=nullptr, std::uint32_t timeout_ms=0, std::int32_t max_reconnects=0, std::uint32_t reconnect_interval_ms=0)</td></tr>
+<tr class="memitem:a8fb77a44a1e1f0d99dec639658e2aa7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a8fb77a44a1e1f0d99dec639658e2aa7e">connect</a> (const string_t &amp;m_name, const <a class="el" href="classcpp__redis_1_1subscriber.html#a7f9e56873e5b96ad9cb2395dadae1a7a">connect_callback_t</a> &amp;connect_callback=nullptr, std::uint32_t timeout_ms=0, std::int32_t max_reconnects=0, std::uint32_t reconnect_interval_ms=0)</td></tr>
 <tr class="memdesc:a8fb77a44a1e1f0d99dec639658e2aa7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Connect to redis server.  <a href="#a8fb77a44a1e1f0d99dec639658e2aa7e">More...</a><br /></td></tr>
 <tr class="separator:a8fb77a44a1e1f0d99dec639658e2aa7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af73acfc3c1859e6b32bc9a69856e6e59"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#af73acfc3c1859e6b32bc9a69856e6e59">is_connected</a> () const</td></tr>
@@ -146,20 +146,20 @@ Public Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#ae93de179d6ea83ece59cf1a30493c3e9">cancel_reconnect</a> ()</td></tr>
 <tr class="memdesc:ae93de179d6ea83ece59cf1a30493c3e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">stop any reconnect in progress <br /></td></tr>
 <tr class="separator:ae93de179d6ea83ece59cf1a30493c3e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b4564fc4dfe356b95aeae4fdb8071c9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a7b4564fc4dfe356b95aeae4fdb8071c9">auth</a> (const std::string &amp;password, const <a class="el" href="classcpp__redis_1_1subscriber.html#a5533ac876d3116911b54ff0dce28f61c">reply_callback_t</a> &amp;reply_callback=nullptr)</td></tr>
+<tr class="memitem:a7b4564fc4dfe356b95aeae4fdb8071c9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a7b4564fc4dfe356b95aeae4fdb8071c9">auth</a> (const string_t &amp;password, const <a class="el" href="classcpp__redis_1_1subscriber.html#a5533ac876d3116911b54ff0dce28f61c">reply_callback_t</a> &amp;reply_callback=nullptr)</td></tr>
 <tr class="memdesc:a7b4564fc4dfe356b95aeae4fdb8071c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">ability to authenticate on the redis server if necessary this method should not be called repeatedly as the storage of reply_callback is NOT thread safe (only one reply callback is stored for the subscriber client) calling repeatedly <a class="el" href="classcpp__redis_1_1subscriber.html#a7b4564fc4dfe356b95aeae4fdb8071c9" title="ability to authenticate on the redis server if necessary this method should not be called repeatedly ...">auth()</a> is undefined concerning the execution of the associated callbacks  <a href="#a7b4564fc4dfe356b95aeae4fdb8071c9">More...</a><br /></td></tr>
 <tr class="separator:a7b4564fc4dfe356b95aeae4fdb8071c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afee579c702182041645a3d3c55de4b9e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#afee579c702182041645a3d3c55de4b9e">subscribe</a> (const std::string &amp;channel, const <a class="el" href="classcpp__redis_1_1subscriber.html#a2ac29261280f488dab483866ae875656">read_callback_t</a> &amp;callback, const <a class="el" href="classcpp__redis_1_1subscriber.html#a19ea39dfabeb19937a9ce4c8d21781b4">acknowledgement_callback_t</a> &amp;acknowledgement_callback=nullptr)</td></tr>
+<tr class="memitem:afee579c702182041645a3d3c55de4b9e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#afee579c702182041645a3d3c55de4b9e">subscribe</a> (const string_t &amp;channel, const <a class="el" href="classcpp__redis_1_1subscriber.html#a2ac29261280f488dab483866ae875656">read_callback_t</a> &amp;callback, const <a class="el" href="classcpp__redis_1_1subscriber.html#a19ea39dfabeb19937a9ce4c8d21781b4">acknowledgement_callback_t</a> &amp;acknowledgement_callback=nullptr)</td></tr>
 <tr class="separator:afee579c702182041645a3d3c55de4b9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a52605edb2a85d370680c3c9e1b84fc3b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a52605edb2a85d370680c3c9e1b84fc3b">psubscribe</a> (const std::string &amp;pattern, const <a class="el" href="classcpp__redis_1_1subscriber.html#a2ac29261280f488dab483866ae875656">read_callback_t</a> &amp;callback, const <a class="el" href="classcpp__redis_1_1subscriber.html#a19ea39dfabeb19937a9ce4c8d21781b4">acknowledgement_callback_t</a> &amp;acknowledgement_callback=nullptr)</td></tr>
+<tr class="memitem:a52605edb2a85d370680c3c9e1b84fc3b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a52605edb2a85d370680c3c9e1b84fc3b">psubscribe</a> (const string_t &amp;pattern, const <a class="el" href="classcpp__redis_1_1subscriber.html#a2ac29261280f488dab483866ae875656">read_callback_t</a> &amp;callback, const <a class="el" href="classcpp__redis_1_1subscriber.html#a19ea39dfabeb19937a9ce4c8d21781b4">acknowledgement_callback_t</a> &amp;acknowledgement_callback=nullptr)</td></tr>
 <tr class="separator:a52605edb2a85d370680c3c9e1b84fc3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08dffea41cfd5914adfa5a966e0ab292"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a08dffea41cfd5914adfa5a966e0ab292">unsubscribe</a> (const std::string &amp;channel)</td></tr>
+<tr class="memitem:a08dffea41cfd5914adfa5a966e0ab292"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a08dffea41cfd5914adfa5a966e0ab292">unsubscribe</a> (const string_t &amp;channel)</td></tr>
 <tr class="separator:a08dffea41cfd5914adfa5a966e0ab292"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26edc7dcf87ddc8734fac04878ca307a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a26edc7dcf87ddc8734fac04878ca307a">punsubscribe</a> (const std::string &amp;pattern)</td></tr>
+<tr class="memitem:a26edc7dcf87ddc8734fac04878ca307a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a26edc7dcf87ddc8734fac04878ca307a">punsubscribe</a> (const string_t &amp;pattern)</td></tr>
 <tr class="separator:a26edc7dcf87ddc8734fac04878ca307a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af78a5542315daac42998809eeec30eef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#af78a5542315daac42998809eeec30eef">commit</a> ()</td></tr>
 <tr class="separator:af78a5542315daac42998809eeec30eef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2faf9e9cc9c95e3c0fed148355af84f1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a2faf9e9cc9c95e3c0fed148355af84f1">add_sentinel</a> (const std::string &amp;host, std::size_t port, std::uint32_t timeout_ms=0)</td></tr>
+<tr class="memitem:a2faf9e9cc9c95e3c0fed148355af84f1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a2faf9e9cc9c95e3c0fed148355af84f1">add_sentinel</a> (const string_t &amp;host, std::size_t port, std::uint32_t timeout_ms=0)</td></tr>
 <tr class="separator:a2faf9e9cc9c95e3c0fed148355af84f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a6212dfba0513508fdc6377f83a0048"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classcpp__redis_1_1sentinel.html">sentinel</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcpp__redis_1_1subscriber.html#a0a6212dfba0513508fdc6377f83a0048">get_sentinel</a> () const</td></tr>
 <tr class="separator:a0a6212dfba0513508fdc6377f83a0048"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -196,7 +196,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::function&lt;void(const std::string &amp;, const std::string &amp;)&gt; <a class="el" href="classcpp__redis_1_1subscriber.html#a2ac29261280f488dab483866ae875656">cpp_redis::subscriber::read_callback_t</a></td>
+          <td class="memname">typedef std::function&lt;void(const string_t &amp;, const string_t &amp;)&gt; <a class="el" href="classcpp__redis_1_1subscriber.html#a2ac29261280f488dab483866ae875656">cpp_redis::subscriber::read_callback_t</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -280,7 +280,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
         <tr>
           <td class="memname">void cpp_redis::subscriber::add_sentinel </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const string_t &amp;&#160;</td>
           <td class="paramname"><em>host</em>, </td>
         </tr>
         <tr>
@@ -323,7 +323,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
         <tr>
           <td class="memname"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a>&amp; cpp_redis::subscriber::auth </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const string_t &amp;&#160;</td>
           <td class="paramname"><em>password</em>, </td>
         </tr>
         <tr>
@@ -398,7 +398,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
         <tr>
           <td class="memname">void cpp_redis::subscriber::connect </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const string_t &amp;&#160;</td>
           <td class="paramname"><em>host</em> = <code>&quot;127.0.0.1&quot;</code>, </td>
         </tr>
         <tr>
@@ -463,7 +463,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
         <tr>
           <td class="memname">void cpp_redis::subscriber::connect </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const string_t &amp;&#160;</td>
           <td class="paramname"><em>m_name</em>, </td>
         </tr>
         <tr>
@@ -625,7 +625,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
         <tr>
           <td class="memname"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a>&amp; cpp_redis::subscriber::psubscribe </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const string_t &amp;&#160;</td>
           <td class="paramname"><em>pattern</em>, </td>
         </tr>
         <tr>
@@ -672,7 +672,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
         <tr>
           <td class="memname"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a>&amp; cpp_redis::subscriber::punsubscribe </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const string_t &amp;&#160;</td>
           <td class="paramname"><em>pattern</em></td><td>)</td>
           <td></td>
         </tr>
@@ -698,7 +698,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
         <tr>
           <td class="memname"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a>&amp; cpp_redis::subscriber::subscribe </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const string_t &amp;&#160;</td>
           <td class="paramname"><em>channel</em>, </td>
         </tr>
         <tr>
@@ -745,7 +745,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
         <tr>
           <td class="memname"><a class="el" href="classcpp__redis_1_1subscriber.html">subscriber</a>&amp; cpp_redis::subscriber::unsubscribe </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const string_t &amp;&#160;</td>
           <td class="paramname"><em>channel</em></td><td>)</td>
           <td></td>
         </tr>

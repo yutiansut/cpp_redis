@@ -27,8 +27,7 @@
 
 #include "winsock_initializer.h"
 
-int
-main() {
+int main() {
   winsock_initializer winsock_init;
   cpp_redis::client client;
 
@@ -44,12 +43,14 @@ main() {
   //! client kill ip:port
   client.client_list([&client](cpp_redis::reply_t &reply) {
     std::string addr;
-    std::stringstream ss(reply.as_string());
+    cpp_redis::stringstream ss(reply.as_string());
 
     ss >> addr >> addr;
 
-    std::string host = std::string(addr.begin() + addr.find('=') + 1, addr.begin() + addr.find(':'));
-    int port         = std::stoi(std::string(addr.begin() + addr.find(':') + 1, addr.end()));
+    std::string host = std::string(addr.begin() + addr.find('=') + 1,
+                             addr.begin() + addr.find(':'));
+    int port =
+        std::stoi(std::string(addr.begin() + addr.find(':') + 1, addr.end()));
 
     client.client_kill(host, port, [](cpp_redis::reply_t &reply) {
       std::cout << reply << std::endl; //! OK

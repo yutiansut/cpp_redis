@@ -110,7 +110,7 @@ public:
   //!  @param timeout_ms max time to connect (in ms)
   //!
   //!
-  void connect(const std::string &host = "127.0.0.1", std::size_t port = 6379,
+  void connect(const string_t &host = "127.0.0.1", std::size_t port = 6379,
                const disconnection_handler_t &disconnection_handler = nullptr,
                const reply_callback_t &reply_callback = nullptr,
                std::uint32_t timeout_ms = 0);
@@ -140,7 +140,7 @@ public:
   //!  @return current instance
   //!
   //!
-  redis_connection &send(const std::vector<std::string> &redis_cmd);
+  redis_connection &send(const std::vector<string_t> &redis_cmd);
 
   //!
   //!  commit pipelined transaction
@@ -174,7 +174,7 @@ private:
   //!  "*2\r\n+GET\r\n+HELLO\r\n"
   //!
   //!
-  std::string build_command(const std::vector<std::string> &redis_cmd);
+  string_t build_command(const std::vector<string_t> &redis_cmd);
 
 private:
   //!
@@ -214,7 +214,7 @@ private:
   //!  flushed to the tcp client when commit is called)
   //!
   //!
-  std::string m_buffer;
+  string_t m_buffer;
 
   //!
   //!  protect internal buffer against race conditions
@@ -224,5 +224,7 @@ private:
 };
 
 } // namespace network
+
+using redis_connection_t = network::redis_connection;
 
 } // namespace cpp_redis

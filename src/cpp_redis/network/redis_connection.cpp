@@ -54,7 +54,7 @@ redis_connection::~redis_connection() {
 }
 
 void redis_connection::connect(
-    const std::string &host, std::size_t port,
+    const string_t &host, std::size_t port,
     const disconnection_handler_t &client_disconnection_handler,
     const reply_callback_t &client_reply_callback, std::uint32_t timeout_ms) {
   try {
@@ -79,8 +79,8 @@ void redis_connection::connect(
 
     __CPP_REDIS_LOG(debug, "cpp_redis::network::redis_connection connected");
   } catch (const std::exception &e) {
-    __CPP_REDIS_LOG(
-        error, std::string("cpp_redis::network::redis_connection ") + e.what());
+    __CPP_REDIS_LOG(error, string_t("cpp_redis::network::redis_connection ") +
+                               e.what());
     throw redis_error(e.what());
   }
 
@@ -110,10 +110,10 @@ void redis_connection::disconnect(bool wait_for_removal) {
 }
 
 bool redis_connection::is_connected() const { return m_client->is_connected(); }
-
-std::string
-redis_connection::build_command(const std::vector<std::string> &redis_cmd) {
-  std::string cmd = "*" + std::to_string(redis_cmd.size()) + "\r\n";
+t
+string_t
+redis_connection::build_command(const std::vector<string_t> &redis_cmd) {
+  string_t cmd = "*" + std::to_string(redis_cmd.size()) + "\r\n";
 
   for (const auto &cmd_part : redis_cmd)
     cmd += "$" + std::to_string(cmd_part.length()) + "\r\n" + cmd_part + "\r\n";
@@ -122,7 +122,7 @@ redis_connection::build_command(const std::vector<std::string> &redis_cmd) {
 }
 
 redis_connection &
-redis_connection::send(const std::vector<std::string> &redis_cmd) {
+redis_connection::send(const std::vector<string_t> &redis_cmd) {
   std::lock_guard<std::mutex> lock(m_buffer_mutex);
 
   m_buffer += build_command(redis_cmd);
@@ -145,15 +145,15 @@ redis_connection &redis_connection::commit() {
   __CPP_REDIS_LOG(debug,
                   "cpp_redis::network::redis_connection attempts to send "
                   "pipelined commands");
-  std::string buffer = std::move(m_buffer);
+  string_t buffer = std::move(m_buffer);
 
   try {
     tcp_client_iface::write_request request = {
         std::vector<char>{buffer.begin(), buffer.end()}, nullptr};
     m_client->async_write(request);
   } catch (const std::exception &e) {
-    __CPP_REDIS_LOG(
-        error, std::string("cpp_redis::network::redis_connection ") + e.what());
+    __CPP_REDIS_LOG(error, string_t("cpp_redis::network::redis_connection ") +
+                               e.what());
     throw redis_error(e.what());
   }
 
@@ -182,7 +182,7 @@ void redis_connection::tcp_client_receive_handler(
     __CPP_REDIS_LOG(debug,
                     "cpp_redis::network::redis_connection receives packet, "
                     "attempts to build reply");
-    m_builder << std::string(result.buffer.begin(), result.buffer.end());
+    m_builder << string_t(result.buffer.begin(), result.buffer.end());
   } catch (const redis_error &) {
     __CPP_REDIS_LOG(error,
                     "cpp_redis::network::redis_connection could not build "

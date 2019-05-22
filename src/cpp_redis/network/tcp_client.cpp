@@ -27,7 +27,7 @@ namespace cpp_redis {
 
 namespace network {
 
-void tcp_client::connect(const std::string &addr, std::uint32_t port,
+void tcp_client::connect(const string_t &addr, std::uint32_t port,
                          std::uint32_t timeout_ms) {
   m_client.connect(addr, port, timeout_ms);
 }

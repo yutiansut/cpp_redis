@@ -42,10 +42,10 @@ cpp_redis::subscriber sub;
 
 sub.connect();
 
-sub.subscribe("some_chan", [](const std::string& chan, const std::string& msg) {
+sub.subscribe("some_chan", [](const string_t& chan, const string_t& msg) {
   std::cout << "MESSAGE " << chan << ": " << msg << std::endl;
 });
-sub.psubscribe("*", [](const std::string& chan, const std::string& msg) {
+sub.psubscribe("*", [](const string_t& chan, const string_t& msg) {
   std::cout << "PMESSAGE " << chan << ": " << msg << std::endl;
 });
 

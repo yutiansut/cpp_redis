@@ -23,21 +23,17 @@
 #include <cpp_redis/cpp_redis>
 #include <tacopie/tacopie>
 
+#include "winsock_initializer.h"
 #include <condition_variable>
 #include <iostream>
 #include <mutex>
 #include <signal.h>
-#include "winsock_initializer.h"
 
 std::condition_variable should_exit;
 
-void
-sigint_handler(int) {
-  should_exit.notify_all();
-}
+void sigint_handler(int) { should_exit.notify_all(); }
 
-int
-main() {
+int main() {
   winsock_initializer winsock_init;
   //! Enable logging
   cpp_redis::active_logger =
@@ -63,10 +59,9 @@ main() {
   //   }
   // });
 
-  sub.subscribe("some_chan",
-                [](const std::string &chan, const std::string &msg) {
-                  std::cout << "MESSAGE " << chan << ": " << msg << std::endl;
-                });
+  sub.subscribe("some_chan", [](const std::string &chan, const std::string &msg) {
+    std::cout << "MESSAGE " << chan << ": " << msg << std::endl;
+  });
   sub.psubscribe("*", [](const std::string &chan, const std::string &msg) {
     std::cout << "PMESSAGE " << chan << ": " << msg << std::endl;
   });

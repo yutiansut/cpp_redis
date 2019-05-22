@@ -29,39 +29,36 @@ using namespace std::placeholders;
 
 namespace cpp_redis {
 
-consumer::client_container::client_container()
-    : ack_client(), poll_client() {}
+consumer::client_container::client_container() : ack_client(), poll_client() {}
 
-consumer::consumer(std::string stream, std::string consumer,
-                   std::size_t max_concurrency)
-    : m_callbacks(),
-    m_stream(std::move(stream)), m_name(std::move(consumer)), m_read_id("0"),
-      m_block_sec(-1),
-      m_max_concurrency(max_concurrency),
-      m_read_count(static_cast<int>(max_concurrency)){
+consumer::consumer(string_t stream, string_t consumer,
+                   size_t max_concurrency)
+    : m_callbacks(), m_stream(std::move(stream)), m_name(std::move(consumer)),
+      m_read_id("0"), m_block_sec(-1), m_max_concurrency(max_concurrency),
+      m_read_count(static_cast<int>(max_concurrency)) {
   // Supply the dispatch queue a callback to notify the queue when it is at max
   // capacity
   m_dispatch_queue = dispatch_queue_ptr_t(new dispatch_queue(
-      stream, [&](std::size_t size) { dispatch_changed_handler(size); },
+      stream, [&](size_t size) { dispatch_changed_handler(size); },
       max_concurrency));
   m_client = consumer::client_container_ptr_t(new consumer::client_container());
 }
 
-consumer_t &cpp_redis::consumer::subscribe(
-    const std::string &group, const consumer_callback_t &consumer_callback,
+consumer_t &consumer::subscribe(
+    const string_t &group, const consumer_callback_t &consumer_callback,
     const acknowledgement_callback_t &acknowledgement_callback) {
   m_callbacks.insert({group, {consumer_callback, acknowledgement_callback}});
   return *this;
 }
 
-void consumer::dispatch_changed_handler(std::size_t size) {
+void consumer::dispatch_changed_handler(size_t size) {
   if (size >= m_max_concurrency) {
     dispatch_queue_full.store(true);
     dispatch_queue_changed.notify_all();
   }
 }
 
-void consumer::connect(const std::string &host, std::size_t port,
+void consumer::connect(const string_t &host, size_t port,
                        const connect_callback_t &connect_callback,
                        int timeout_ms, int max_reconnects,
                        int reconnect_interval_ms) {
@@ -71,7 +68,7 @@ void consumer::connect(const std::string &host, std::size_t port,
                                 max_reconnects, reconnect_interval_ms);
 }
 
-void consumer::auth(const std::string &password,
+void consumer::auth(const string_t &password,
                     const reply_callback_t &reply_callback) {
   m_client->ack_client.auth(password, reply_callback);
   m_client->poll_client.auth(password, reply_callback);
@@ -80,7 +77,7 @@ void consumer::auth(const std::string &password,
 consumer_t &consumer::commit() {
   while (!is_ready) {
     if (!is_ready) {
-      std::unique_lock<std::mutex> dispatch_lock(dispatch_queue_changed_mutex);
+      mutex_lock_t dispatch_lock(dispatch_queue_changed_mutex);
       dispatch_queue_changed.wait(
           dispatch_lock, [&]() { return !dispatch_queue_full.load(); });
       m_read_count =
@@ -91,15 +88,14 @@ consumer_t &consumer::commit() {
   return *this;
 }
 
-void consumer::dispatch(const xmessage_t &message, const std::pair<std::string, consumer_callback_container_t> &cb) {
-  m_dispatch_queue->dispatch(
-      message, [&](const message_type &message) {
-    auto response =
-        cb.second.consumer_callback(message);
+void consumer::dispatch(
+    const xmessage_t &message,
+    const pair<string_t, consumer_callback_container_t> &cb) {
+  m_dispatch_queue->dispatch(message, [&](const message_type &message) {
+    auto response = cb.second.consumer_callback(message);
 
     // add results to result stream
-    m_client->ack_client.xadd(m_stream + ":results",
-                              CPP_REDIS_WILD_CARD,
+    m_client->ack_client.xadd(m_stream + ":results", CPP_REDIS_WILD_CARD,
                               response);
 
     // acknowledge task completion
@@ -108,8 +104,7 @@ void consumer::dispatch(const xmessage_t &message, const std::pair<std::string, 
               [&](const reply_t &r) {
                 if (r.is_integer()) {
                   auto ret_int = r.as_integer();
-                  cb.second.acknowledgement_callback(
-                      ret_int);
+                  cb.second.acknowledgement_callback(ret_int);
                 }
               })
         .sync_commit();
@@ -127,9 +122,9 @@ void consumer::poll() {
              m_read_count,
              m_block_sec,
              false},
-            [&](cpp_redis::reply_t &reply) {
+            [&](reply_t &reply) {
               // The reply is an array if valid
-              cpp_redis::xstream_reply s_reply(reply);
+              xstream_reply s_reply(reply);
               if (!s_reply.is_null()) {
                 __CPP_REDIS_LOG(2, "Stream " << s_reply)
                 for (const auto &stream : s_reply) {

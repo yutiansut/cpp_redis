@@ -149,7 +149,7 @@ configure_file("cpp_redis.pc.in"
 #
 # executable
 #
-add_library(${PROJECT} STATIC ${SOURCES})
+add_library(${PROJECT} STATIC ${SOURCES} include/cpp_redis/helpers/string_util.hpp include/cpp_redis/misc/crc16.hpp)
 set_property(TARGET ${PROJECT} PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(${PROJECT} PRIVATE include)

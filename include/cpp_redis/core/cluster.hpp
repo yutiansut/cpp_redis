@@ -39,6 +39,8 @@
 #include <cstring>
 
 #include <cpp_redis/core/client.hpp>
+#include <cpp_redis/helpers/string_util.hpp>
+#include <cpp_redis/misc/crc16.hpp>
 
 #define __METER "m"
 
@@ -49,7 +51,7 @@ namespace cpp_redis {
 
 namespace cluster {
 
-using slot_t = std::tuple<int, int>;
+using slot_t = pair<int, int>;
 
 enum class link_state_type { CONNECTED = 1, DISCONNECTED = 2 };
 
@@ -57,42 +59,51 @@ using link_state_t = link_state_type;
 
 using slot_vec_t = std::vector<slot_t>;
 
+enum class node_type { master = 1, slave = 2 };
+using node_type_t = node_type;
+
 class node {
 private:
   string_t m_ip;
   client_ptr_t m_client;
-  int m_port;
+  int m_port{};
+  node_type_t m_type;
+  slot_t m_slot;
   // optional_t<string_t> master;
-  int ping_sent;
-  int ping_recv;
+  int ping_sent{};
+  int ping_recv{};
 
   //! AKA version. Pick the highest version
   //! when multiple nodes claim the same hash slot
-  int config_epoch;
+  int config_epoch{};
   link_state_t link_state;
   slot_vec_t slots;
 
 public:
+  node() = default;
   node(string_t ip, int port)
       : m_ip(std::move(ip)), m_client(new client_t()), m_port(port) {}
 
-   void set_address(string_t &address) {
-    int sep = address.find_first_of(':');
-    m_ip = address.substr(0, sep);
-    std::cout << "ip:  " << m_ip << std::endl;
-    string_t v = address.substr(sep, address.length());
-    std::cout << "lksdjf " << v << std::endl;
-    m_port = 8000;
-    // m_port = std::stoi(address.substr(sep,address.length())); }
+  void set_address(string_t &address);
+
+  void set_type(string_t &type_str);
+
+  void set_range(string_t &range_str);
+
+  int get_port() { return m_port; }
+
+  string_t get_ip() { return m_ip; }
+
+  slot_t get_range() {
+    return m_slot;
   }
-   int get_port() { return m_port; }
 };
 
 using node_t = node;
 
-using node_pair_t = std::pair<string_t, node_t>;
-
 using node_ptr_t = std::shared_ptr<node_t>;
+
+using node_pair_t = std::pair<string_t, node_ptr_t>;
 
 using node_map_t = std::map<string_t, node_ptr_t>;
 
@@ -107,68 +118,102 @@ struct cluster_slot {
   slot_t range;
 };
 
-std::istream &operator>>(std::istream &is, node_pair_t &t) {
-  // Read string to space
-  getline(is >> std::ws, t.first, ' ');
+inline void operator<<(string_t &is, node_pair_t &t) {
+  vector<string_t> v = split_str(is, ' ');
 
-  int i = 1;
-  while ((is.peek() != '\n') && (is >> std::ws)) {
-    string_t temp;
-    getline(is >> std::ws, temp, ' ');
+  int i = 0;
+  for(auto val:v) {
     switch (i) {
-    case 1:
-      t.second.set_address(temp);
+    case 0:
+      t.first = val;
       break;
-    case 2: // flags
-      std::cout << temp << std::endl;
+    case 1:
+      t.second->set_address(val);
+      break;
+    case 2: // flags (master/slave)
+      t.second->set_type(val);
       break;
     case 3: // master
-      std::cout << temp << std::endl;
+      std::cout << val << std::endl;
+      break;
+    case 8: // range
+      t.second->set_range(val);
       break;
     default:
-      std::cout << temp << std::endl;
+      std::cout << val << std::endl;
       break;
     }
     i++;
   }
-
-  // Read formatted input; ignore everything else to end of line
-  // is >> t.avg;
-  // is.ignore( std::numeric_limits<std::streamsize>::max(), '\n' );
-
-  return is;
 }
 
-std::istream &operator>>(std::istream &is, node_map_t &data) {
-  data.clear();
-  node_pair_t rec = {"", node_t("", 0)};
-  while (is >> rec)
-    data.insert({rec.first, std::shared_ptr<node_t>(&rec.second)});
-  return is;
+inline void operator<<(string_t &is, node_map_t &data) {
+  vector<string_t> v = split_str(is, '\n');
+
+  for(auto val:v) {
+    node_pair_t rec = {"", std::make_shared<node_t>()};
+    val << rec;
+    data.insert(rec);
+  }
+}
+
+inline void operator<<(const reply_t &repl, node_map_t &data) {
+  if (!repl.is_error() && repl.is_bulk_string()) {
+    string_t r = repl.as_string();
+    r << data;
+  }
 }
 
 class cluster_client {
 private:
   node_map_t m_nodes;
+  std::map<string_t, slot_t> m_ranges;
+  std::map<string_t, std::shared_ptr<client_t>> m_clients;
   std::vector<string_t> m_slots;
   std::pair<string_t, int> m_address;
 
-public:
-  cluster_client(const string_t ip, int port) : m_address({ip, port}) {}
+private:
 
-  void connect() {
-    client_t rclient;
-
-    rclient.connect(m_address.first, m_address.second);
-
-    rclient.cluster_nodes([&](const reply_t &repl) {
-      if (!repl.is_error() && repl.is_bulk_string()) {
-        node_map_t nm;
-        std::istringstream(repl.as_string()) >> nm;
+  void connect(const string_t &key) {
+    auto hash_key = crc16(key);
+    for (const auto& range : m_ranges) {
+      if (range.second.first <= hash_key <= range.second.second) {
+        auto * node = m_nodes[range.first].get();
+        int_t port = node->get_port();
+        string_t host = node->get_ip();
+        m_clients[range.first]->connect(host, port);
       }
-    });
-    // m_nodes.emplace()
+    }
   }
+
+  std::shared_ptr<client_t> &get_client(const string_t &key) {
+    auto hash_key = crc16(key);
+    for (const auto& range : m_ranges) {
+      if (range.second.first <= hash_key <= range.second.second) {
+        auto * node = m_nodes[range.first].get();
+        int_t port = node->get_port();
+        string_t host = node->get_ip();
+        if (!m_clients[range.first]->is_connected()) {
+          m_clients[range.first]->connect(host, port);
+        }
+        return m_clients[range.first];
+      }
+    }
+  }
+
+public:
+  cluster_client(const string_t ip, int port) : m_address({ip, port}), m_nodes() {}
+  bool m_is_first_connect{};
+  void connect();
+
+  cluster_client &getset(const string_t &key, const string_t &val,
+         const reply_callback_t &reply_callback);
+
+  void sync_commit() { for (auto client : m_clients) {
+    client.second->sync_commit();
+  } }
+
+
 };
 } // namespace cluster
 } // namespace cpp_redis

@@ -40,11 +40,13 @@ public:
     std::cout << "debug: " << msg << " @ " << file << ":" << line << std::endl;
   }
 
-  void info(const std::string &msg, const std::string &file, std::size_t line) override {
+  void info(const std::string &msg, const std::string &file,
+            std::size_t line) override {
     std::cout << "info: " << msg << " @ " << file << ":" << line << std::endl;
   }
 
-  void warn(const std::string &msg, const std::string &file, std::size_t line) override {
+  void warn(const std::string &msg, const std::string &file,
+            std::size_t line) override {
     std::cout << "warn: " << msg << " @ " << file << ":" << line << std::endl;
   }
 

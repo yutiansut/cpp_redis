@@ -40,7 +40,7 @@
 #include <cpp_redis/impl/serializer.ipp>
 
 namespace cpp_redis {
-using consumer_response_t = std::multimap<std::string, std::string>;
+using consumer_response_t = std::multimap<string_t, string_t>;
 
 typedef std::function<consumer_response_t(const cpp_redis::message_type &)>
     dispatch_callback_t;
@@ -55,7 +55,7 @@ typedef struct dispatch_callback_collection {
 class dispatch_queue {
 
 public:
-  explicit dispatch_queue(std::string name,
+  explicit dispatch_queue(string_t name,
                           const notify_callback_t &notify_callback,
                           size_t thread_cnt = 1);
   ~dispatch_queue();
@@ -76,7 +76,7 @@ public:
   size_t size();
 
 private:
-  std::string m_name;
+  string_t m_name;
   std::mutex m_threads_lock;
   mutable std::vector<std::thread> m_threads;
   std::mutex m_mq_mutex;

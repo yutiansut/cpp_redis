@@ -58,7 +58,7 @@ public:
   //!  @param timeout_ms max time to connect in ms
   //!
   //!
-  virtual void connect(const std::string &addr, std::uint32_t port,
+  virtual void connect(const string_t &addr, std::uint32_t port,
                        std::uint32_t timeout_ms = 0) = 0;
 
   //!
@@ -204,5 +204,7 @@ public:
 };
 
 } // namespace network
+
+using tcp_client_iface_t = network::tcp_client_iface;
 
 } // namespace cpp_redis

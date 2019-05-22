@@ -65,7 +65,7 @@ public:
   //!
   //!
   explicit sentinel(
-      const std::shared_ptr<network::tcp_client_iface> &tcp_client);
+      const shared_ptr<tcp_client_iface_t> &tcp_client);
 
   //!
   //!  dtor
@@ -90,7 +90,7 @@ public:
   //!  callback to be called whenever a reply has been received
   //!
   //!
-  using reply_callback_t = std::function<void(reply &)>;
+  using reply_callback_t = std::function<void(reply_t &)>;
 
   //!
   //!  send the given command
@@ -103,7 +103,7 @@ public:
   //!  @return current instance
   //!
   //!
-  sentinel &send(const std::vector<std::string> &sentinel_cmd,
+  sentinel &send(const vector<string_t> &sentinel_cmd,
                  const reply_callback_t &callback = nullptr);
 
   //!
@@ -136,7 +136,7 @@ public:
   sentinel &sync_commit(const std::chrono::duration<Rep, Period> &timeout) {
     try_commit();
 
-    std::unique_lock<std::mutex> lock_callback(m_callbacks_mutex);
+    std::unique_lock<mutex_t> lock_callback(m_callbacks_mutex);
     __CPP_REDIS_LOG(debug,
                     "cpp_redis::sentinel waiting for callbacks to complete");
     if (!m_sync_condvar.wait_for(lock_callback, timeout, [=] {
@@ -162,8 +162,8 @@ public:
   //!  @return current instance
   //!
   //!
-  sentinel &add_sentinel(const std::string &host, std::size_t port,
-                         std::uint32_t timeout_ms = 0);
+  sentinel &add_sentinel(const string_t &host, size_t port,
+                         uint_t timeout_ms = 0);
 
   //!
   //!  clear all existing sentinels.
@@ -217,9 +217,9 @@ public:
   //!
   //!
   void
-  connect(const std::string &host, std::size_t port,
+  connect(const string_t &host, size_t port,
           const sentinel_disconnect_handler_t &disconnect_handler = nullptr,
-          std::uint32_t timeout_ms = 0);
+          uint_t timeout_ms = 0);
 
   //!
   //!  Used to find the current redis master by asking one or more sentinels.
@@ -238,43 +238,43 @@ public:
   //!  @return true if a master was found and fills in host and port output
   //!  parameters, false otherwise
   //!
-  bool get_master_addr_by_name(const std::string &name, std::string &host,
-                               std::size_t &port, bool autoconnect = true);
+  bool get_master_addr_by_name(const string_t &name, string_t &host,
+                               size_t &port, bool autoconnect = true);
 
 public:
-  sentinel &ckquorum(const std::string &name,
+  sentinel &ckquorum(const string_t &name,
                      const reply_callback_t &reply_callback = nullptr);
 
-  sentinel &failover(const std::string &name,
+  sentinel &failover(const string_t &name,
                      const reply_callback_t &reply_callback = nullptr);
 
   sentinel &flushconfig(const reply_callback_t &reply_callback = nullptr);
 
-  sentinel &master(const std::string &name,
+  sentinel &master(const string_t &name,
                    const reply_callback_t &reply_callback = nullptr);
 
   sentinel &masters(const reply_callback_t &reply_callback = nullptr);
 
-  sentinel &monitor(const std::string &name, const std::string &ip,
-                    std::size_t port, std::size_t quorum,
+  sentinel &monitor(const string_t &name, const string_t &ip, size_t port,
+                    size_t quorum,
                     const reply_callback_t &reply_callback = nullptr);
 
   sentinel &ping(const reply_callback_t &reply_callback = nullptr);
 
-  sentinel &remove(const std::string &name,
+  sentinel &remove(const string_t &name,
                    const reply_callback_t &reply_callback = nullptr);
 
-  sentinel &reset(const std::string &pattern,
+  sentinel &reset(const string_t &pattern,
                   const reply_callback_t &reply_callback = nullptr);
 
-  sentinel &sentinels(const std::string &name,
+  sentinel &sentinels(const string_t &name,
                       const reply_callback_t &reply_callback = nullptr);
 
-  sentinel &set(const std::string &name, const std::string &option,
-                const std::string &value,
+  sentinel &set(const string_t &name, const string_t &option,
+                const string_t &value,
                 const reply_callback_t &reply_callback = nullptr);
 
-  sentinel &slaves(const std::string &name,
+  sentinel &slaves(const string_t &name,
                    const reply_callback_t &reply_callback = nullptr);
 
 public:
@@ -289,7 +289,7 @@ public:
     //!  ctor
     //!
     //!
-    sentinel_def(std::string host, std::size_t port, std::uint32_t timeout_ms)
+    sentinel_def(string_t host, size_t port, uint_t timeout_ms)
         : m_host(std::move(host)), m_port(port), m_timeout_ms(timeout_ms) {}
 
     //!
@@ -303,7 +303,7 @@ public:
     //!  @return sentinel host
     //!
     //!
-    const std::string &get_host() const { return m_host; }
+    const string_t &get_host() const { return m_host; }
 
     //!
     //!  @return sentinel port
@@ -315,33 +315,33 @@ public:
     //!  @return timeout for sentinel
     //!
     //!
-    std::uint32_t get_timeout_ms() const { return m_timeout_ms; }
+    uint_t get_timeout_ms() const { return m_timeout_ms; }
 
     //!
     //!  set connect timeout for sentinel in ms
     //!  @param timeout_ms new value
     //!
     //!
-    void set_timeout_ms(std::uint32_t timeout_ms) { m_timeout_ms = timeout_ms; }
+    void set_timeout_ms(uint_t timeout_ms) { m_timeout_ms = timeout_ms; }
 
   private:
     //!
     //!  sentinel host
     //!
     //!
-    std::string m_host;
+    string_t m_host;
 
     //!
     //!  sentinel port
     //!
     //!
-    std::size_t m_port;
+    size_t m_port;
 
     //!
     //!  connect timeout config
     //!
     //!
-    std::uint32_t m_timeout_ms;
+    uint_t m_timeout_ms;
   };
 
 public:
@@ -349,13 +349,13 @@ public:
   //!  @return sentinels
   //!
   //!
-  const std::vector<sentinel_def> &get_sentinels() const;
+  const vector<sentinel_def> &get_sentinels() const;
 
   //!
   //!  @return sentinels (non-const version)
   //!
   //!
-  std::vector<sentinel_def> &get_sentinels();
+  vector<sentinel_def> &get_sentinels();
 
 private:
   //!
@@ -366,8 +366,8 @@ private:
   //!  @param reply parsed reply
   //!
   //!
-  void connection_receive_handler(network::redis_connection &connection,
-                                  reply &reply);
+  void connection_receive_handler(redis_connection_t &connection,
+                                  reply_t &reply);
 
   //!
   //!  redis_connection disconnection handler, triggered whenever a
@@ -376,7 +376,7 @@ private:
   //!  @param connection redis_connection instance
   //!
   //!
-  void connection_disconnect_handler(network::redis_connection &connection);
+  void connection_disconnect_handler(redis_connection_t &connection);
 
   //!
   //!  Call the user-defined disconnection handler
@@ -404,19 +404,19 @@ private:
   //!  the master.
   //!
   //!
-  std::vector<sentinel_def> m_sentinels;
+  vector<sentinel_def> m_sentinels;
 
   //!
   //!  tcp client for redis sentinel connection
   //!
   //!
-  network::redis_connection m_client;
+  redis_connection_t m_client;
 
   //!
   //!  queue of callback to process
   //!
   //!
-  std::queue<reply_callback_t> m_callbacks;
+  queue<reply_callback_t> m_callbacks;
 
   //!
   //!  user defined disconnection handler to be called on disconnection
@@ -428,19 +428,19 @@ private:
   //!  callbacks thread safety
   //!
   //!
-  std::mutex m_callbacks_mutex;
+  mutex_t m_callbacks_mutex;
 
   //!
   //!  condvar for callbacks updates
   //!
   //!
-  std::condition_variable m_sync_condvar;
+  condition_variable_t m_sync_condvar;
 
   //!
   //!  number of callbacks currently being running
   //!
   //!
-  std::atomic<unsigned int> m_callbacks_running;
+  atomic_uint m_callbacks_running;
 };
 
 using sentinel_t = sentinel;

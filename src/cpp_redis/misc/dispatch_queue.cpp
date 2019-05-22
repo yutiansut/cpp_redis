@@ -25,7 +25,7 @@
 
 namespace cpp_redis {
 
-dispatch_queue::dispatch_queue(std::string name,
+dispatch_queue::dispatch_queue(string_t name,
                                const notify_callback_t &notify_callback,
                                size_t thread_cnt)
     : m_name(name), m_threads(thread_cnt), m_mq(),

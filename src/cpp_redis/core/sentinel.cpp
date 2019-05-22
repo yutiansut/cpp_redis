@@ -38,24 +38,23 @@ sentinel::sentinel(const std::shared_ptr<network::tcp_client_iface> &tcp_client)
   __CPP_REDIS_LOG(debug, "cpp_redis::sentinel created");
 }
 
-sentinel::~sentinel(void) {
+sentinel::~sentinel() {
   m_sentinels.clear();
   if (m_client.is_connected())
     m_client.disconnect(true);
   __CPP_REDIS_LOG(debug, "cpp_redis::sentinel destroyed");
 }
 
-sentinel &sentinel::add_sentinel(const std::string &host, std::size_t port,
-                                 std::uint32_t timeout_ms) {
+sentinel &sentinel::add_sentinel(const string_t &host, std::size_t port,
+                                 uint_t timeout_ms) {
   m_sentinels.push_back({host, port, timeout_ms});
   return *this;
 }
 
 void sentinel::clear_sentinels() { m_sentinels.clear(); }
 
-bool sentinel::get_master_addr_by_name(const std::string &name,
-                                       std::string &host, std::size_t &port,
-                                       bool autoconnect) {
+bool sentinel::get_master_addr_by_name(const string_t &name, string_t &host,
+                                       std::size_t &port, bool autoconnect) {
   //! reset connection settings
   host = "";
   port = 0;
@@ -129,21 +128,21 @@ void sentinel::connect_sentinel(
     try {
       __CPP_REDIS_LOG(
           debug,
-          std::string("cpp_redis::sentinel attempting to connect to host ") +
+          string_t("cpp_redis::sentinel attempting to connect to host ") +
               it->get_host());
       m_client.connect(it->get_host(), it->get_port(), disconnect_handler,
                        receive_handler, it->get_timeout_ms());
     } catch (const redis_error &) {
       __CPP_REDIS_LOG(
-          info, std::string(
-                    "cpp_redis::sentinel unable to connect to sentinel host ") +
-                    it->get_host());
+          info,
+          string_t("cpp_redis::sentinel unable to connect to sentinel host ") +
+              it->get_host());
     }
 
     if (is_connected()) {
       not_connected = false;
       __CPP_REDIS_LOG(info,
-                      std::string("cpp_redis::sentinel connected ok to host ") +
+                      string_t("cpp_redis::sentinel connected ok to host ") +
                           it->get_host());
     } else {
       //! Make sure its closed.
@@ -161,9 +160,9 @@ void sentinel::connect_sentinel(
 }
 
 void sentinel::connect(
-    const std::string &host, std::size_t port,
+    const string_t &host, std::size_t port,
     const sentinel_disconnect_handler_t &sentinel_disconnect_handler,
-    std::uint32_t timeout_ms) {
+    uint_t timeout_ms) {
   __CPP_REDIS_LOG(debug, "cpp_redis::sentinel attempts to connect");
 
   auto disconnect_handler = std::bind(&sentinel::connection_disconnect_handler,
@@ -206,7 +205,7 @@ void sentinel::connection_receive_handler(network::redis_connection &,
   }
 }
 
-void sentinel::clear_callbacks(void) {
+void sentinel::clear_callbacks() {
   std::lock_guard<std::mutex> lock(m_callbacks_mutex);
 
   std::queue<reply_callback_t> empty;
@@ -215,7 +214,7 @@ void sentinel::clear_callbacks(void) {
   m_sync_condvar.notify_all();
 }
 
-void sentinel::call_disconnect_handler(void) {
+void sentinel::call_disconnect_handler() {
   if (m_disconnect_handler) {
     __CPP_REDIS_LOG(info, "cpp_redis::sentinel calls disconnect handler");
     m_disconnect_handler(*this);
@@ -234,17 +233,17 @@ void sentinel::disconnect(bool wait_for_removal) {
   __CPP_REDIS_LOG(info, "cpp_redis::sentinel disconnected");
 }
 
-bool sentinel::is_connected(void) { return m_client.is_connected(); }
+bool sentinel::is_connected() { return m_client.is_connected(); }
 
 const std::vector<sentinel::sentinel_def> &sentinel::get_sentinels(void) const {
   return m_sentinels;
 }
 
-std::vector<sentinel::sentinel_def> &sentinel::get_sentinels(void) {
+std::vector<sentinel::sentinel_def> &sentinel::get_sentinels() {
   return m_sentinels;
 }
 
-sentinel &sentinel::send(const std::vector<std::string> &redis_cmd,
+sentinel &sentinel::send(const std::vector<string_t> &redis_cmd,
                          const reply_callback_t &callback) {
   std::lock_guard<std::mutex> lock_callback(m_callbacks_mutex);
 
@@ -262,7 +261,7 @@ sentinel &sentinel::send(const std::vector<std::string> &redis_cmd,
 //!
 //!  commit pipelined transaction
 //!
-sentinel &sentinel::commit(void) {
+sentinel &sentinel::commit() {
   try_commit();
 
   return *this;
@@ -281,7 +280,7 @@ sentinel &sentinel::sync_commit() {
   return *this;
 }
 
-void sentinel::try_commit(void) {
+void sentinel::try_commit() {
   try {
     __CPP_REDIS_LOG(debug,
                     "cpp_redis::sentinel attempts to send pipelined commands");
@@ -305,37 +304,37 @@ sentinel &sentinel::masters(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-sentinel &sentinel::master(const std::string &name,
+sentinel &sentinel::master(const string_t &name,
                            const reply_callback_t &reply_callback) {
   send({"SENTINEL", "MASTER", name}, reply_callback);
   return *this;
 }
 
-sentinel &sentinel::slaves(const std::string &name,
+sentinel &sentinel::slaves(const string_t &name,
                            const reply_callback_t &reply_callback) {
   send({"SENTINEL", "SLAVES", name}, reply_callback);
   return *this;
 }
 
-sentinel &sentinel::sentinels(const std::string &name,
+sentinel &sentinel::sentinels(const string_t &name,
                               const reply_callback_t &reply_callback) {
   send({"SENTINEL", "SENTINELS", name}, reply_callback);
   return *this;
 }
 
-sentinel &sentinel::ckquorum(const std::string &name,
+sentinel &sentinel::ckquorum(const string_t &name,
                              const reply_callback_t &reply_callback) {
   send({"SENTINEL", "CKQUORUM", name}, reply_callback);
   return *this;
 }
 
-sentinel &sentinel::failover(const std::string &name,
+sentinel &sentinel::failover(const string_t &name,
                              const reply_callback_t &reply_callback) {
   send({"SENTINEL", "FAILOVER", name}, reply_callback);
   return *this;
 }
 
-sentinel &sentinel::reset(const std::string &pattern,
+sentinel &sentinel::reset(const string_t &pattern,
                           const reply_callback_t &reply_callback) {
   send({"SENTINEL", "RESET", pattern}, reply_callback);
   return *this;
@@ -346,7 +345,7 @@ sentinel &sentinel::flushconfig(const reply_callback_t &reply_callback) {
   return *this;
 }
 
-sentinel &sentinel::monitor(const std::string &name, const std::string &ip,
+sentinel &sentinel::monitor(const string_t &name, const string_t &ip,
                             std::size_t port, std::size_t quorum,
                             const reply_callback_t &reply_callback) {
   send({"SENTINEL", "MONITOR", name, ip, std::to_string(port),
@@ -355,14 +354,14 @@ sentinel &sentinel::monitor(const std::string &name, const std::string &ip,
   return *this;
 }
 
-sentinel &sentinel::remove(const std::string &name,
+sentinel &sentinel::remove(const string_t &name,
                            const reply_callback_t &reply_callback) {
   send({"SENTINEL", "REMOVE", name}, reply_callback);
   return *this;
 }
 
-sentinel &sentinel::set(const std::string &name, const std::string &option,
-                        const std::string &value,
+sentinel &sentinel::set(const string_t &name, const string_t &option,
+                        const string_t &value,
                         const reply_callback_t &reply_callback) {
   send({"SENTINEL", "SET", name, option, value}, reply_callback);
   return *this;

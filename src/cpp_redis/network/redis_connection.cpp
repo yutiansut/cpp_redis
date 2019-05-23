@@ -110,7 +110,7 @@ void redis_connection::disconnect(bool wait_for_removal) {
 }
 
 bool redis_connection::is_connected() const { return m_client->is_connected(); }
-t
+
 string_t
 redis_connection::build_command(const std::vector<string_t> &redis_cmd) {
   string_t cmd = "*" + std::to_string(redis_cmd.size()) + "\r\n";
